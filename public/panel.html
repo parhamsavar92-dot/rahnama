@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>پنل من — پیشرفت، نشان‌ها و آمار مطالعه | رهنما</title>
+<meta name="description" content="پنل دانش‌آموزی رهنما: پیشرفت کلی مطالعه، پیشرفت به تفکیک درس، یادداشت‌ها و نشانه‌گذاری‌های من، نشان‌ها، آخرین جایی که بودم و دسترسی سریع به جزوه‌ها، آزمون، فلش‌کارت و کارنامه.">
+<link rel="canonical" href="https://www.hamkardarsi.ir/panel.html">
+<meta name="theme-color" content="#6d5efc">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icons/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fa_IR">
+<meta property="og:site_name" content="رهنما">
+<meta property="og:title" content="پنل من — پیشرفت، نشان‌ها و آمار مطالعه | رهنما">
+<meta property="og:description" content="پنل دانش‌آموزی رهنما: پیشرفت مطالعه، نشان‌ها، یادداشت‌ها و دسترسی سریع به همهٔ بخش‌ها.">
+<meta property="og:url" content="https://www.hamkardarsi.ir/panel.html">
+<meta property="og:image" content="https://www.hamkardarsi.ir/assets/icons/og-cover.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="پنل من — رهنما">
+<meta name="twitter:description" content="پیشرفت مطالعه، نشان‌ها و آمار شخصی دانش‌آموز.">
+<meta name="twitter:image" content="https://www.hamkardarsi.ir/assets/icons/og-cover.png">
+
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/enhance.css">
+<link rel="stylesheet" href="assets/ultra.css">
+<link rel="stylesheet" href="assets/ai2.css">
+<link rel="stylesheet" href="assets/hk.css">
+<link rel="stylesheet" href="assets/print.css">
+<link rel="stylesheet" href="assets/hk3d.css">
+<link rel="stylesheet" href="assets/hk-school.css">
+
+<style>
+/* ---------- استایل اختصاصی پنل دانش‌آموزی ---------- */
+.st-id { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.st-ava {
+  display: grid; place-items: center; width: 62px; height: 62px; border-radius: 20px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #fff;
+  font-size: 1.6rem; font-weight: 800; flex: 0 0 auto;
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--brand) 32%, transparent);
+}
+.st-tick {
+  display: inline-grid; place-items: center; width: 19px; height: 19px; border-radius: 50%;
+  background: #1d9bf0; color: #fff; font-size: .68rem; vertical-align: middle; margin-inline-start: 4px;
+}
+.st-owner {
+  display: inline-flex; align-items: center; gap: 4px; font-size: .74rem; font-weight: 800;
+  background: linear-gradient(135deg, #f59e0b, #f97316); color: #fff;
+  padding: 2px 9px; border-radius: 99px; vertical-align: middle; margin-inline-start: 6px;
+}
+.st-chip {
+  display: inline-block; font-size: .72rem; font-weight: 700; padding: 2px 9px; border-radius: 99px;
+  background: var(--surface-3); color: var(--text-soft); border: 1px solid var(--border);
+}
+.st-actions { display: flex; gap: 8px; margin-inline-start: auto; }
+
+.st-kpis { margin-block: 16px; }
+.st-kpi { text-align: center; }
+.st-num { display: block; font-size: 1.75rem; font-weight: 800; color: var(--accent-ink, var(--brand)); margin-block: 2px; }
+.st-kpi p { margin: 0; font-size: .78rem; color: var(--muted); }
+
+/* حلقهٔ پیشرفت */
+.st-ring-card { display: flex; align-items: center; gap: 16px; }
+.st-ring {
+  --p: 0;
+  width: 92px; height: 92px; border-radius: 50%; flex: 0 0 auto;
+  display: grid; place-items: center;
+  background:
+    radial-gradient(closest-side, var(--surface) 72%, transparent 73%),
+    conic-gradient(var(--brand) calc(var(--p) * 1%), var(--surface-3) 0);
+}
+.st-ring b { font-size: 1.15rem; font-weight: 800; }
+
+/* نوارهای پیشرفت هر درس */
+.st-bars { display: flex; flex-direction: column; gap: 8px; margin-block-start: 8px; }
+.st-bar { display: flex; align-items: center; gap: 9px; font-size: .85rem; }
+.st-bar-t { flex: 0 0 34%; color: var(--text-soft); }
+.st-bar-m { flex: 1 1 auto; height: 9px; border-radius: 99px; background: var(--surface-3); overflow: hidden; }
+.st-bar-m i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--brand), var(--brand-3, #22d3ee)); }
+.st-bar-n { flex: 0 0 auto; font-size: .78rem; color: var(--muted); font-family: var(--font-en); }
+
+/* نشان‌ها */
+.st-badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-block-start: 8px; }
+.st-badge {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center;
+  padding: 12px 8px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface-2);
+}
+.st-badge span { font-size: 1.4rem; }
+.st-badge b { font-size: .84rem; }
+.st-badge small { font-size: .7rem; color: var(--muted); }
+
+@media (max-width: 900px), (pointer: coarse) {
+  .st-actions { margin-inline-start: 0; width: 100%; }
+  .st-ava { width: 52px; height: 52px; border-radius: 16px; font-size: 1.3rem; }
+  .st-bar-t { flex-basis: 42%; }
+  .st-ring { width: 78px; height: 78px; }
+}
+</style>
+<link rel="stylesheet" href="assets/polish.css">
+<link rel="stylesheet" href="assets/cute.css">
+<link rel="stylesheet" href="assets/r6.css?v=6.1">
+</head>
+<body data-grade="" data-page="panel">
+
+<!-- ============================== سربرگ ============================== -->
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">ر</span>
+      <span class="brand-text">رهنما<small>پنل من</small></span>
+    </a>
+    <nav class="header-nav">
+      <a href="index.html">صفحهٔ اصلی</a>
+      <a href="jozve.html">جزوه‌ها</a>
+      <a href="exam.html">آزمون</a>
+      <a href="flashcards.html">فلش‌کارت</a>
+      <a href="report.html">کارنامه</a>
+      <a href="class.html">کلاس مجازی</a>
+      <a href="profile.html">حساب من</a>
+    
+      <a href="panel.html">پنل من</a>
+      <a href="class.html">کلاس مجازی</a>
+      <a href="exam.html">آزمون جامع</a>
+      <a href="jozve.html">جزوه‌ها</a>
+      <a href="consult.html">مشاورهٔ آنلاین</a>
+      <a href="report.html">کارنامه</a>
+      <a href="profile.html">حساب من</a>
+      <a href="about.html">دربارهٔ ما</a></nav>
+  </div>
+</header>
+
+<main>
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">پنل دانش‌آموزی</span>
+        <h1>پنل من</h1>
+        <p>هرچه در سایت مطالعه کنی، همان‌جا ثبت می‌شود: پیشرفت هر درس، یادداشت‌ها، نشانه‌گذاری‌ها، نشان‌ها و آخرین جای مطالعه. داده‌ها روی همین دستگاه ذخیره می‌شوند و در حساب آنلاین هم همگام می‌شوند.</p>
+      </div>
+      <div id="stPanel"></div>
+    </div>
+  </section>
+</main>
+
+<!-- ============================== پانویس ============================== -->
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="flex" style="flex-wrap:wrap;gap:18px;justify-content:space-between">
+      <div>
+        <h5>رهنما</h5>
+        <p style="font-size:.85rem;margin:0">سامانهٔ آموزش، جزوه و کلاس مجازی مدرسهٔ رهنما.</p>
+      </div>
+      <div>
+        <h5>دسترسی سریع</h5>
+        <p style="font-size:.85rem;margin:0">
+          <a href="jozve.html">جزوه‌ها</a> ·
+          <a href="exam.html">آزمون</a> ·
+          <a href="flashcards.html">فلش‌کارت</a> ·
+          <a href="report.html">کارنامه</a> ·
+          <a href="class.html">کلاس مجازی</a> ·
+          <a href="about.html">درباره</a>
+        </p>
+      </div>
+    </div>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:16px">© رهنما — همهٔ حقوق محفوظ است.</p>
+  </div>
+</footer>
+
+<script src="assets/hk-server.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/enhance.js"></script>
+<script src="assets/grade.js"></script>
+<script src="assets/ultra.js"></script>
+<script src="assets/ai2.js"></script>
+<script src="assets/hk-agent.js"></script>
+<script src="assets/hk-panel.js"></script>
+<script src="assets/hk3d.js"></script>
+<script src="assets/hk-auth.js"></script>
+<script src="assets/hk-student-panel.js"></script>
+<script src="assets/polish.js" defer></script>
+<script src="assets/r6.js?v=6.1" defer></script>
+</body>
+</html>

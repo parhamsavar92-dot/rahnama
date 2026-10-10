@@ -1,0 +1,24 @@
+{
+  "name": "rahnama",
+  "version": "6.0.0",
+  "private": true,
+  "type": "module",
+  "description": "رهنما — سامانهٔ آموزش دورهٔ اول متوسطه (هفتم، هشتم، نهم): جزوه، آزمون، فلش‌کارت، کلاس مجازی و دستیار هوشمند",
+  "scripts": {
+    "dev": "wrangler dev",
+    "serve": "node tests/dev-server.mjs",
+    "deploy": "wrangler deploy",
+    "db:init": "wrangler d1 execute rahnama-db --remote --file=schema.sql",
+    "build:engine": "python3 tools/build-engine.py",
+    "test": "node --no-warnings tests/server.test.mjs",
+    "domain": "node deploy/set-domain.mjs",
+    "publish": "node deploy/publish.mjs",
+    "share": "node deploy/share.mjs",
+    "apk:tools": "node android/tools/fetch-tools.mjs",
+    "apk:sync": "node android/tools/sync-assets.mjs",
+    "apk": "node android/tools/build-apk.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

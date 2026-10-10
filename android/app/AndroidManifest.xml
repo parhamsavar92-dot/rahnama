@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  نکته: عمداً «package» اینجا نوشته نشده است.
+  • برای Gradle/Android Studio، نام بستهٔ برنامه (namespace) در app/build.gradle است.
+  • برای ساخت بدون Gradle، اسکریپت android/tools/build-apk.mjs خودش هنگام لینک،
+    نام بسته را تزریق می‌کند.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionCode="6"
+    android:versionName="6.0.0">
+
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:theme="@style/AppTheme"
+        android:allowBackup="true"
+        android:hardwareAccelerated="true"
+        android:usesCleartextTraffic="false"
+        android:supportsRtl="true">
+
+        <activity
+            android:name="ir.rahnama.app.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|smallestScreenSize|density">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- اگر کسی روی پیوند rahnama داخل مرورگر زد، اپ باز شود -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="rahnama" android:host="open" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

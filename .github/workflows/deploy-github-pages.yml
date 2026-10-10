@@ -1,0 +1,51 @@
+# انتشار سریع سایت روی GitHub Pages (بدون هیچ سرویس دیگری)
+# ---------------------------------------------------------------------------
+# این مسیر برای «سایت آفلاین‌محور» است: همهٔ جزوه‌ها، آزمون‌ها، فلش‌کارت‌ها و
+# دستیار محلی کار می‌کنند. حساب کاربری روی خود دستگاه ساخته می‌شود.
+# برای پنل مدیریت واقعی و کلاس مجازی مشترک، از Cloudflare Workers استفاده کنید
+# (فایل deploy-cloudflare.yml).
+#
+# راه‌اندازی: Settings → Pages → Source = GitHub Actions
+name: Deploy (GitHub Pages)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare static site
+        run: |
+          mkdir -p site
+          cp -R public/. site/
+          # صفحهٔ ۴۰۴ برای مسیرهای ناشناخته
+          if [ ! -f site/404.html ]; then cp site/offline.html site/404.html; fi
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,326 @@
+/* ==========================================================================
+   رهنما — ویرایشگر جزوه (مثل Adobe Acrobat) + صیقل‌کاری صفحهٔ جزوه
+   |  assets/hk-editor.css
+   ========================================================================== */
+
+/* ============================ صیقل نوار ابزار بالا ======================== */
+.hk-tools {
+  position: sticky;
+  top: calc(var(--u-shell-h, 0px) + 6px);
+  z-index: 55;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 16px;
+  padding: 9px 11px;
+  border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: saturate(160%) blur(12px);
+  -webkit-backdrop-filter: saturate(160%) blur(12px);
+  box-shadow: 0 10px 30px rgba(20, 22, 45, .08);
+}
+.hk-tools .hk-find { display: flex; align-items: center; gap: 6px; flex: 1 1 240px; min-width: 200px; }
+.hk-tools .hk-find input {
+  flex: 1 1 auto; min-width: 120px; font-family: var(--font-fa); font-size: .84rem;
+  color: var(--text); background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 11px; padding: 8px 11px; outline: none;
+}
+.hk-tools .hk-find input:focus { border-color: var(--brand); box-shadow: var(--ring); background: var(--surface); }
+.hk-tb {
+  font-family: var(--font-fa);
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--text-soft);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 7px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform .16s ease, background .16s ease, color .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.hk-tb:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand);
+  color: var(--brand);
+  background: var(--accent-soft);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--brand) 18%, transparent);
+}
+.hk-tb.is-on, .hk-tb[aria-pressed="true"] { background: linear-gradient(135deg, var(--brand), var(--brand-2)); border-color: transparent; color: #fff; }
+.hk-tb-sep { width: 1px; height: 22px; background: var(--border); margin: 0 3px; flex: 0 0 auto; }
+.hk-status { font-size: .72rem; color: var(--muted); }
+
+/* ============================ بدنهٔ جزوه (تمیزتر) ======================== */
+.lesson {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: clamp(16px, 2.6vw, 30px);
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+  line-height: 2.15;
+  position: relative;
+  transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease;
+}
+.lesson > h2, .lesson > h3 { letter-spacing: -.3px; }
+.lesson:hover { box-shadow: 0 18px 44px rgba(20, 22, 45, .09); }
+.lesson p { margin-block: .7em; }
+.lesson:target { border-color: color-mix(in srgb, var(--brand) 45%, var(--border)); }
+@media print {
+  .lesson { box-shadow: none; border: 0; border-radius: 0; padding: 0; margin: 0 0 12px; break-inside: auto; }
+}
+
+/* =============================== ویرایشگر =============================== */
+.hk-ed-fab {
+  position: fixed;
+  inset-inline-start: 16px;
+  bottom: calc(140px + var(--u-shell-h, 0px));
+  z-index: 640;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 16px;
+  cursor: pointer;
+  font-family: var(--font-fa);
+  font-size: .84rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #0ea5e9, var(--brand) 55%, var(--brand-2));
+  background-size: 180% 180%;
+  animation: hk-grad 9s ease infinite;
+  box-shadow: 0 12px 30px rgba(109, 94, 252, .36);
+}
+.hk-ed-fab:hover { transform: translateY(-2px); }
+
+.hk-ed-bar {
+  position: fixed;
+  inset-inline: 0;
+  /* زیر سربرگ چسبان می‌نشیند تا آن را نپوشاند (پیش‌تر روی سربرگ می‌افتاد) */
+  top: var(--header-h, 68px);
+  z-index: 700;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 9px 12px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: saturate(170%) blur(14px);
+  -webkit-backdrop-filter: saturate(170%) blur(14px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 12px 30px rgba(20, 22, 45, .12);
+  animation: hk-ed-drop .22s ease;
+}
+@keyframes hk-ed-drop { from { transform: translateY(-100%); } }
+.hk-ed-bar[hidden] { display: none; }
+.hk-ed-bar .hk-ed-title { font-size: .82rem; font-weight: 800; color: var(--brand); margin-inline-end: 4px; }
+.hk-ed-tool {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-fa); font-size: .79rem; font-weight: 700;
+  color: var(--text-soft); background: var(--surface); border: 1px solid var(--border);
+  border-radius: 11px; padding: 7px 11px; cursor: pointer;
+  transition: transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
+}
+.hk-ed-tool:hover { transform: translateY(-2px); border-color: var(--brand); color: var(--brand); }
+.hk-ed-tool.is-on { background: linear-gradient(135deg, var(--brand), var(--brand-2)); border-color: transparent; color: #fff; }
+.hk-ed-colors { display: inline-flex; gap: 4px; align-items: center; }
+.hk-ed-colors button {
+  width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--surface);
+  box-shadow: 0 0 0 1px var(--border); cursor: pointer; padding: 0;
+}
+.hk-ed-colors button.is-on { box-shadow: 0 0 0 2px var(--brand); }
+.hk-ed-save { font-size: .72rem; color: var(--muted); margin-inline-start: auto; }
+.hk-ed-save.is-dirty { color: var(--warn); font-weight: 700; }
+
+body.hk-editing .lesson { user-select: none; }
+body.hk-editing .lesson .hk-ann-text { user-select: text; }
+
+/* لایهٔ نشانه‌ها */
+.hk-ann-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  overflow: visible;
+}
+.hk-ann-layer > * { pointer-events: auto; }
+.hk-ann-layer canvas.hk-ann-ink { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.hk-ann {
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: 8px;
+}
+/* باگ اصلی: لایه در حالت عادی pointer-events:none بود و در حالت ویرایش هم
+   روشن نمی‌شد؛ پس هیچ کلیکی به لایه نمی‌رسید و ابزارها (متن، یادداشت، ماژیک،
+   قلم) هیچ‌چیز نمی‌ساختند. حالا فقط در حالت ویرایش، لایه کلیک می‌گیرد. */
+body.hk-editing .hk-ann-layer { pointer-events: auto; cursor: crosshair; }
+body.hk-editing.hk-tool-select .hk-ann-layer { cursor: default; }
+body.hk-editing.hk-tool-eraser .hk-ann-layer { cursor: not-allowed; }
+
+.hk-ann-text {
+  min-width: 60px;
+  min-height: 26px;
+  padding: 5px 9px;
+  font-size: .9rem;
+  line-height: 1.9;
+  color: #12203a;
+  background: color-mix(in srgb, #fff 88%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--brand) 55%, transparent);
+  border-radius: 9px;
+  outline: none;
+  box-shadow: 0 4px 14px rgba(20, 22, 45, .1);
+}
+.hk-ann-note {
+  width: 190px;
+  min-height: 74px;
+  padding: 8px 10px 8px;
+  font-size: .83rem;
+  line-height: 1.85;
+  color: #4a3400;
+  background: linear-gradient(180deg, #fff6c9, #ffeaa0);
+  border: 1px solid #f0d964;
+  border-radius: 10px;
+  box-shadow: 0 10px 24px rgba(120, 90, 0, .18);
+  outline: none;
+}
+.hk-ann-note::before {
+  content: "🗒";
+  position: absolute;
+  top: -9px;
+  inset-inline-start: 8px;
+  font-size: .85rem;
+}
+.hk-ann-rect { border-radius: 6px; mix-blend-mode: multiply; }
+.hk-ann-ink { position: absolute; inset: 0; pointer-events: none; }
+.hk-ann.is-sel { outline: 2px solid var(--brand); outline-offset: 2px; }
+.hk-ann-handle {
+  position: absolute;
+  inset-inline-start: -7px;
+  bottom: -7px;
+  width: 14px;
+  height: 14px;
+  border-radius: 5px;
+  background: var(--brand);
+  border: 2px solid #fff;
+  cursor: nwse-resize;
+}
+.hk-ann-del {
+  position: absolute;
+  top: -10px;
+  inset-inline-end: -10px;
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid #fff; background: var(--err); color: #fff;
+  font-size: .7rem; line-height: 1; cursor: pointer; display: grid; place-items: center;
+}
+body:not(.hk-editing) .hk-ann-handle,
+body:not(.hk-editing) .hk-ann-del,
+body:not(.hk-editing) .hk-ann-text { border-style: solid; border-color: transparent; background: transparent; box-shadow: none; }
+body:not(.hk-editing) .hk-ann-note { box-shadow: 0 6px 16px rgba(120, 90, 0, .16); }
+
+@media (max-width: 860px) {
+  .hk-ed-bar { gap: 5px; padding: 7px 9px; }
+  .hk-ed-tool { font-size: .74rem; padding: 6px 9px; }
+  .hk-ed-fab { bottom: calc(196px + var(--u-shell-h, 0px)); padding: 10px 13px; }
+  .hk-tools { top: calc(var(--u-shell-h, 0px) + 2px); }
+}
+/* سرصفحهٔ چاپ (فقط هنگام خروجی PDF، بعد از چاپ حذف می‌شود) */
+.hk-ed-print-head { display: none; }
+@media print {
+  .hk-ed-print-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+    font-size: 11pt;
+  }
+  .hk-ed-print-head span { font-size: 8.5pt; color: #555; }
+  .hk-ed-fab, .hk-ed-bar, .hk-ann-handle, .hk-ann-del { display: none !important; }
+  .hk-ann-handle, .hk-ann-del { display: none !important; }
+  .hk-ann-layer { position: absolute; }
+  .hk-ann-text, .hk-ann-note { box-shadow: none !important; }
+}
+
+
+/* ==========================================================================
+   رفع ایرادهای بازبینی: سرریز افقی نوار ویرایشگر + پوشاندن متن درس
+   ========================================================================== */
+
+/* ابزارهای داخل نوار باید بپیچند و هرگز از عرض صفحه بیرون نزنند */
+.hk-ed-bar > * {
+  max-width: 100%;
+  min-width: 0;
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+.hk-ed-bar .toolbar,
+.hk-ed-bar .hk-ed-actions,
+.hk-ed-bar .hk-ed-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-width: 0;
+}
+.hk-ed-bar button,
+.hk-ed-bar .hk-ic-btn,
+.hk-ed-bar .hk-tb {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+/* وقتی ویرایشگر باز است، نوار روی متن درس نیفتد */
+body.hk-editing .lesson-layout,
+body.hk-editing main {
+  padding-block-start: 62px;
+}
+
+@media (max-width: 900px), (pointer: coarse) {
+  .hk-ed-bar {
+    inset-inline: 0;
+    max-height: 44vh;
+    overflow-y: auto;
+    padding-block: 6px;
+  }
+  .hk-ed-bar .toolbar,
+  .hk-ed-bar .hk-ed-row { gap: 5px; }
+  .hk-ed-fab { inset-inline-start: 12px; bottom: calc(196px + var(--u-shell-h, 0px)); }
+}
+
+
+/* ==========================================================================
+   حالت «ویرایش متن جزوه» (📝 ویرایش متن)
+   در این حالت باید کلیک‌ها به خود متن برسند (نه لایهٔ نشانه‌گذاری) و متن
+   قابل انتخاب و تایپ باشد.
+   ========================================================================== */
+body.hk-docedit .hk-ann-layer { pointer-events: none !important; }
+body.hk-docedit .lesson,
+body.hk-docedit .lesson * { user-select: text !important; -webkit-user-select: text !important; }
+
+body.hk-docedit article.lesson {
+  outline: 1px dashed color-mix(in srgb, var(--brand) 45%, transparent);
+  outline-offset: 6px;
+  border-radius: 12px;
+  transition: outline-color .15s;
+}
+body.hk-docedit article.lesson:focus-within {
+  outline: 2px solid var(--brand);
+  background: color-mix(in srgb, var(--brand) 4%, transparent);
+}
+
+/* نشانگر «در حال ویرایش» */
+body.hk-docedit .hk-ed-bar { box-shadow: 0 6px 22px color-mix(in srgb, var(--brand) 30%, transparent); }
+body.hk-docedit .hk-ed-title::after { content: " · ویرایش متن"; color: var(--accent-ink, var(--brand)); }
+body.hk-docedit .hk-ed-save { color: var(--ok, #16a34a); font-weight: 700; }
+
+@media (max-width: 900px), (pointer: coarse) {
+  body.hk-docedit article.lesson { outline-offset: 3px; }
+}

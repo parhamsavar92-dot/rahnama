@@ -1,0 +1,6 @@
+# robots.txt — www.hamkardarsi.ir
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://www.hamkardarsi.ir/sitemap.xml

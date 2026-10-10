@@ -1,0 +1,4 @@
+// پروژهٔ ریشه — فقط افزونهٔ اندروید لازم است (هیچ کتابخانهٔ بیرونی مصرف نمی‌شود)
+plugins {
+    id 'com.android.application' version '8.5.2' apply false
+}

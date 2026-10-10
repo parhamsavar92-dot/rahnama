@@ -1,0 +1,79 @@
+{
+  "name": "رهنما — جزوه، آزمون و فلش‌کارت",
+  "short_name": "رهنما",
+  "description": "جزوهٔ کامل و درس‌به‌درس همهٔ کتاب‌های دورهٔ اول متوسطه (هفتم، هشتم و نهم) با خلاصه، نکات کلیدی، نمونه سؤال، آزمون تعاملی، فلش‌کارت، دستیار هوشمند آفلاین، هایلایت و یادداشت‌گذاری.",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
+  "background_color": "#f5f6fb",
+  "theme_color": "#6d5efc",
+  "categories": [
+    "education",
+    "books",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "کلاس مجازی",
+      "short_name": "کلاس",
+      "url": "class.html"
+    },
+    {
+      "name": "پنل من",
+      "short_name": "پنل من",
+      "url": "panel.html"
+    },
+    {
+      "name": "جزوه‌های کامل",
+      "short_name": "جزوه‌ها",
+      "url": "jozve.html"
+    },
+    {
+      "name": "مشاورهٔ آنلاین",
+      "short_name": "مشاور",
+      "url": "consult.html"
+    },
+    {
+      "name": "کارنامهٔ من",
+      "short_name": "کارنامه",
+      "url": "report.html"
+    },
+    {
+      "name": "آزمون جامع",
+      "short_name": "آزمون",
+      "url": "exam.html"
+    },
+    {
+      "name": "دربارهٔ ما",
+      "short_name": "درباره",
+      "url": "about.html"
+    }
+  ]
+}

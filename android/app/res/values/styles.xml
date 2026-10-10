@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- بدون ActionBar و بدون کتابخانهٔ بیرونی؛ فقط تم خود اندروید -->
+    <style name="AppTheme" parent="@android:style/Theme.DeviceDefault.Light.NoActionBar">
+        <item name="android:windowBackground">@color/r6_bg</item>
+        <item name="android:colorBackground">@color/r6_bg</item>
+        <item name="android:statusBarColor">@color/r6_brand</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

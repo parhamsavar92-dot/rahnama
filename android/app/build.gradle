@@ -1,0 +1,64 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'ir.rahnama.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "ir.rahnama.app"
+        minSdk 21
+        targetSdk 34
+        versionCode 6
+        versionName "6.0.0"
+    }
+
+    // امضای نسخهٔ انتشار: اگر متغیرهای محیطی تنظیم شده باشند و کلیدفروشگاه
+    // کنار همین فایل باشد. وگرنه با کلید دیباگ سیستم امضا می‌شود.
+    signingConfigs {
+        release {
+            def p = System.getenv("KEYSTORE_PASS")
+            if (p != null && file("rahnama-release.keystore").exists()) {
+                storeFile file("rahnama-release.keystore")
+                storePassword p
+                keyAlias(System.getenv("KEYSTORE_ALIAS") ?: "rahnama")
+                keyPassword p
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            if (System.getenv("KEYSTORE_PASS") != null) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    // ساختار پوشه‌ها همان‌جایی است که پروژه دارد (بدون src/main)
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['java']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        resources.excludes += ['META-INF/*']
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}

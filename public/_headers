@@ -1,0 +1,48 @@
+# ==========================================================================
+#  رهنما — هدرهای امنیتی و کش | www.hamkardarsi.ir
+#  این فایل در ریشهٔ پوشهٔ منتشرشده (site/) قرار می‌گیرد و توسط
+#  Cloudflare Pages / Netlify خوانده می‌شود. برای Nginx از فایل
+#  deploy/nginx/hamkar-darsi.conf استفاده کنید.
+# ==========================================================================
+
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Cross-Origin-Opener-Policy: same-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=()
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https:; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests
+  X-DNS-Prefetch-Control: on
+  Cache-Control: public, max-age=0, must-revalidate
+
+# API و پاسخ‌های داینامیک هرگز نباید کش شوند
+/api/*
+  Cache-Control: no-store, no-cache, must-revalidate
+  X-Robots-Tag: noindex
+
+/assets/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/icons/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/jozve/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/sw.js
+  Cache-Control: no-cache
+
+/manifest.webmanifest
+  Content-Type: application/manifest+json; charset=utf-8
+  Cache-Control: no-cache
+
+/robots.txt
+  Cache-Control: public, max-age=86400
+
+/sitemap.xml
+  Content-Type: application/xml; charset=utf-8
+  Cache-Control: public, max-age=86400

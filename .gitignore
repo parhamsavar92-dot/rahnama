@@ -1,0 +1,16 @@
+node_modules/
+.wrangler/
+.dev.vars
+
+# اندروید — خروجی ساخت و محتوای کپی‌شدهٔ سایت (خودکار ساخته می‌شود)
+android/build/
+android/dist/
+android/app/assets/site/
+android/.gradle/
+android/local.properties
+*.keystore
+*.jks
+
+# ابزارهای دانلودی ساخت APK
+_work/
+android-tools/

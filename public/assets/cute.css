@@ -1,0 +1,110 @@
+/* ==========================================================================
+   رهنما — لایهٔ «کیوت و دلنشین» | cute.css  (فقط ظاهر؛ سازگار با تم تیره)
+   ========================================================================== */
+:root {
+  --cute-pink: #ff8fb8;
+  --cute-peach: #ffb98a;
+  --cute-mint: #5fe0c0;
+  --cute-sky: #6cc8ff;
+  --cute-lilac: #b79cff;
+  --radius: 22px;
+  --radius-sm: 15px;
+  --radius-lg: 32px;
+  --pl-radius: 22px;
+  --cute-spring: cubic-bezier(.34, 1.56, .64, 1);
+}
+html[data-theme="light"], html:not([data-theme]) {
+  --bg: #f7f5ff;
+  --surface-2: #faf8ff;
+  --surface-3: #f0ecff;
+  --border: #e9e4fb;
+}
+
+/* پس‌زمینهٔ نرم با لکه‌های رنگی ملایم */
+body {
+  background-image:
+    radial-gradient(520px 380px at 8% -4%, color-mix(in srgb, var(--cute-pink) 20%, transparent), transparent 70%),
+    radial-gradient(560px 420px at 96% 6%, color-mix(in srgb, var(--cute-sky) 20%, transparent), transparent 70%),
+    radial-gradient(640px 460px at 50% 112%, color-mix(in srgb, var(--cute-lilac) 18%, transparent), transparent 70%);
+  background-attachment: fixed;
+}
+
+/* لوگو و نشان‌ها */
+.brand-mark { border-radius: 16px; box-shadow: 0 8px 20px color-mix(in srgb, var(--brand) 34%, transparent); transition: transform .35s var(--cute-spring); }
+.brand:hover .brand-mark { transform: rotate(-8deg) scale(1.08); }
+.chip, .eyebrow, .pill-row > * {
+  border-radius: 999px; padding-inline: 14px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cute-lilac) 22%, var(--surface)), color-mix(in srgb, var(--cute-pink) 16%, var(--surface)));
+  border: 1px solid color-mix(in srgb, var(--cute-lilac) 40%, transparent);
+}
+
+/* تیتر درخشان‌تر */
+.grad-text, .hero h1 .grad {
+  background: linear-gradient(100deg, var(--brand) 0%, var(--cute-pink) 55%, var(--cute-peach) 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+/* دکمه‌ها: گرد، بامزه، با جهش نرم */
+.btn { border-radius: 999px; padding-inline: 22px; font-weight: 800; transition: transform .28s var(--cute-spring), box-shadow .25s ease, background .2s ease; }
+.btn:hover { transform: translateY(-3px) scale(1.03); }
+.btn-primary { background: linear-gradient(135deg, var(--brand), var(--brand-2) 55%, var(--cute-pink)); border: 0; }
+.btn-ghost { background: color-mix(in srgb, var(--surface) 88%, transparent); border: 1.5px solid var(--border-strong); }
+.btn-ghost:hover { border-color: var(--brand); background: var(--accent-soft); }
+.icon-btn { border-radius: 14px; transition: transform .25s var(--cute-spring), background .2s; }
+.icon-btn:hover { transform: translateY(-2px) rotate(-4deg); }
+
+/* کارت‌ها: نرم، شناور و رنگی در لبه */
+.card, .subject-card, .tool-card, .rp-card, .hero-card, .callout {
+  border-radius: var(--radius); border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--surface) 94%, var(--cute-lilac)));
+  transition: transform .3s var(--cute-spring), box-shadow .3s ease, border-color .25s;
+}
+.card:hover, .subject-card:hover, .tool-card:hover, .rp-card:hover {
+  transform: translateY(-6px) rotate(-.4deg);
+  border-color: color-mix(in srgb, var(--brand) 45%, var(--border));
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--brand) 18%, transparent);
+}
+.card-icon, .subject-icon, .ti {
+  border-radius: 18px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cute-lilac) 30%, var(--surface)), color-mix(in srgb, var(--cute-sky) 26%, var(--surface)));
+  transition: transform .35s var(--cute-spring);
+}
+.card:hover .card-icon, .subject-card:hover .subject-icon, .tool-card:hover .ti { transform: scale(1.12) rotate(-7deg); }
+.subject-grid > :nth-child(5n+1) .subject-icon { background: linear-gradient(135deg, #ffe0ec, #ffd1e3); }
+.subject-grid > :nth-child(5n+2) .subject-icon { background: linear-gradient(135deg, #dff4ff, #cfeaff); }
+.subject-grid > :nth-child(5n+3) .subject-icon { background: linear-gradient(135deg, #dcfbef, #c8f5e3); }
+.subject-grid > :nth-child(5n+4) .subject-icon { background: linear-gradient(135deg, #ffefd9, #ffe3c2); }
+.subject-grid > :nth-child(5n+5) .subject-icon { background: linear-gradient(135deg, #ece4ff, #ddd0ff); }
+html[data-theme="dark"] .subject-grid .subject-icon { background: color-mix(in srgb, var(--brand) 24%, var(--surface-2)); }
+
+/* آمار قهرمان صفحه */
+.hero-stat b, .hero-stat strong { background: linear-gradient(120deg, var(--brand), var(--cute-pink)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* فیلدها */
+input, select, textarea { border-radius: 16px; border-width: 1.5px; }
+.hk-tab { border-radius: 999px; }
+.hk-tab.on { background: linear-gradient(135deg, var(--brand), var(--cute-pink)); color: #fff; box-shadow: 0 6px 16px color-mix(in srgb, var(--brand) 30%, transparent); }
+
+/* فوتر و عنوان بخش‌ها */
+.site-footer { border-top-left-radius: 32px; border-top-right-radius: 32px; background: linear-gradient(180deg, var(--surface), var(--surface-3)); }
+.section-head h2::after { content: ""; display: block; width: 54px; height: 5px; margin-top: 10px; border-radius: 99px; background: linear-gradient(90deg, var(--brand), var(--cute-pink), var(--cute-peach)); }
+
+/* بالا آمدن نرم عناصر هنگام ورود به صفحه */
+@keyframes cute-rise { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
+.subject-card, .tool-card, .card, .rp-card { animation: cute-rise .55s var(--cute-spring) both; }
+.subject-grid > :nth-child(2), .tool-grid > :nth-child(2), .grid-3 > :nth-child(2) { animation-delay: .06s; }
+.subject-grid > :nth-child(3), .tool-grid > :nth-child(3), .grid-3 > :nth-child(3) { animation-delay: .12s; }
+.subject-grid > :nth-child(4), .tool-grid > :nth-child(4) { animation-delay: .18s; }
+.subject-grid > :nth-child(n+5), .tool-grid > :nth-child(n+5) { animation-delay: .24s; }
+
+/* مکعب و آرت قهرمان: شناور و زنده */
+@keyframes cute-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.hero-art { animation: cute-float 6s ease-in-out infinite; }
+
+/* اسکرول‌بار و دکمهٔ بالا */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--brand) 35%, var(--surface-3)); border-radius: 99px; border: 2px solid var(--bg); }
+#toTop { border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--cute-pink)); color: #fff; border: 0; }
+
+@media (prefers-reduced-motion: reduce) { .hero-art, .subject-card, .tool-card, .card, .rp-card { animation: none !important; } }
+@media print { body { background: #fff !important; } .card, .subject-card { animation: none; box-shadow: none; } }
