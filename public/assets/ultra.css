@@ -21,7 +21,9 @@ html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-t
 
 body {
   -webkit-tap-highlight-color: transparent;
-  overscroll-behavior-y: none;
+  /* قبلاً none بود؛ همین باعث می‌شد وقتی body ظرف اسکرول می‌شد،
+     زنجیرِ اسکرول به صفحهٔ اصلی قطع شود و صفحه «قفل» به نظر برسد. */
+  overscroll-behavior-y: auto;
   text-rendering: optimizeLegibility;
 }
 a, button, .opt, .subject-card, .card, summary { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }

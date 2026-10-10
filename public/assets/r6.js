@@ -784,12 +784,10 @@
     upd();
   }
 
-  /* صفحهٔ خیلی بلند: بخش‌های بیرون از دید رسم نمی‌شوند (کلاس r6-perf) */
-  function longPageOptimize() {
-    try {
-      if ($$("article.lesson").length > 10) D.body.classList.add("r6-perf");
-    } catch (e) { }
-  }
+  /* توجه: پیش‌تر این‌جا کلاس r6-perf برای content-visibility درس‌ها گذاشته
+     می‌شد. برداشته شد، چون هم‌زمان با باگ «body به‌عنوان ظرف اسکرول» باعث
+     برآورد غلط ارتفاع سند و قفل‌شدن اسکرول می‌شد. خودِ پروژه از قبل برای
+     بخش‌های سنگین از .u-lazy استفاده می‌کند و همان کافی است. */
 
   function readingTime() {
     var art = $("article.lesson");
@@ -926,7 +924,6 @@
   function boot() {
     try { skipLink(); } catch (e) {}
     try { scrollEngine(); } catch (e) {}
-    try { longPageOptimize(); } catch (e) {}
     try { netBadge(); } catch (e) {}
     try { buildTOC(); } catch (e) {}
     try { readingTime(); } catch (e) {}

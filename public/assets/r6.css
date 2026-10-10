@@ -411,14 +411,19 @@ html[data-theme="dark"] .hk-tools { background: var(--surface) !important; }
   .subject-card:hover, .tool-card:hover { transform: translateY(-4px); }
 }
 
-/* ---------- صفحه‌های خیلی بلند (جزوهٔ ۴۷ درسی) ----------
-   بخش‌های بیرون از دید، اصلاً رسم نمی‌شوند. این تنها راه واقعی برای روان
-   کردن اسکرول صفحه‌ای با هزاران گره است. دو درس اول همیشه رسم می‌مانند تا
-   پرش به بالا و فهرست دقیق بماند. کلاس r6-perf را r6.js می‌گذارد. */
-body.r6-perf article.lesson:not(:nth-of-type(-n+2)) {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 1100px;
-}
-@media print {
-  body.r6-perf article.lesson { content-visibility: visible !important; }
+/* ---------- تضمین نهایی: <body> هرگز نباید ظرف اسکرول شود ----------
+   این همان باگی بود که صفحه را روی دسکتاپ «قفل» می‌کرد:
+   اگر overflow افقی body مقدار hidden باشد، مرورگر برای body یک ظرف
+   اسکرول می‌سازد (overflow-y محاسبه‌شده = auto). در جزوه‌های بلند، حدود
+   ۱۱٬۶۰۰ پیکسل از ارتفاع سند از دید ریشه بیرون می‌ماند و چرخاندن ماوس
+   هیچ حرکتی نمی‌دهد؛ در همان حال scrollTo از راه کد کار می‌کند و همین
+   گمراه‌کننده است.
+   clip ظرف اسکرول نمی‌سازد و همان جلوگیری از سرریز افقی را انجام می‌دهد.
+   (این تضمین از این‌جا اعمال می‌شود تا اگر فایل‌های CSS قدیمی دوباره
+   بارگذاری شدند، باگ برنگردد.) */
+html { overflow-x: clip !important; }
+body {
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+  overscroll-behavior-y: auto !important;
 }

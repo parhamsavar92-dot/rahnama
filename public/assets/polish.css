@@ -8,7 +8,12 @@
   --pl-shadow-2: 0 2px 4px rgba(20, 24, 50, .06), 0 14px 34px rgba(20, 24, 50, .10);
 }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-body { text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+/* نکتهٔ مهم (رفع باگ اسکرول): اینجا قبلاً overflow-x: hidden بود.
+   مقدار hidden از body یک «ظرف اسکرول» می‌سازد؛ در نتیجه بخشی از ارتفاع
+   صفحهٔ جزوه‌ها (حدود ۱۱٬۶۰۰ پیکسل) از دید ریشه بیرون می‌ماند و چرخ ماوس
+   صفحه را تکان نمی‌داد. clip ظرف اسکرول نمی‌سازد و همان کار را می‌کند.
+   (خود style.css هم همین را توصیه کرده بود.) */
+body { text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; overflow-x: clip; }
 ::selection { background: color-mix(in srgb, var(--brand, #6d5efc) 28%, transparent); }
 :focus-visible { outline: 2px solid var(--brand, #6d5efc); outline-offset: 2px; border-radius: 8px; }
 img, svg, video { max-width: 100%; }
