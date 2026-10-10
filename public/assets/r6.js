@@ -307,7 +307,13 @@
   function composeLocal(query, hits, intent) {
     var L = hits[0].L;
     var t = [];
-    var src = hits.slice(0, 3).map(function (h) {
+    // فقط درس‌هایی که واقعاً به پرسش مربوط‌اند منبع می‌شوند.
+    // پیش‌تر سه نتیجهٔ اول بدون توجه به امتیاز می‌آمد و درس‌های بی‌ربط
+    // (مثلاً «دین و زندگی» برای پرسش فیثاغورس) هم به‌عنوان منبع نشان داده می‌شد.
+    var top = hits[0].sc || 1;
+    var keep = hits.filter(function (h) { return h.sc >= top * 0.55; }).slice(0, 3);
+    if (!keep.length) keep = [hits[0]];
+    var src = keep.map(function (h) {
       return { t: h.L.t, bn: (bookName(h.L) || "") + " · پایهٔ " + (h.L._g || ""), url: lessonUrl(h.L) };
     });
 
@@ -395,6 +401,10 @@
       var intent = intentOf(q);
       var hits = rankLessons(q, 4);
       if (!hits.length) return noHitsAnswer();
+      // درس‌های ضعیف کنار می‌روند تا هم منابع و هم متن مرجعی که به سرور
+      // می‌رود، فقط از مطالب واقعاً مرتبط ساخته شود.
+      var top = hits[0].sc || 1;
+      hits = hits.filter(function (h) { return h.sc >= top * 0.5; });
       var a = composeLocal(q, hits, intent);
       a.intent = intent;
       return a;
