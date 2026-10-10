@@ -1,0 +1,41 @@
+# انتشار خودکار سایت روی Cloudflare Workers
+# Secret های لازم در مخزن: CLOUDFLARE_API_TOKEN و CLOUDFLARE_ACCOUNT_ID
+name: Deploy (Cloudflare Workers)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-cloudflare
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install
+        run: npm install --no-audit --no-fund
+
+      - name: Tests
+        run: npm test
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+
+      - name: Health check
+        run: |
+          sleep 8
+          curl -fsS "https://rahnama.workers.dev/api/health" || \
+            echo "نام Worker را در wrangler.jsonc ببینید و آدرس را در همین فایل به‌روز کنید."

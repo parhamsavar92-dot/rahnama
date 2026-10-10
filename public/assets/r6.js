@@ -29,6 +29,15 @@
     return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   };
+  /* نمایش سبک متن ساختاریافتهٔ دستیار: **پررنگ**، فهرست، پاراگراف.
+     همیشه اول escape می‌شود تا هیچ HTML ناامنی از پاسخ بیرون نیاید. */
+  var md = function (s) {
+    return esc(s)
+      .replace(/\*\*([^*\n]+)\*\*/g, "<b>$1</b>")
+      .replace(/\$([^$\n]+)\$/g, "<code>$1</code>")
+      .replace(/^(\s*)(•|-)\s/gm, "$1• ")
+      .replace(/\n/g, "<br>");
+  };
   function toast(m, ms) {
     try {
       if (W.HK && W.HK.toast) return W.HK.toast(m, ms);
@@ -57,7 +66,7 @@
       .replace(/\s+/g, " ").trim().toLowerCase();
   }
   var STOP = {};
-  ("و در به از که این را با برای است هست یک آن های ها یا اگر تا هم نه بله چه چی کی کجا چطور چگونه چرا می شود شده بود بودن کن بکن بگو بده ولی اما پس نیز دیگر خیلی همه هر بعضی بر ای ان درباره مورد طریق انجام داشته دارد لطفا میشه یعنی چیست چیه تعریف معنی کدام توضیح فرمول رابطه قاعده قانون تفاوت فرق مقایسه مثال نمونه فهرست انواع علت دلیل مراحل خلاصه چکیده چند بساز بزن بنویس").split(" ")
+  ("و در به از که این را با برای است هست یک آن های ها یا اگر تا هم نه بله چه چی کی کجا چطور چگونه چرا می شود شده بود بودن کن بکن بگو بده ولی اما پس نیز دیگر خیلی همه هر بعضی بر ای ان درباره مورد طریق انجام داشته دارد لطفا میشه یعنی چیست چیه تعریف معنی کدام توضیح فرمول رابطه قاعده قانون تفاوت فرق مقایسه مثال نمونه فهرست انواع علت دلیل مراحل خلاصه چکیده چند بساز بزن بنویس درس فصل بخش کنید کنم بدید بدم").split(" ")
     .forEach(function (w) { STOP[w] = 1; });
   function toks(s) {
     return norm(s).split(" ").filter(function (t) { return t.length > 1 && !STOP[t]; });
@@ -97,53 +106,178 @@
   /* ======================================================================
      ۱) موتور محلی: جست‌وجو در نمایهٔ درس‌ها (بدون اینترنت، بدون کلید)
      ====================================================================== */
-  var IDX = null, IDX_P = null;
+  /* ---------------------------------------------------------------------
+     پایگاه دانش درس‌ها (kb*.json)
+     هر درس دارد: خلاصه، نکته‌های کلیدی، واژه‌نامه، فرمول، حل گام‌به‌گام و
+     اشتباه‌های رایج. همین منبع، هم پاسخ محلی را می‌سازد و هم «متن مرجع»ی
+     می‌شود که به دستیار سروری داده می‌شود تا پاسخش مستند و دقیق باشد.
+     --------------------------------------------------------------------- */
+  var KB = null, KB_P = null, KB_BOOKS = {}, DF = null, BOOKNAMES = {};
+  /* هر سه پایه بارگذاری می‌شوند تا دستیار «همهٔ» جزوه‌ها را بشناسد؛ فقط
+     درس‌های پایهٔ خودِ کاربر کمی امتیاز بیشتری می‌گیرند. */
+  var KBFILES = [
+    { file: "assets/kb-g7.json", grade: "7" },
+    { file: "assets/kb.json", grade: "8" },
+    { file: "assets/kb-g9.json", grade: "9" }
+  ];
+
   function loadIndex() {
-    if (IDX_P) return IDX_P;
-    IDX_P = fetch(url("assets/search-index.json"), { credentials: "same-origin" })
-      .then(function (r) { return r.ok ? r.json() : []; })
-      .then(function (j) {
-        IDX = Array.isArray(j) ? j : [];
-        IDX.forEach(function (row) {
-          row._n = norm(row.t);
-          row._b = norm(row.bn);
-          row._s = norm(row.s);
-          row._hay = row._n + " " + row._b + " " + row._s;
+    if (KB_P) return KB_P;
+    KB_P = Promise.all(KBFILES.map(function (k) {
+      return fetch(url(k.file), { credentials: "same-origin" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) { return { grade: k.grade, j: j }; })
+        .catch(function () { return { grade: k.grade, j: null }; });
+    })).then(function (all) {
+      KB = []; KB_BOOKS = {};
+      var pairs = function (arr) { return arr.map(function (y) { return y[0] + " " + y[1]; }).join(" "); };
+      BOOKNAMES = {};
+      all.forEach(function (x) {
+        if (!x.j || !x.j.lessons || !x.j.lessons.length) return;
+        var byKey = {};
+        (x.j.books || []).forEach(function (b) {
+          KB_BOOKS[x.grade + ":" + b.key] = b;
+          byKey[b.key] = b;
+          var bn = norm(b.name);
+          if (bn) BOOKNAMES[bn] = 1;
         });
-        return IDX;
-      })
-      .catch(function () { IDX = []; return IDX; });
-    return IDX_P;
+        x.j.lessons.forEach(function (L) {
+          L.pts = L.pts || []; L.terms = L.terms || []; L.f = L.f || [];
+          L.st = L.st || []; L.ca = L.ca || [];
+          L._g = x.grade;
+          var b = byKey[L.b];
+          L._bn = b ? norm(b.name) : "";
+          L._t = norm(L.t);
+          L._terms = norm(L.terms.map(function (y) { return y[0]; }).join(" "));
+          // نام کتاب هم بخشی از متن جست‌وجو است تا «ریاضی» همهٔ درس‌های ریاضی را بیاورد
+          L._hay = norm([L.t, L._bn, L.s || "", L.pts.join(" "), pairs(L.terms), pairs(L.f), pairs(L.st), pairs(L.ca)].join(" "));
+          KB.push(L);
+        });
+      });
+      buildDF();
+      return KB;
+    }).catch(function () { KB = []; return KB; });
+    return KB_P;
   }
   R6.loadIndex = loadIndex;
+  function kbReady() { return KB ? Promise.resolve(KB) : loadIndex(); }
 
-  function search(query, limit) {
-    if (!IDX || !IDX.length) return [];
-    var g = currentGrade();
-    var ph = norm(query);
-    if (!ph) return [];
-    var ts = toks(query);
-    if (!ts.length) ts = ph.split(" ").filter(function (t) { return t.length > 1; });
-    if (!ts.length) return [];
-    var out = [];
-    for (var i = 0; i < IDX.length; i++) {
-      var r = IDX[i], sc = 0, k;
-      for (k = 0; k < ts.length; k++) {
-        var t = ts[k];
-        if (r._n.indexOf(t) > -1) sc += 12;
-        if (r._b.indexOf(t) > -1) sc += 5;
-        var idx = r._s.indexOf(t);
-        if (idx > -1) { sc += 2.4; if (idx < 90) sc += 1; }
+  /* فراوانی واژه‌ها در درس‌ها — برای اینکه واژه‌های کم‌یاب ارزش بیشتری بگیرند
+     (مثلاً «فیثاغورس» مهم‌تر از «ریاضی» است که در همهٔ درس‌ها هست). */
+  function buildDF() {
+    DF = {};
+    for (var i = 0; i < KB.length; i++) {
+      var words = (KB[i]._t + " " + KB[i]._terms + " " + KB[i]._hay).split(" ");
+      var seen = {};
+      for (var k = 0; k < words.length; k++) {
+        var w = words[k];
+        if (!w || seen[w]) continue;
+        seen[w] = 1;
+        DF[w] = (DF[w] || 0) + 1;
       }
-      if (r._hay.indexOf(ph) > -1) sc += 9;
-      if (sc <= 0) continue;
-      if (String(r.g) === String(g)) sc *= 1.6;
-      out.push({ row: r, score: sc });
     }
-    out.sort(function (a, b) { return b.score - a.score; });
-    return out.slice(0, limit || 4);
   }
-  R6.search = search;
+  function idf(t) {
+    if (!DF || !KB || !KB.length) return 1;
+    return Math.log(1 + KB.length / (1 + (DF[t] || 0)));
+  }
+
+  /* رتبه‌بندی درس‌ها: وزن واژه نادر + جای واژه (عنوان > واژه‌نامه > متن)
+     + پاداش پوشش چندواژه‌ای + اولویت پایهٔ خودِ کاربر */
+  function rankLessons(query, limit) {
+    if (!KB || !KB.length) return [];
+    var ts = toks(query);
+    var ph = norm(query);
+    if (!ts.length && ph) ts = ph.split(" ").filter(function (t) { return t.length > 1; });
+    if (!ts.length) return [];
+    var mine = String(currentGrade());
+    // اگر کاربر نام کتاب را گفته باشد (ریاضی، علوم، فارسی…)، درس‌های همان کتاب
+    // بر بقیه اولویت می‌گیرند. رفع باگ «درس اول ریاضی» که عربی می‌آورد.
+    var qBook = "";
+    for (var bn in BOOKNAMES) {
+      if (bn.length > 2 && ph.indexOf(bn) > -1) { qBook = bn; break; }
+    }
+    var out = [];
+    for (var i = 0; i < KB.length; i++) {
+      var L = KB[i], sc = 0, matched = 0, k;
+      for (k = 0; k < ts.length; k++) {
+        var t = ts[k], w = 0.5 + idf(t);
+        if (L._t.indexOf(t) > -1) { sc += 24 * w; matched++; }
+        else if (L._terms.indexOf(t) > -1) { sc += 9 * w; matched++; }
+        else if (L._hay.indexOf(t) > -1) { sc += 3 * w; matched++; }
+      }
+      if (!matched) continue;
+      sc *= 0.6 + 0.9 * (matched / ts.length);      // پاداش پوشش
+      if (ph) {
+        if (L._t.indexOf(ph) > -1) sc += 18;
+        else if (L._hay.indexOf(ph) > -1) sc += 7;
+      }
+      if (qBook && L._bn.indexOf(qBook) > -1) sc *= 2.4;
+      if (String(L._g) === mine) sc *= 1.35;
+      out.push({ L: L, sc: sc });
+    }
+    out.sort(function (a, b) { return b.sc - a.sc; });
+    return out.slice(0, limit || 3);
+  }
+  R6.search = rankLessons;
+
+  /* رتبه‌بندی جمله‌های یک درس بر اساس پرسش (تا مرتبط‌ترین‌ها اول بیایند) */
+  function rankSentences(list, query, min) {
+    if (!list || !list.length) return [];
+    var ts = toks(query);
+    if (!ts.length) return list.slice(0, min || list.length);
+    var scored = list.map(function (s, i) {
+      var txt = Array.isArray(s) ? (s[0] + " " + s[1]) : String(s);
+      var n = norm(txt), sc = 0;
+      for (var k = 0; k < ts.length; k++) if (n.indexOf(ts[k]) > -1) sc += 1;
+      return { s: s, sc: sc, i: i };
+    });
+    scored.sort(function (a, b) { return b.sc - a.sc || a.i - b.i; });
+    return scored.map(function (x) { return x.s; }).slice(0, min || list.length);
+  }
+
+  /* ------------------------------------------------ تشخیص منظور پرسش */
+  var INTENTS = [
+    ["summary", /خلاصه|جمع ?بندی|چکیده|مرور|نکته‌?های مهم|مهم‌?ترین/],
+    ["formula", /فرمول|رابطه|قاعده|قانون|محاسبه|چگونه حساب/],
+    ["example", /مثال|حل کن|حل کن|مسئله|تمرین حل| نمونه/],
+    ["practice", /سؤال|سوال|تمرین|آزمون|تست|بساز|بده.*(سؤال|سوال)/],
+    ["definition", /تعریف|چیست|چیه|یعنی چه|معنی|چی هستند|چی هست/],
+    ["mistake", /اشتباه|خطا|غلط|دقت|گاف/],
+    ["simple", /ساده|راحت|مبتدی|بلد نیستم|نمی ?فهمم|کودکانه|ساده‌تر/],
+    ["why", /چرا|دلیل|علت|به چه کار/],
+    ["compare", /تفاوت|فرق|مقایسه|بهتر است/]
+  ];
+  function intentOf(q) {
+    var s = norm(q);
+    for (var i = 0; i < INTENTS.length; i++) if (INTENTS[i][1].test(s)) return INTENTS[i][0];
+    return "explain";
+  }
+  R6.intentOf = intentOf;
+
+  /* متن مرجع فشرده برای دستیار سروری (حدود ۶ هزار نویسه) */
+  function buildContext(query, hits, maxChars) {
+    if (!hits || !hits.length) return "";
+    var parts = [];
+    var used = 0;
+    for (var i = 0; i < hits.length && i < 3; i++) {
+      var L = hits[i].L;
+      var b = [];
+      b.push("### درس: " + L.t + (L.badge ? " (" + L.badge + ")" : ""));
+      if (L.s) b.push("خلاصه: " + L.s);
+      if (L.pts.length) b.push("نکته‌های کلیدی:\n- " + rankSentences(L.pts, query, 10).join("\n- "));
+      if (L.terms.length) b.push("واژه‌نامه: " + L.terms.slice(0, 8).map(function (t) { return t[0] + " = " + t[1]; }).join(" | "));
+      if (L.f.length) b.push("فرمول‌ها: " + L.f.slice(0, 6).map(function (t) { return t[0] + ": " + t[1]; }).join(" | "));
+      if (L.st.length) b.push("حل گام‌به‌گام:\n" + L.st.slice(0, 3).map(function (t) { return "- " + t[0] + ": " + t[1]; }).join("\n"));
+      if (L.ca.length) b.push("اشتباه‌های رایج:\n" + L.ca.slice(0, 3).map(function (t) { return "- " + t[0] + ": " + t[1]; }).join("\n"));
+      var chunk = b.join("\n");
+      if (used + chunk.length > (maxChars || 6000)) break;
+      parts.push(chunk);
+      used += chunk.length;
+    }
+    return parts.join("\n\n");
+  }
+  R6.buildContext = buildContext;
 
   function snippet(text, max) {
     var s = String(text || "").replace(/\s+/g, " ").trim();
@@ -153,28 +287,117 @@
     return (sp > max * 0.6 ? cut.slice(0, sp) : cut) + "…";
   }
 
-  /* پاسخ محلی: اول نمایه را مطمئناً بارگذاری می‌کند، بعد پاسخ می‌دهد.
+  /* ---------------------------------------------------------------------
+     ساخت پاسخ مفهومی از پایگاه دانش (حالت بدون اینترنت)
+     ترتیب: تعریف → توضیح مفهومی → فرمول → حل گام‌به‌گام → اشتباه‌های رایج
+     → خلاصه. بسته به منظور پرسش، بخش‌های مربوط پررنگ‌تر و کامل‌تر می‌آیند.
+     --------------------------------------------------------------------- */
+  function bookName(L) {
+    var b = KB_BOOKS[L._g + ":" + L.b];
+    return (b && b.name) || L.b || "";
+  }
+
+  function lessonUrl(L) {
+    var b = KB_BOOKS[L._g + ":" + L.b];
+    var anchor = L.id ? "#" + L.id : "";
+    if (b && b.file) return b.file + anchor;   // مسیر نسبت به ریشهٔ سایت
+    return "jozve/" + (L._g || currentGrade()) + "/" + (L.b || "math") + ".html" + anchor;
+  }
+
+  function composeLocal(query, hits, intent) {
+    var L = hits[0].L;
+    var t = [];
+    var src = hits.slice(0, 3).map(function (h) {
+      return { t: h.L.t, bn: (bookName(h.L) || "") + " · پایهٔ " + (h.L._g || ""), url: lessonUrl(h.L) };
+    });
+
+    t.push("**" + L.t + "**" + (L.badge ? " — " + L.badge : "") + (L.b ? " · " + bookName(L) + " · پایهٔ " + (L._g || "") : ""));
+    if (L.s) t.push(L.s);
+    t.push("");
+
+    // ۱) تعریف واژه‌های مرتبط با پرسش
+    var qn = norm(query);
+    var defs = L.terms.filter(function (x) {
+      var n = norm(x[0]);
+      return qn.indexOf(n) > -1 || n.indexOf(qn.split(" ")[0] || "@") > -1 ||
+        toks(x[0]).some(function (w) { return qn.indexOf(w) > -1; });
+    });
+    if (!defs.length) defs = L.terms.slice(0, intent === "definition" ? 5 : 3);
+    if (defs.length) {
+      t.push("**تعریف‌ها**");
+      defs.slice(0, 5).forEach(function (x) { t.push("• " + x[0] + ": " + x[1]); });
+      t.push("");
+    }
+
+    // ۲) توضیح مفهومی
+    var pts = rankSentences(L.pts, query, intent === "summary" || intent === "simple" ? 8 : 6);
+    if (pts.length) {
+      t.push("**توضیح مفهومی**");
+      pts.forEach(function (p, i) { t.push((i + 1) + ". " + p); });
+      t.push("");
+    }
+
+    // ۳) فرمول‌ها
+    if (L.f.length && (intent !== "simple")) {
+      t.push("**فرمول‌ها و قاعده‌ها**");
+      rankSentences(L.f, query, 5).forEach(function (x) { t.push("• " + x[0] + ": " + x[1]); });
+      t.push("");
+    }
+
+    // ۴) حل گام‌به‌گام
+    if (L.st.length && (intent === "example" || intent === "explain" || intent === "formula" || intent === "why")) {
+      t.push("**حل گام‌به‌گام (نمونه)**");
+      L.st.slice(0, 4).forEach(function (x) { t.push("• " + x[0] + " — " + x[1]); });
+      t.push("");
+    }
+
+    // ۵) اشتباه‌های رایج
+    if (L.ca.length && (intent === "mistake" || intent === "explain" || intent === "why")) {
+      t.push("**اشتباه‌های رایج — حواست باشد**");
+      L.ca.slice(0, 3).forEach(function (x) { t.push("• " + x[0] + " — " + x[1]); });
+      t.push("");
+    }
+
+    // ۶) تمرین پیشنهادی
+    if (intent === "practice") {
+      t.push("**چند پرسش برای تمرین**");
+      rankSentences(L.pts, query, 4).forEach(function (p, i) {
+        t.push((i + 1) + ". با تکیه بر این نکته توضیح بده: " + p.replace(/[.。]$/, "") + " — چرا؟");
+      });
+      t.push("");
+    }
+
+    // ۷) خلاصهٔ سریع
+    if (L.pts.length) {
+      t.push("**خلاصهٔ سریع**");
+      t.push(rankSentences(L.pts, query, 3).map(function (p) { return snippet(p, 120); }).join(" • "));
+    }
+
+    return { text: t.join("\n"), src: src, hits: hits };
+  }
+
+  function noHitsAnswer() {
+    return {
+      text: "برای این پرسش مطلب مستقیمی در جزوه‌ها پیدا نکردم.\n\n" +
+        "سه کار که کمک می‌کند:\n" +
+        "• واژهٔ اصلی را کوتاه‌تر بنویس (مثلاً «فیثاغورس» یا «آرایهٔ ادبی»).\n" +
+        "• نام درس یا واژهٔ کتاب را دقیق بنویس.\n" +
+        "• یا با Ctrl + K جست‌وجوی سراسری را باز کن.\n\n" +
+        "می‌توانی سؤالت را کامل‌تر هم بپرسی؛ مثلاً «تفاوت سلول جانوری و گیاهی را با مثال توضیح بده».",
+      src: []
+    };
+  }
+
+  /* پاسخ محلی: اول پایگاه دانش حتماً بارگذاری می‌شود، بعد پاسخ ساخته می‌شود.
      (به همین دلیل Promise برمی‌گرداند.) */
   function localAnswer(q) {
-    return loadIndex().then(function () {
-      var hits = search(q, 4);
-      if (!hits.length) {
-        return {
-          text: "برای این پرسش، مطلب مستقیمی در جزوه‌های بارگذاری‌شده پیدا نکردم. " +
-            "می‌توانی واژهٔ اصلی را کوتاه‌تر بنویسی (مثلاً «قضیهٔ فیثاغورس» یا «آرایه‌های ادبی»)، " +
-            "یا از بخش «جست‌وجوی سراسری» با Ctrl + K استفاده کنی.",
-          src: []
-        };
-      }
-      var lines = ["بر پایهٔ جزوه‌های همین سایت:"];
-      var src = [];
-      hits.slice(0, 3).forEach(function (h, i) {
-        var r = h.row;
-        lines.push((i + 1) + ". " + r.t + " — " + snippet(r.s, 190));
-        src.push({ t: r.t, bn: r.bn, url: r.url });
-      });
-      lines.push("برای مطالعهٔ کامل، روی پیوندهای زیر بزن.");
-      return { text: lines.join("\n"), src: src, hits: hits };
+    return kbReady().then(function () {
+      var intent = intentOf(q);
+      var hits = rankLessons(q, 4);
+      if (!hits.length) return noHitsAnswer();
+      var a = composeLocal(q, hits, intent);
+      a.intent = intent;
+      return a;
     });
   }
   R6.localAnswer = localAnswer;
@@ -199,7 +422,7 @@
   R6.server = function () { return SRV; };
 
   /* ------------------------------------------------- پاسخ سرور با پخش زنده */
-  function serverAnswer(messages, ctx, onDelta) {
+  function serverAnswer(messages, ctx, intent, onDelta) {
     return fetch("/api/ai/chat/completions", {
       method: "POST",
       credentials: "same-origin",
@@ -208,6 +431,7 @@
         messages: messages.slice(-12),
         grade: currentGrade(),
         context: ctx || "",
+        intent: intent || "explain",
         stream: true
       })
     }).then(function (r) {
@@ -366,7 +590,7 @@
       var got = "";
       var done = function (text, src, note) {
         bubble.className = "r6-msg ai";
-        bubble.innerHTML = esc(text).replace(/\n/g, "<br>") + (note ? '<span class="src">' + esc(note) + "</span>" : "") + (src && src.length ? srcHtml(src) : "");
+        bubble.innerHTML = md(text) + (note ? '<span class="src">' + esc(note) + "</span>" : "") + (src && src.length ? srcHtml(src) : "");
         log.scrollTop = log.scrollHeight;
         history.push({ role: "assistant", content: text });
         if (history.length > 24) history = history.slice(-24);
@@ -385,22 +609,28 @@
       };
 
       if (SRV.ai) {
-        var ctx = pageContext();
-        serverAnswer(history.slice(-8), ctx, function (d) {
-          got += d;
-          bubble.className = "r6-msg ai";
-          bubble.innerHTML = esc(got).replace(/\n/g, "<br>");
-          log.scrollTop = log.scrollHeight;
-        }).then(function (out) {
-          var text = (out && out.text) || got;
-          if (!text) return localFallback("سرور پاسخی برنگرداند؛ پاسخ از موتور محلی سایت");
-          var note = "پاسخ از سرور سایت" + (out.provider ? " (" + out.provider + ")" : "");
-          localAnswer(q).then(function (a) { done(text, a.src, note); })
-            .catch(function () { done(text, [], note); });
-        }).catch(function (e) {
-          if (e && e.status === 401) return localFallback("برای پاسخ سروری وارد حساب شو؛ فعلاً از موتور محلی پاسخ داده شد");
-          if (got) return done(got, [], "پاسخ ناقص از سرور");
-          localFallback("ارتباط با سرور برقرار نشد؛ پاسخ از موتور محلی سایت");
+        // اول دانش مرتبط را از خود جزوه‌ها بیرون می‌کشیم؛ همان می‌شود «متن مرجع»
+        // دستیار سروری. این‌طور پاسخ‌ها مستند به کتاب درسی می‌مانند.
+        var intent = intentOf(q);
+        localAnswer(q).then(function (a) {
+          var ctx = buildContext(q, a.hits, 7000);
+          if (!ctx && pageContext()) ctx = pageContext().slice(0, 4000);
+          serverAnswer(history.slice(-8), ctx, intent, function (d) {
+            got += d;
+            bubble.className = "r6-msg ai";
+            bubble.innerHTML = md(got);
+            log.scrollTop = log.scrollHeight;
+          }).then(function (out) {
+            var text = (out && out.text) || got;
+            if (!text) return localFallback("سرور پاسخی برنگرداند؛ پاسخ از موتور محلی سایت");
+            done(text, a.src, "پاسخ از سرور سایت" + (out.provider ? " · " + out.provider : ""));
+          }).catch(function (e) {
+            if (e && e.status === 401) return localFallback("برای پاسخ سروری وارد حساب شو؛ فعلاً از موتور محلی پاسخ داده شد");
+            if (got) return done(got, a.src, "پاسخ ناقص از سرور");
+            done(a.text, a.src, "سرور در دسترس نبود؛ پاسخ از موتور محلی سایت");
+          });
+        }).catch(function () {
+          localFallback("پایگاه دانش بارگذاری نشد؛ پاسخ از موتور محلی سایت");
         });
       } else {
         setTimeout(function () { localFallback(); }, 120);
@@ -411,7 +641,7 @@
     /* پیام خوش‌آمد */
     if (history.length) {
       history.slice(-6).forEach(function (m) {
-        push(m.role === "user" ? "me" : "ai", esc(m.content).replace(/\n/g, "<br>"));
+        push(m.role === "user" ? "me" : "ai", md(m.content));
       });
     } else {
       push("ai", "سلام! من دستیار رهنما هستم. هر جای جزوه گیر کردی بپرس — خلاصه، نمونه‌سؤال، فرمول یا توضیح ساده. " +
@@ -505,31 +735,50 @@
     box.style.insetBlockStart = "50%";
   }
 
-  function readingProgress() {
-    // اگر #readbar از قبل هست، app.js خودش آن را پر می‌کند؛ دوباره دست نمی‌زنیم
-    // تا مقدار پیشرفت دو بار اعمال نشود.
-    if ($("#readbar")) {
-      var r0 = 0;
-      W.addEventListener("scroll", function () {
-        if (r0) return;
-        r0 = W.requestAnimationFrame(function () { r0 = 0; D.body.classList.toggle("r6-scrolled", W.scrollY > 8); });
-      }, { passive: true });
-      return;
+  /* ---------------------------------------------------------------------
+     یک حلقهٔ اسکرول برای همهٔ کارهای این لایه
+     پیش‌تر سه شنوندهٔ جدا داشتیم (نوار پیشرفت، سایهٔ سربرگ، کلاس بدنه) و هر
+     کدام جداگانه محاسبه می‌کردند. حالا یک شنونده و یک requestAnimationFrame
+     برای همه — کمترین فشار ممکن روی رشتهٔ اصلی مرورگر.
+     اگر #readbar از قبل باشد (کار app.js و hk-jozve.js)، دست نمی‌زنیم تا
+     مقدار پیشرفت دو بار اعمال نشود.
+     --------------------------------------------------------------------- */
+  function scrollEngine() {
+    var head = $(".site-header");
+    var bar = $("#readbar");
+    var madeBar = false;
+    if (!bar) {
+      bar = D.createElement("div");
+      bar.id = "readbar";
+      bar.style.cssText = "position:fixed;top:0;inset-inline:0;height:3px;transform-origin:right;transform:scaleX(0);z-index:400";
+      D.body.insertBefore(bar, D.body.firstChild);
+      madeBar = true;
     }
-    var bar = D.createElement("div");
-    bar.id = "readbar";
-    bar.style.cssText = "position:fixed;top:0;inset-inline:0;height:3px;transform-origin:right;transform:scaleX(0);z-index:400";
-    D.body.insertBefore(bar, D.body.firstChild);
-    var raf = 0;
+
+    var hgt = -1, stuck = false, scrolled = false, raf = 0;
     function upd() {
       raf = 0;
-      var h = D.documentElement.scrollHeight - W.innerHeight;
-      var p = h > 40 ? Math.min(1, Math.max(0, W.scrollY / h)) : 0;
-      bar.style.transform = "scaleX(" + p + ")";
-      D.body.classList.toggle("r6-scrolled", W.scrollY > 8);
+      var y = W.scrollY;
+      if (madeBar) {
+        if (hgt < 0) hgt = D.documentElement.scrollHeight - W.innerHeight;
+        bar.style.transform = "scaleX(" + (hgt > 40 ? Math.min(1, Math.max(0, y / hgt)) : 0) + ")";
+      }
+      var s = y > 10;
+      if (head && s !== stuck) { stuck = s; head.classList.toggle("is-stuck", s); }
+      var sc = y > 8;
+      if (sc !== scrolled) { scrolled = sc; D.body.classList.toggle("r6-scrolled", sc); }
     }
     W.addEventListener("scroll", function () { if (!raf) raf = W.requestAnimationFrame(upd); }, { passive: true });
+    W.addEventListener("resize", function () { hgt = -1; }, { passive: true });
+    try { if (W.ResizeObserver) new W.ResizeObserver(function () { hgt = -1; }).observe(D.body); } catch (e) { }
     upd();
+  }
+
+  /* صفحهٔ خیلی بلند: بخش‌های بیرون از دید رسم نمی‌شوند (کلاس r6-perf) */
+  function longPageOptimize() {
+    try {
+      if ($$("article.lesson").length > 10) D.body.classList.add("r6-perf");
+    } catch (e) { }
   }
 
   function readingTime() {
@@ -592,15 +841,6 @@
       mo.observe(D.body, { childList: true });
       setTimeout(function () { mo.disconnect(); }, 9000);
     }
-  }
-
-  function stickyHeader() {
-    var h = $(".site-header");
-    if (!h) return;
-    var raf = 0;
-    function upd() { raf = 0; h.classList.toggle("is-stuck", W.scrollY > 10); }
-    W.addEventListener("scroll", function () { if (!raf) raf = W.requestAnimationFrame(upd); }, { passive: true });
-    upd();
   }
 
   /* ======================================================================
@@ -675,8 +915,8 @@
   /* ------------------------------------------------------------ راه‌اندازی */
   function boot() {
     try { skipLink(); } catch (e) {}
-    try { stickyHeader(); } catch (e) {}
-    try { readingProgress(); } catch (e) {}
+    try { scrollEngine(); } catch (e) {}
+    try { longPageOptimize(); } catch (e) {}
     try { netBadge(); } catch (e) {}
     try { buildTOC(); } catch (e) {}
     try { readingTime(); } catch (e) {}

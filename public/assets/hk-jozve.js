@@ -726,10 +726,23 @@
       D.body.insertBefore(el, D.body.firstChild);
     }
   }
+  /* نوار پیشرفت مطالعه
+     ---------------------------------------------------------------------
+     پیش‌تر روی «هر» رویداد اسکرول، ارتفاع کل صفحه خوانده و عرض نوار نوشته
+     می‌شد؛ خواندن scrollHeight مرورگر را مجبور به محاسبهٔ دوبارهٔ چیدمان
+     می‌کند و روی جزوه‌های بلند (۴۷ درس) همین باعث کندی و لَختی اسکرول بود.
+     حالا: یک بار در هر فریم (requestAnimationFrame)، با ارتفاع کش‌شده که
+     فقط هنگام تغییر اندازه/محتوا تازه می‌شود. */
+  var _pbEl = null, _pbH = -1, _pbRaf = 0;
   function progressBar() {
-    var el = D.getElementById("readbar"); if (!el) return;
-    var h = D.documentElement.scrollHeight - W.innerHeight;
-    el.style.width = (h > 0 ? Math.min(100, W.scrollY / h * 100) : 0) + "%";
+    if (_pbRaf) return;
+    _pbRaf = W.requestAnimationFrame(function () {
+      _pbRaf = 0;
+      if (!_pbEl || !_pbEl.isConnected) _pbEl = D.getElementById("readbar");
+      if (!_pbEl) return;
+      if (_pbH < 0) _pbH = D.documentElement.scrollHeight - W.innerHeight;
+      _pbEl.style.width = (_pbH > 0 ? Math.min(100, (W.scrollY / _pbH) * 100) : 0) + "%";
+    });
   }
 
   function applySavedUi() {
@@ -751,6 +764,12 @@
 
     var t0 = Date.now();
     W.addEventListener("scroll", function () { progressBar(); }, { passive: true });
+    W.addEventListener("resize", function () { _pbH = -1; progressBar(); }, { passive: true });
+    // هر تغییری در اندازهٔ محتوا (تغییر فونت، باز/بستن درس، بارگذاری تصویر)
+    // ارتفاع کش‌شده را باطل می‌کند
+    try {
+      if (W.ResizeObserver) new W.ResizeObserver(function () { _pbH = -1; }).observe(D.body);
+    } catch (e) { }
     W.addEventListener("beforeunload", savePos);
     setInterval(savePos, 8000);
 

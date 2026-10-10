@@ -432,7 +432,34 @@ const AI_DEFAULTS = {
   gemini: { model: "gemini-2.0-flash", base: "https://generativelanguage.googleapis.com/v1beta" },
   workersai: { model: "@cf/meta/llama-3.1-8b-instruct", base: "" }
 };
-const AI_SYS_BASE = "تو دستیار درسی «رهنما» برای دانش‌آموزان دورهٔ اول متوسطه (پایه‌های هفتم، هشتم و نهم) هستی. همیشه فارسی، ساده، دقیق و مرحله‌به‌مرحله پاسخ بده. اگر متن جزوه در اختیارت گذاشته شد، فقط بر پایهٔ همان پاسخ بده و از خودت مطلب اضافه نکن.";
+const AI_SYS_BASE =
+  "تو «دستیار آموزشی رهنما» هستی؛ یک معلم خصوصی فارسی‌زبان و باتجربه برای دانش‌آموزان دورهٔ اول متوسطه (پایه‌های هفتم، هشتم و نهم).\n" +
+  "کارت این است که هر پرسش را کامل، مفهومی و مرحله‌به‌مرحله توضیح بدهی؛ پاسخ کوتاه و ناقص نده.\n\n" +
+  "اصول پاسخ‌دهی:\n" +
+  "۱) اول شهود و «چرا» را بگو، بعد تعریف دقیق، بعد جزئیات، بعد مثال.\n" +
+  "۲) فارسیِ ساده و روان بنویس؛ هر اصطلاح تخصصی را همان‌جا در پرانتز معنی کن.\n" +
+  "۳) ساختار روشن بده: تعریف ← توضیح مفهومی ← مثال حل‌شده ← اشتباه‌های رایج ← جمع‌بندی کوتاه.\n" +
+  "۴) اگر «متن جزوهٔ مرتبط» در اختیارت گذاشته شده، پاسخ را بر پایهٔ همان بساز و از آن خارج نشو. اگر پاسخ در آن نبود، صریح بگو «در جزوهٔ این درس نبود» و بعد مفهوم را با دانش عمومی همان پایه توضیح بده.\n" +
+  "۵) هرگز عدد، تاریخ، نام یا فرمولی از خودت نساز. اگر مطمئن نیستی، همان را بگو.\n" +
+  "۶) هر جا مناسب بود از فهرست نشانه‌دار، جدول کوچک یا فرمول استفاده کن. فرمول را در $...$ بنویس.\n" +
+  "۷) اگر پرسش مبهم است، یک برداشت معقول را اعلام کن و بر همان اساس کامل توضیح بده.\n" +
+  "۸) پایان هر پاسخ: یک «جمع‌بندی» دو-سه خطی و یک «سؤال تمرینی» کوتاه.\n" +
+  "۹) برای پرسش مفهومی معمولاً ۲۵۰ تا ۷۰۰ واژه بنویس؛ نه کوتاه‌تر از حد لازم، نه پرگویی بی‌فایده.\n" +
+  "۱۰) هیچ‌وقت از کاربر اطلاعات شخصی نخواه و از موضوع درسی خارج نشو.";
+
+// راهنمای هر «منظور پرسش» که از سمت سایت فرستاده می‌شود
+const AI_INTENT_HINT = {
+  summary: "کاربر خلاصه می‌خواهد: اول یک خلاصهٔ یکپارچه در دو-سه بند، بعد نکته‌های کلیدی به‌صورت فهرست کوتاه.",
+  formula: "کاربر فرمول/قاعده می‌خواهد: هر فرمول را جدا بنویس، هر نماد را معنی کن و یک مثال عددی کوچک بزن.",
+  example: "کاربر مثال حل‌شده می‌خواهد: صورت مسئله، سپس حل گام‌به‌گام شماره‌دار، سپس پاسخ نهایی و بررسی درستی.",
+  practice: "کاربر تمرین می‌خواهد: پنج پرسش متنوع (مفهومی، محاسباتی، کاربردی) بساز و پاسخ کوتاه هرکدام را در پایان بده.",
+  definition: "کاربر تعریف می‌خواهد: تعریف دقیق، سپس مرزهای مفهوم (چه هست و چه نیست)، سپس مثال و نمونهٔ نقض.",
+  mistake: "کاربر دربارهٔ اشتباه‌ها می‌پرسد: اشتباه‌های رایج را با علت هرکدام و راه پیشگیری فهرست کن.",
+  simple: "کاربر توضیح ساده می‌خواهد: با زبان روزمره و یک تشبیه ساده توضیح بده و از اصطلاحات دشوار پرهیز کن.",
+  why: "کاربر دنبال چرایی است: ابتدا شهود و علت اصلی، بعد استدلال، بعد یک مثال روشن.",
+  compare: "کاربر مقایسه می‌خواهد: یک جدول دو-سه ستونی از شباهت‌ها و تفاوت‌ها بساز و در پایان نتیجه بگیر.",
+  explain: ""
+};
 const dec = new TextDecoder();
 
 function aiPlan(env, pref) {
@@ -514,7 +541,7 @@ async function aiRun(env, provider, cfg, sys, conv, stream) {
     const r = await fetch(cfg.base + "/v1/messages", {
       method: "POST",
       headers: Object.assign({ "x-api-key": cfg.key, "anthropic-version": "2023-06-01" }, H),
-      body: JSON.stringify({ model: cfg.model, max_tokens: 1400, system: sys, messages: msgs, stream: !!stream })
+      body: JSON.stringify({ model: cfg.model, max_tokens: 3000, temperature: 0.35, system: sys, messages: msgs, stream: !!stream })
     });
     if (!r.ok) throw new Error("anthropic " + r.status);
     if (!stream) {
@@ -530,7 +557,7 @@ async function aiRun(env, provider, cfg, sys, conv, stream) {
     const r = await fetch(cfg.base + "/chat/completions", {
       method: "POST",
       headers: h,
-      body: JSON.stringify({ model: cfg.model, messages: [{ role: "system", content: sys }].concat(msgs), max_tokens: 1400, temperature: 0.4, stream: !!stream })
+      body: JSON.stringify({ model: cfg.model, messages: [{ role: "system", content: sys }].concat(msgs), max_tokens: 2800, temperature: 0.35, stream: !!stream })
     });
     if (!r.ok) throw new Error("openai " + r.status);
     if (!stream) {
@@ -547,7 +574,7 @@ async function aiRun(env, provider, cfg, sys, conv, stream) {
     const r = await fetch(url, {
       method: "POST",
       headers: H,
-      body: JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents: contents, generationConfig: { temperature: 0.4, maxOutputTokens: 1400 } })
+      body: JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents: contents, generationConfig: { temperature: 0.35, maxOutputTokens: 2800 } })
     });
     if (!r.ok) throw new Error("gemini " + r.status);
     const pickG = (o) => {
@@ -558,7 +585,7 @@ async function aiRun(env, provider, cfg, sys, conv, stream) {
   }
 
   if (provider === "workersai") {
-    const out = await env.AI.run(cfg.model, { messages: [{ role: "system", content: sys }].concat(msgs), max_tokens: 1200, stream: !!stream });
+    const out = await env.AI.run(cfg.model, { messages: [{ role: "system", content: sys }].concat(msgs), max_tokens: 2200, stream: !!stream });
     if (stream && out && typeof out.getReader === "function") return { stream: rawToOpenAIStream(out) };
     if (stream && out instanceof ReadableStream) return { stream: rawToOpenAIStream(out) };
     return { text: String((out && (out.response || out.result)) || "") };
@@ -595,10 +622,12 @@ async function handleAI(env, req, body, uid) {
   const sys = clean.filter((m) => m.role === "system").map((m) => m.content).join("\n");
   const conv = clean.filter((m) => m.role !== "system");
   const student = String(body.grade || "").trim();
-  const ctx = String(body.context || "").slice(0, 12000);
+  const intent = String(body.intent || "explain").toLowerCase().slice(0, 20);
+  const ctx = String(body.context || "").slice(0, 16000);
   let SYS = (sys ? sys + "\n" : "") + AI_SYS_BASE;
-  if (student) SYS += "\nپایهٔ تحصیلی کاربر: " + student + ".";
-  if (ctx) SYS += "\n\n— متن جزوهٔ مرتبط (تنها منبع مجاز) —\n" + ctx;
+  if (student) SYS += "\nپایهٔ تحصیلی کاربر: پایهٔ " + student + " (بر همان سطح توضیح بده).";
+  if (AI_INTENT_HINT[intent]) SYS += "\nمنظور این پرسش: " + AI_INTENT_HINT[intent];
+  if (ctx) SYS += "\n\n— متن جزوهٔ مرتبط (منبع اصلی و معتبر؛ بر پایهٔ همین پاسخ بده) —\n" + ctx;
 
   const plan = aiPlan(env, body.provider);
   if (!plan.order.length) {

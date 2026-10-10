@@ -348,3 +348,77 @@ img[loading="lazy"] { background: var(--surface-2); }
   body.r6-has-fab #r6-ai-fab { bottom: 84px; }
   body.r6-has-fab #r6-ai-panel { bottom: 150px; }
 }
+
+/* ==========================================================================
+   ۱۰. کارایی اسکرول — رفع کندی و لَختی حرکت صفحه
+   --------------------------------------------------------------------------
+   چهار علت واقعی کندی اسکرول در این سایت پیدا و رفع شد:
+
+   ۱) background-attachment: fixed روی body  (فایل cute.css)
+      → مرورگر مجبور بود در هر فریم، پس‌زمینهٔ گرادیانی کل صفحه را از نو
+        بکشد. این گران‌ترین بخش اسکرول بود.
+
+   ۲) scroll-behavior: smooth روی html  (style.css / polish.css / ultra.css)
+      → اسکرول با کلید، صفحه‌کلید و نوار پیمایش «کند و کشدار» می‌شد و روی
+        صفحه‌های بلند حس «اصلاً حرکت نمی‌کند» می‌داد. حالا فقط پرش‌های
+        درون‌صفحه‌ای (کلیک روی فهرست) نرم می‌مانند — آن را در r6.js با
+        scrollTo({behavior:'smooth'}) انجام می‌دهیم.
+
+   ۳) بلور شیشه‌ای (backdrop-filter) روی نوارهای چسبان
+      → در هر فریم باید پشتِ نوار دوباره محاسبه و بلور شود. حالا نوارها
+        پس‌زمینهٔ تقریباً یکدست دارند (همان ظاهر، بدون هزینهٔ هر فریم).
+
+   ۴) انیمیشن‌های بی‌پایان هاله‌های پس‌زمینه
+      → تمام‌نشدنی بودند و موتور رندر هیچ‌وقت بیکار نمی‌شد.
+   ========================================================================== */
+
+html { scroll-behavior: auto !important; }          /* (۲) */
+body { background-attachment: scroll !important; }  /* (۱) */
+body.u-bg-aurora { background-attachment: scroll !important; }
+
+/* (۳) بلور پشت نوارهای چسبان خاموش — ظاهر با پس‌زمینهٔ مات حفظ می‌شود */
+.site-header,
+.hk-tools,
+.hk-ed-bar,
+.cls-bar,
+.hk-chat-head,
+.admin-side,
+.adm-modal,
+.hk-ai-head,
+.nav-more .nav-more-menu {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.site-header,
+.hk-tools,
+.hk-ed-bar { background: var(--surface) !important; }
+html[data-theme="dark"] .site-header,
+html[data-theme="dark"] .hk-tools { background: var(--surface) !important; }
+
+/* تغییر سایهٔ سربرگ هنگام اسکرول نباید در هر فریم بازرسم کند */
+.site-header { transition: background .2s ease, border-color .2s ease; }
+
+/* (۴) هاله‌های متحرک: یک‌بار رسم، بدون کار بی‌پایان */
+.hk-aura i,
+.hk-aura { animation: none !important; will-change: auto !important; }
+
+/* لایه‌های گرافیکی بی‌مورد حذف می‌شوند */
+.card, .cls-card, .subject-card, .tool-card,
+.hk-pane, .hk-pane-list, .hk-pane-main, .hk-dock { will-change: auto !important; }
+
+/* در حین اسکرول، افکت‌های گران روی هاور کار نمی‌کنند */
+@media (hover: hover) and (pointer: fine) {
+  .subject-card:hover, .tool-card:hover { transform: translateY(-4px); }
+}
+
+/* ---------- صفحه‌های خیلی بلند (جزوهٔ ۴۷ درسی) ----------
+   بخش‌های بیرون از دید، اصلاً رسم نمی‌شوند. این تنها راه واقعی برای روان
+   کردن اسکرول صفحه‌ای با هزاران گره است. دو درس اول همیشه رسم می‌مانند تا
+   پرش به بالا و فهرست دقیق بماند. کلاس r6-perf را r6.js می‌گذارد. */
+body.r6-perf article.lesson:not(:nth-of-type(-n+2)) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1100px;
+}
+@media print {
+  body.r6-perf article.lesson { content-visibility: visible !important; }
+}
