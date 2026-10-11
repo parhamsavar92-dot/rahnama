@@ -30,7 +30,19 @@
 
   function lUsers() { try { return JSON.parse(localStorage.getItem(L_USERS) || "{}"); } catch (e) { return {}; } }
   function lWrite(o) { try { localStorage.setItem(L_USERS, JSON.stringify(o)); } catch (e) {} }
-  function lSession() { try { return JSON.parse(localStorage.getItem(L_SESS) || "null"); } catch (e) { return null; } }
+  function lSession() {
+    try {
+      var u = JSON.parse(localStorage.getItem(L_SESS) || "null");
+      // ارتقای حساب مالکی که پیش‌تر محلی ساخته شده و مالک علامت نخورده بود
+      if (u && !u.isOwner && String(u.email || "").toLowerCase() === String(OWNER_EMAIL || "").toLowerCase()) {
+        u.isOwner = true; u.role = "owner"; u.roleFa = "مالک سایت"; u.verified = true;
+        localStorage.setItem(L_SESS, JSON.stringify(u));
+        var us = lUsers();
+        if (us[u.email]) { us[u.email].user = u; lWrite(us); }
+      }
+      return u;
+    } catch (e) { return null; }
+  }
   function lHash(s) {
     var h = 5381, i;
     for (i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
@@ -48,7 +60,10 @@
       if (!/^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$/.test(email)) return Promise.reject(new Error("ایمیل معتبر نیست."));
       if (String(body.password || "").length < 6) return Promise.reject(new Error("رمز باید حداقل ۶ نویسه باشد."));
       if (users[email]) return Promise.reject(new Error("این ایمیل قبلاً در این دستگاه ثبت شده است."));
-      var owner = false; /* مالک فقط از طریق سرور اصلی تعیین می‌شود */
+      /* مالک سایت با ایمیل خودش شناخته می‌شود — حتی در حالت محلی
+         (اپ اندروید / میزبانی استاتیک). بدون این، پنل مالک روی
+         میزبانی بدون سرور اصلاً باز نمی‌شد. */
+      var owner = (email === String(OWNER_EMAIL || "").toLowerCase());
       // تعیین نقش در حالت محلی هم مثل سرور: دانش‌آموز آزاد، بقیه با کد همکاران
       var wantRole = String(body.role || "student").toLowerCase();
       if (["teacher", "deputy"].indexOf(wantRole) > -1 &&
