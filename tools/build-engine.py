@@ -21,8 +21,9 @@ sub1(r'var OWNER_EMAIL = "[^"]*";',
      'var OWNER_EMAIL = String((CFG && CFG.ownerEmail) || "").toLowerCase();', rx=True)
 sub1('function setPass(u, pw) { u.ph = hashPass(u.email, pw); delete u.pass; }',
      'function setPass(u, pw) { u._np = String(pw); delete u.ph; delete u.pass; }')
-sub1('String(body.staffCode || "").trim() !== "rahnama-hamkaran"',
-     '(!(CFG && CFG.staffCode) || String(body.staffCode || "").trim() !== CFG.staffCode)')
+# کد همکاران: در مرورگر از تنظیمات سایت، در سرور علاوه بر آن از متغیر محیطی
+sub1('var WANT_STAFF_CODE = String((d.settings && d.settings.staffCode) || "").trim() || "rahnama-hamkaran";',
+     'var WANT_STAFF_CODE = String((d.settings && d.settings.staffCode) || (CFG && CFG.staffCode) || "").trim() || "rahnama-hamkaran";')
 sub1('if (seg[0] === "ai") return', 'if (seg[0] === "ai-local") return')
 # موتور سرور هر درخواست نسخهٔ تازهٔ پایگاه را می‌خواند؛ ادغام لازم ندارد و
 # اگر انجام شود، رکوردهای حذف‌شده را دوباره زنده می‌کند.

@@ -658,7 +658,8 @@ export function createEngine(LS, CFG) {
       var s = d.settings;
       ["registrationOpen", "maintenance", "aiEnabled", "consultEnabled",
         "aiMaintenance", "consultMaintenance", "aiMaintenanceNote", "consultMaintenanceNote",
-        "maintenanceNote", "allowedGrades"].forEach(function (k) { if (body[k] != null) s[k] = body[k]; });
+        "maintenanceNote", "allowedGrades", "staffCode", "schoolKey",
+        "classLimit", "announceBanner"].forEach(function (k) { if (body[k] != null) s[k] = body[k]; });
       if (s.allowedGrades) s.allowedGrades = s.allowedGrades.map(String);
       save(); audit("settings.update", "site", body);
       return J({ settings: s });
@@ -859,7 +860,11 @@ export function createEngine(LS, CFG) {
         if (body.role && !mu2.isOwner && body.role !== mu2.role) {
           var wr = String(body.role).toLowerCase();
           if (["student", "teacher", "deputy"].indexOf(wr) < 0) return bad("نقش مدیر فقط توسط مالک سایت تعیین می‌شود.", 403);
-          if (wr !== "student" && (!(CFG && CFG.staffCode) || String(body.staffCode || "").trim() !== CFG.staffCode)) {
+          /* کد همکاران: اول از تنظیمات سایت (قابل تغییر در پنل مالک)، وگرنه پیش‌فرض.
+       tools/build-engine.py این خط را برای موتور سرور به متغیر محیطی STAFF_CODE
+       هم وصل می‌کند تا در Cloudflare هم قابل تنظیم باشد. */
+    var WANT_STAFF_CODE = String((d.settings && d.settings.staffCode) || (CFG && CFG.staffCode) || "").trim() || "rahnama-hamkaran";
+    if (wr !== "student" && String(body.staffCode || "").trim() !== WANT_STAFF_CODE) {
             return J({ error: "برای نقش دبیر / ناظم / مدیر باید «کد همکاران» درست را وارد کنی.", needCode: true }, 403);
           }
           mu2.role = wr;
