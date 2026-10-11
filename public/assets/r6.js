@@ -534,6 +534,19 @@
       }
       var fab = $("#r6-ai-fab");
       if (fab) fab.classList.toggle("is-maint", flagOn("ai"));
+
+      // ── مشاورهٔ آنلاین ──
+      // پیش‌تر فقط یک کلاس روی body گذاشته می‌شد و هیچ‌چیز آن را مصرف نمی‌کرد؛
+      // یعنی با وجود «حالت تعمیر»، دکمهٔ شناور و کشوی مشاوره باز می‌شدند.
+      var cOn = flagOn("consult");
+      var cfab = $(".hk-fab");
+      if (cfab) cfab.style.display = cOn ? "none" : "";
+      if (cOn) {
+        var cdr = $(".hk-drawer");
+        if (cdr) cdr.classList.remove("open");
+        var cbd = $(".hk-backdrop");
+        if (cbd) cbd.classList.remove("open");
+      }
     } catch (e) { }
   }
   R6.applyFlags = applyFlags;
@@ -1282,9 +1295,10 @@
     var html =
       '<section class="section" id="r6HomeProf" style="padding-bottom:0">' +
       '<div class="wrap">' +
-      '<div class="r6-prof-grid">' +
-
-      // ---- کارت ۱: پروفایل شخصی ----
+      '<div class="r6-prof-grid r6-prof-grid--one">' +
+      // ---- یک کارت واحد ----
+      // پیش‌تر این‌جا «دو» کارت ساخته می‌شد (پروفایل شخصی + کارت نقش) و
+      // کاربر آن را به‌درستی «دو پروفایل» می‌دید. حالا همه‌چیز در یک کارت است.
       '<article class="card r6-prof-card">' +
       '<div class="r6-prof-head">' + avatarHTML(u, 76) +
       "<div>" + nameHTML(u) +
@@ -1292,23 +1306,16 @@
       '<div class="r6-prof-pills">' + tick + own + keyPill + "</div>" +
       "</div></div>" +
       (u.bio ? '<p class="r6-prof-bio">' + esc(u.bio) + "</p>" : "") +
+      '<p class="r6-prof-note" style="margin-top:12px">' + esc(rp.note) + "</p>" +
       '<div class="r6-prof-acts">' +
       '<a class="btn btn-sm btn-primary" href="' + url("profile.html") + '">ویرایش پروفایل</a>' +
+      '<a class="btn btn-sm" href="' + url(rp.url) + '">ورود به پنل ' + esc(roleFa) + "</a>" +
       '<a class="btn btn-sm" href="' + url("settings.html") + '">تنظیمات من</a>' +
-      "</div></article>" +
-
-      // ---- کارت ۲: نقش و پنل ----
-      '<article class="card r6-prof-card">' +
-      '<h4><span class="card-icon">◆</span> نقش من: ' + esc(roleFa) + "</h4>" +
-      '<p class="r6-prof-sub" style="margin:6px 0 10px">' + esc(rp.note) + "</p>" +
-      '<div class="r6-prof-acts">' +
-      '<a class="btn btn-sm btn-primary" href="' + url(rp.url) + '">ورود به پنل ' + esc(roleFa) + "</a>" +
       '<a class="btn btn-sm" href="' + url("class-support.html") + '">پشتیبانی کلاس مجازی</a>' +
       "</div>" +
       '<p class="r6-prof-note">نقش‌های <b>دبیر</b> و <b>ناظم</b> با «کد همکاران» فعال می‌شوند؛ ' +
-      "نقش <b>مدیر</b> را فقط مالک سایت تعیین می‌کند. برای کلید کلاس مجازی مدرسه، از پشتیبانی درخواست بده.</p>" +
+      "نقش <b>مدیر</b> را فقط مالک سایت تعیین می‌کند.</p>" +
       "</article>" +
-
       "</div></div></section>";
 
     var wrap = D.createElement("div");
@@ -1330,6 +1337,10 @@
     var what = isConsult ? "consult" : "ai";
     var on = flagOn(what);
     var old = $("#r6MaintBanner");
+    // کلاس مخصوص «صفحهٔ مشاوره در تعمیر»: با آن، محتوای صفحه جای خود را به
+    // پیام تعمیر می‌دهد. عمداً فقط روی همین صفحه اعمال می‌شود تا بقیهٔ سایت
+    // دست‌نخورده بماند.
+    if (isConsult) D.body.classList.toggle("r6-maint-consult-page", on);
     if (!on) { if (old) old.remove(); return; }
     if (old) old.remove();
     var b = D.createElement("div");

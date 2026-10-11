@@ -466,6 +466,7 @@ html[data-theme="dark"] .r6-pill.warn { color: #fbbf24; }
 
 /* ---------- کارت‌های پروفایل صفحهٔ اصلی ---------- */
 .r6-prof-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.r6-prof-grid--one { grid-template-columns: 1fr; }   /* کارت پروفایل تکی */
 .r6-prof-card { padding: 18px; }
 .r6-prof-head { display: flex; align-items: center; gap: 14px; }
 .r6-prof-sub { font-size: .83rem; color: var(--muted); margin-top: 3px; }
@@ -513,6 +514,23 @@ body.r6-maint-ai #r6-ai-panel .r6-ai-row { opacity: .55; }
   border: 1px solid color-mix(in srgb, #d97706 32%, transparent);
 }
 .r6-maint-banner b { font-size: .95rem; }
+
+/* ---- حالت تعمیر مشاورهٔ آنلاین ----
+   پیش‌تر این پرچم هیچ اثری نداشت: دکمهٔ شناور «پنل مشاوره» و کشوی آن باز
+   می‌شدند و صفحهٔ مشاوره هم کاملاً کار می‌کرد. */
+body.r6-maint-consult .hk-fab,
+body.r6-maint-consult .hk-drawer,
+body.r6-maint-consult .hk-backdrop { display: none !important; }
+
+/* فقط در صفحهٔ مشاوره: محتوا جای خود را به پیام تعمیر می‌دهد */
+body.r6-maint-consult-page main > * { display: none !important; }
+body.r6-maint-consult-page #r6MaintBanner {
+  display: block !important;
+  margin: 28px 0 40px;
+  padding: 26px 22px;
+  text-align: center;
+}
+body.r6-maint-consult-page #r6MaintBanner b { display: block; margin-bottom: 8px; font-size: 1.12rem; }
 
 /* ---------- صفحه‌های تازه (پشتیبانی، تنظیمات، پنل نقش) ---------- */
 .r6-page { max-width: 1040px; margin: 0 auto; padding: 22px 16px 60px; }

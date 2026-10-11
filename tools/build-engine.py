@@ -24,6 +24,9 @@ sub1('function setPass(u, pw) { u.ph = hashPass(u.email, pw); delete u.pass; }',
 sub1('String(body.staffCode || "").trim() !== "rahnama-hamkaran"',
      '(!(CFG && CFG.staffCode) || String(body.staffCode || "").trim() !== CFG.staffCode)')
 sub1('if (seg[0] === "ai") return', 'if (seg[0] === "ai-local") return')
+# موتور سرور هر درخواست نسخهٔ تازهٔ پایگاه را می‌خواند؛ ادغام لازم ندارد و
+# اگر انجام شود، رکوردهای حذف‌شده را دوباره زنده می‌کند.
+sub1('var MERGE_ON_SAVE = true;', 'var MERGE_ON_SAVE = false;')
 s = t.index('  /* ------------------------------------------------------------ نصب */')
 t = t[:s] + (
     "  return {\n"

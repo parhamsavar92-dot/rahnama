@@ -148,19 +148,106 @@
     return d;
   }
 
+  /* ------------------------------------------------------- ذخیره‌سازی ایمن
+     ─ باگ واقعی که پیدا شد ─
+     DB یک بار هنگام بارگذاری خوانده و در حافظه نگه داشته می‌شد و save()
+     همان نسخهٔ حافظه را روی localStorage می‌نوشت. اگر تب دیگری در این فاصله
+     کاربر/کلاس تازه اضافه کرده بود، نوشتن این تب آن را پاک می‌کرد.
+     نتیجه‌های دیده‌شده: شمار کاربران بین ۱ و ۲ نوسان می‌کرد، خطای الکی
+     «این ایمیل قبلاً ثبت شده است» می‌آمد، حساب کاربر ناپدید/پیدا می‌شد و
+     شمارندهٔ پنل مدیر با جدول کاربران نمی‌خواند.
+     راه‌حل: پیش از هر نوشتن، نسخهٔ تازهٔ دیسک خوانده و با حافظه ادغام
+     می‌شود (اتحاد بر پایهٔ شناسه)؛ حذف‌ها هم علامت‌گذاری می‌شوند تا ادغام
+     دوباره زنده‌شان نکند. با رویداد storage هم نسخهٔ حافظه تازه می‌شود. */
+  /* در «مرورگر» (حالت محلی) ادغام لازم است: DB در حافظهٔ صفحه می‌ماند و تب
+     دیگری می‌تواند در این فاصله نسخهٔ تازه‌تری نوشته باشد.
+     در «موتور سرور» هر درخواست نسخهٔ تازهٔ خودش را از پایگاه می‌خواند؛ آن‌جا
+     ادغام با نسخهٔ «پیش از درخواست» فقط باعث زنده‌شدن رکوردهای حذف‌شده
+     می‌شود (کاربر حذف‌شده دوباره می‌توانست وارد شود).
+     tools/build-engine.py این مقدار را برای موتور سرور به false تغییر می‌دهد. */
+  var MERGE_ON_SAVE = true;
+  var ARR_KEYS = ["users", "events", "audit", "classes", "sessions", "messages", "reports"];
+  var MAP_KEYS = ["rooms", "rate"];
+  var PREV = null;
+  function tkey(arr, id) { return arr + ":" + id; }
+
+  function mergeArr(arrName, mem, disk, del) {
+    var out = [], seen = {};
+    function add(x) {
+      if (!x || x.id == null) return;
+      var k = String(x.id);
+      if (seen[k]) return;
+      seen[k] = 1; out.push(x);
+    }
+    (mem || []).forEach(add);                       // نسخهٔ همین تب اولویت دارد
+    (disk || []).forEach(function (x) {
+      if (!x || x.id == null) return;
+      var k = String(x.id);
+      if (seen[k]) return;
+      if (del && del[tkey(arrName, k)]) return;     // در این نشست حذف شده است
+      add(x);
+    });
+    return out;
+  }
+
+  function mergeDB(disk, mem) {
+    if (!disk || disk.v !== 4 || !Array.isArray(disk.users)) return mem;
+    var out = clone(mem);
+    ARR_KEYS.forEach(function (k) { out[k] = mergeArr(k, mem[k], disk[k], mem._del); });
+    MAP_KEYS.forEach(function (k) { out[k] = Object.assign({}, disk[k] || {}, mem[k] || {}); });
+    if (disk.support || mem.support) {
+      var ds = disk.support || emptySupport(), ms = mem.support || emptySupport();
+      out.support = {
+        reqs: mergeArr("sreqs", ms.reqs, ds.reqs, mem._del),
+        keys: mergeArr("skeys", ms.keys, ds.keys, mem._del)
+      };
+    }
+    if (mem.settings) out.settings = Object.assign({}, disk.settings || {}, mem.settings);
+    return out;
+  }
+
   var DB = jload(DB_KEY, null);
   function db() {
-    if (!DB || DB.v !== 4 || !DB.users) { DB = seedDB(); jsave(DB_KEY, DB); }
+    if (!DB || DB.v !== 4 || !DB.users) { DB = seedDB(); save(); }
     else {
       var dirty = false;
       if (!DB._chk) { DB._chk = 1; if (ensureOwner(DB)) dirty = true; }
       // مهاجرت پایگاه‌های قدیمی: بخش «پشتیبانی کلاس مجازی» تازه اضافه شده است
       if (!DB.support || !DB.support.reqs) { DB.support = emptySupport(); dirty = true; }
-      if (dirty) jsave(DB_KEY, DB);
+      if (dirty) save();
     }
     return DB;
   }
-  function save() { jsave(DB_KEY, DB); }
+
+  function save() {
+    if (!MERGE_ON_SAVE) { jsave(DB_KEY, DB); return; }
+    var disk = jload(DB_KEY, null);
+    var mem = DB;
+    // رکوردهایی که در همین نشست حذف شده‌اند علامت می‌خورند
+    if (PREV) {
+      ARR_KEYS.forEach(function (k) {
+        var nowIds = {};
+        (mem[k] || []).forEach(function (x) { if (x && x.id != null) nowIds[x.id] = 1; });
+        (PREV[k] || []).forEach(function (x) {
+          if (x && x.id != null && !nowIds[x.id]) { mem._del = mem._del || {}; mem._del[tkey(k, x.id)] = 1; }
+        });
+      });
+    }
+    var merged = mergeDB(disk, mem);
+    PREV = clone(merged);
+    DB = merged;
+    jsave(DB_KEY, merged);
+  }
+
+  // اگر تب دیگری پایگاه را عوض کرد، نسخهٔ حافظهٔ این تب هم تازه می‌شود
+  try {
+    W.addEventListener("storage", function (e) {
+      if (!e || e.key !== DB_KEY) return;
+      var fresh = jload(DB_KEY, null);
+      if (fresh && fresh.v === 4 && Array.isArray(fresh.users)) { DB = fresh; PREV = clone(fresh); }
+    });
+  } catch (e) { }
+
   db();
 
   /* ------------------------------------------------------------ نشست */
