@@ -16,7 +16,13 @@
     }
   ],
   "vars": {
-    "OWNER_EMAIL": "parham.savar92@gmail.com"
+    "OWNER_EMAIL": "parham.savar92@gmail.com",
+    "AI_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
   },
-  "observability": { "enabled": true }
+  "ai": {
+    "binding": "AI"
+  },
+  "observability": {
+    "enabled": true
+  }
 }

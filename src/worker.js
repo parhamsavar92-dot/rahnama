@@ -592,7 +592,13 @@ async function aiRun(env, provider, cfg, sys, conv, stream) {
   }
 
   if (provider === "workersai") {
-    const out = await env.AI.run(cfg.model, { messages: [{ role: "system", content: sys }].concat(msgs), max_tokens: 2200, stream: !!stream });
+    // مسیر سبک (پرسش کوتاه) پاسخ کوتاه‌تر می‌دهد تا سریع تمام شود
+    const out = await env.AI.run(cfg.model, {
+      messages: [{ role: "system", content: sys }].concat(msgs),
+      max_tokens: cfg.fast ? 900 : 3200,
+      temperature: 0.35,
+      stream: !!stream
+    });
     if (stream && out && typeof out.getReader === "function") return { stream: rawToOpenAIStream(out) };
     if (stream && out instanceof ReadableStream) return { stream: rawToOpenAIStream(out) };
     return { text: String((out && (out.response || out.result)) || "") };
@@ -643,21 +649,28 @@ async function handleAI(env, req, body, uid) {
     return err("دستیار هوشمند روی سرور تنظیم نشده است؛ ANSWERS از موتور محلی سایت استفاده می‌کند. برای فعال‌سازی، یکی از این‌ها را در تنظیمات Worker بگذار: ANTHROPIC_API_KEY، OPENAI_API_KEY، GEMINI_API_KEY یا اتصال Workers AI با نام AI.", 503);
   }
   const wantStream = !!body.stream;
+
+  /* نکته: پیش‌تر این‌جا برای پرسش‌های کوتاه به یک «مدل سبک» سوییچ می‌شد،
+     ولی نام آن مدل روی Workers AI معتبر نبود و همهٔ پاسخ‌ها ۵۰۲ می‌شد.
+     حالا همیشه مدل تنظیم‌شده (پیش‌فرض ۷۰B) استفاده می‌شود تا کیفیت و
+     پایداری تضمین شود؛ سرعت درک‌شده از راه پخش زنده (SSE) می‌آید. */
   let lastErr = null;
   for (const id of plan.order) {
     try {
-      const out = await aiRun(env, id, plan.have[id], SYS, conv, wantStream);
+      const cfg = plan.have[id];
+      const use = cfg;
+      const out = await aiRun(env, id, use, SYS, conv, wantStream);
       await bumpAI(env, id);
       if (out.stream) {
         return new Response(out.stream, {
           status: 200,
-          headers: { "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-store", "X-AI-Provider": id, "X-Accel-Buffering": "no" }
+          headers: { "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-store", "X-AI-Provider": id, "X-AI-Model": use.model, "X-Accel-Buffering": "no" }
         });
       }
       return json(
-        Object.assign({ provider: id, model: plan.have[id].model }, aiBody(String(out.text || ""))),
+        Object.assign({ provider: id, model: use.model }, aiBody(String(out.text || ""))),
         200,
-        { "X-AI-Provider": id }
+        { "X-AI-Provider": id, "X-AI-Model": use.model }
       );
     } catch (e) { lastErr = e; }
   }

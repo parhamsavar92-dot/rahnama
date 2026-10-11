@@ -14,6 +14,16 @@
   Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=()
   Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: blob: https:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https:; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests
   X-DNS-Prefetch-Control: on
+
+# توجه: این‌جا عمداً Cache-Control گذاشته نشده است.
+# اگر روی /* هم Cache-Control بگذاریم، Cloudflare آن را با قاعدهٔ /assets/*
+# «به‌هم می‌چسباند» و دو max-age متناقض ساخته می‌شود
+# (max-age=0, must-revalidate, public, max-age=604800) که مرورگر اولین را
+# می‌گیرد و کش هفت‌روزهٔ دارایی‌ها بی‌اثر می‌شود. پس کش هر نوع فایل
+# فقط در قاعدهٔ خودش تعیین می‌شود.
+
+# صفحه‌های HTML: همیشه تازه بررسی شوند تا نسخهٔ جدید بیاید
+/*.html
   Cache-Control: public, max-age=0, must-revalidate
 
 # API و پاسخ‌های داینامیک هرگز نباید کش شوند
