@@ -1,7 +1,12 @@
 import { D1Shim } from "./d1-shim.mjs";
 import worker from "../src/worker.js";
 
-const env = { DB: new D1Shim(), OWNER_EMAIL: "parham.savar92@gmail.com", OWNER_PASSWORD: "Parham2273", ASSETS: { fetch: () => new Response("asset") } };
+// ⚠ امنیت: رمز این آزمون عمداً «متفاوت از رمز سایت زنده» است.
+// رمز واقعی فقط به‌صورت Secret در Cloudflare نگه داشته می‌شود و هرگز
+// داخل مخزن (که عمومی است) نوشته نمی‌شود.
+const TEST_OWNER_PASSWORD = "local-test-only-pass";
+const OWNER_EMAIL_TEST = "parham.savar92@gmail.com";
+const env = { DB: new D1Shim(), OWNER_EMAIL: OWNER_EMAIL_TEST, OWNER_PASSWORD: TEST_OWNER_PASSWORD, ASSETS: { fetch: () => new Response("asset") } };
 const ctxw = { waitUntil() {} };
 class Jar { constructor(envx) { this.c = ""; this.env = envx || env; }
   async call(method, path, body, hdr) {
@@ -17,7 +22,7 @@ let fails = 0; const t = (n, c) => { console.log((c ? "PASS " : "FAIL ") + n); i
 
 const owner = new Jar(), stu = new Jar(), anon = new Jar();
 let r = await anon.call("GET", "/api/__status"); t("status reports d1 + owner ready", r.s === 200 && r.j.server === "d1" && r.j.ownerReady === true);
-r = await owner.call("POST", "/api/auth/login", { email: "Parham.savar92@gmail.com", password: "Parham2273" });
+r = await owner.call("POST", "/api/auth/login", { email: "Parham.savar92@gmail.com", password: TEST_OWNER_PASSWORD });
 t("owner login", r.s === 200 && r.j.user.role === "owner" && r.j.user.verified && r.j.user.isOwner);
 t("cookie is HttpOnly+Secure+SameSite", /HttpOnly/.test(r.sc) && /Secure/.test(r.sc) && /SameSite=Lax/.test(r.sc));
 t("no hash in login response", !/p1\$|"ph"|"pass"/.test(r.txt));
@@ -92,7 +97,7 @@ r = await owner.call("POST", "/api/auth/logout"); t("logout", r.s === 200 && /Ma
 r = await owner.call("GET", "/api/admin/stats"); t("session dead after logout", r.s === 401);
 r = await anon.call("POST", "/api/auth/login", { email: "parham.savar92@gmail.com", password: "x" }, { Origin: "https://evil.test" }); t("foreign Origin blocked", r.s === 403);
 r = await anon.call("POST", "/api/ai/chat/completions", { messages: [{ role: "user", content: "سلام" }] }); t("AI requires login", r.s === 401);
-const o2 = new Jar(); await o2.call("POST", "/api/auth/login", { email: "parham.savar92@gmail.com", password: "Parham2273" });
+const o2 = new Jar(); await o2.call("POST", "/api/auth/login", { email: "parham.savar92@gmail.com", password: TEST_OWNER_PASSWORD });
 r = await o2.call("POST", "/api/ai/chat/completions", { messages: [{ role: "user", content: "سلام" }] }); t("AI 503 when no key configured", r.s === 503);
 // brute force
 const bf = new Jar(); let last;
@@ -122,7 +127,7 @@ t("ai-usage blocked for anonymous", r.s === 401);
 // ------------------------------------------------- چند ارائه‌دهنده + پخش زنده
 const env2 = { ...env, ANTHROPIC_API_KEY: "test-key" };
 const oai = new Jar(env2);
-await oai.call("POST", "/api/auth/login", { email: "parham.savar92@gmail.com", password: "Parham2273" });
+await oai.call("POST", "/api/auth/login", { email: "parham.savar92@gmail.com", password: TEST_OWNER_PASSWORD });
 const realFetch = globalThis.fetch;
 const calls = [];
 globalThis.fetch = async (u, opt) => {

@@ -5,7 +5,11 @@ import path from "node:path";
 import { D1Shim } from "./d1-shim.mjs";
 import worker from "../src/worker.js";
 const PORT = +process.env.PORT || 8790, ROOT = path.resolve("public");
-const env = { DB: new D1Shim(), OWNER_EMAIL: "parham.savar92@gmail.com", OWNER_PASSWORD: process.env.OWNER_PASSWORD || "Parham2273" };
+// ⚠ امنیت: این رمز فقط برای «آزمون محلی» است و نباید همان رمز سایت زنده باشد.
+// رمز واقعی سایت فقط به‌صورت Secret در Cloudflare نگه داشته می‌شود
+// (npx wrangler secret put OWNER_PASSWORD) و هرگز داخل مخزن نوشته نمی‌شود.
+const TEST_OWNER_PASSWORD = "local-test-only-pass";
+const env = { DB: new D1Shim(), OWNER_EMAIL: "parham.savar92@gmail.com", OWNER_PASSWORD: process.env.OWNER_PASSWORD || TEST_OWNER_PASSWORD };
 const MIME = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2", ".ico": "image/x-icon", ".webmanifest": "application/manifest+json", ".txt": "text/plain" };
 env.ASSETS = { fetch: async (req) => {
   let p = decodeURIComponent(new URL(req.url).pathname); if (p.endsWith("/")) p += "index.html";
