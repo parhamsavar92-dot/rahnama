@@ -48,7 +48,7 @@
     <button class="icon-btn nav-toggle" data-nav-toggle aria-label="فهرست"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     <nav class="header-nav">
       <a href="index.html">خانه</a>
-      <a href="jozve.html">جزوه‌ها</a>
+      <a href="jozve.html">جزوه‌ها</a> <a href="pdf-tools.html">ابزار PDF</a>
       <a href="consult.html">مشاورهٔ آنلاین</a>
       <a href="report.html">کارنامه</a>
       <a href="dashboard.html">داشبورد</a>
@@ -149,7 +149,9 @@
 
   <!-- ------------------------------- پروفایل ------------------------------- -->
   <section class="wrap" id="profileWrap" hidden>
-    <div class="grid-2">
+    <!-- ▼ یک کارت واحد: پیش‌تر «دو کارت» کنار هم بود (نمایش پروفایل + فرم ویرایش)
+         و هر دو نام کاربر را نشان می‌دادند؛ کاربر آن را «دو پروفایل» می‌دید. -->
+    <div>
       <div class="card">
         <div class="flex" style="align-items:center;gap:14px">
           <span class="hk-ava" id="pfAva" style="width:62px;height:62px;flex:0 0 62px;font-size:1.5rem;border-radius:20px">؟</span>
@@ -171,10 +173,9 @@
           <button class="btn btn-ghost btn-sm" id="btnLogout">خروج از حساب</button>
         </div>
         <div class="hk-status" id="syncNote"></div>
-      </div>
 
-      <div class="card">
-        <h4><span class="card-icon">◆</span> ویرایش پروفایل</h4>
+        <hr style="border:0;border-top:1px dashed var(--border);margin:20px 0 14px">
+        <h4 style="margin:0 0 12px"><span class="card-icon">✎</span> ویرایش پروفایل</h4>
         <div class="hk-field"><label for="pfNameIn">نام و نام خانوادگی</label>
           <input id="pfNameIn" style="width:100%;padding:11px 13px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);font:inherit"></div>
         <div class="hk-field"><label for="pfGradeIn">پایه</label>
@@ -230,7 +231,7 @@
 
     <div class="grid-2">
       <div class="card">
-        <h4><span class="card-icon">◆</span> تغییر رمز عبور</h4>
+        <h4><span class="card-icon">🔒</span> تغییر رمز عبور</h4>
         <div class="hk-field"><label for="pwCur">رمز فعلی</label>
           <input id="pwCur" type="password" style="width:100%;padding:11px 13px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);font:inherit"></div>
         <div class="hk-field"><label for="pwNew">رمز جدید (حداقل ۶ نویسه)</label>
