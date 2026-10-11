@@ -415,21 +415,130 @@
   /* ======================================================================
      ۲) وضعیت سرور دستیار
      ====================================================================== */
-  var SRV = { known: false, ai: false, providers: [], model: null, version: "" };
+  var SRV = { known: false, ai: false, providers: [], model: null, version: "", settings: null, static: false };
+
+  /* ---------------------------------------------------------------------
+     وضعیت سایت: یک‌جا از سرور خوانده می‌شود و برای همهٔ بخش‌ها (دستیار،
+     مشاوره، حالت تعمیر) استفاده می‌شود.
+     ⚠️ روی میزبانی استاتیک (مثل GitHub Pages) هیچ سروری وجود ندارد؛ در آن
+     حالت /api/health خطای ۴۰۴ می‌دهد و سایت خودکار «حالت محلی» می‌شود.
+     --------------------------------------------------------------------- */
   function probeServer() {
     return fetch("/api/health", { credentials: "same-origin" })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (j) {
         SRV.known = true;
+        SRV.static = !j;
         SRV.ai = !!(j && j.ai && j.ai.configured);
         SRV.providers = (j && j.ai && j.ai.providers) || [];
         SRV.model = j && j.ai ? j.ai.defaultModel : null;
         SRV.version = (j && j.version) || "";
-        return SRV;
+        return fetch("/api/site/status", { credentials: "same-origin" })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (s) { SRV.settings = (s && s.settings) || null; return SRV; })
+          .catch(function () { return SRV; });
       })
-      .catch(function () { SRV.known = true; SRV.ai = false; return SRV; });
+      .catch(function () { SRV.known = true; SRV.static = true; SRV.ai = false; return SRV; });
   }
   R6.server = function () { return SRV; };
+
+  /* ---------------------------------------------------------------------
+     پرچم‌های محلی سایت — برای وقتی که سروری در کار نیست.
+     مالک از پنل تغییر می‌دهد؛ همان لحظه در همین مرورگر و همهٔ زبانه‌های باز
+     اعمال می‌شود (localStorage + BroadcastChannel). این همان «اعمال مستقیم و
+     بی‌قید و شرط» است — بدون نیاز به رفرش.
+     --------------------------------------------------------------------- */
+  var FLAGS_KEY = "g8:site:flags";
+  var R6CH = null;
+  try { if (W.BroadcastChannel) R6CH = new W.BroadcastChannel("g8-site-flags"); } catch (e) { R6CH = null; }
+
+  function localFlags() {
+    try { return JSON.parse(W.localStorage.getItem(FLAGS_KEY) || "{}") || {}; } catch (e) { return {}; }
+  }
+  function writeFlags(o) {
+    try { W.localStorage.setItem(FLAGS_KEY, JSON.stringify(o || {})); } catch (e) { }
+    try { localStorage.setItem(FLAGS_KEY, JSON.stringify(o || {})); } catch (e) { }
+    if (R6CH) { try { R6CH.postMessage({ t: "flags", v: o }); } catch (e) { } }
+    applyFlags();
+  }
+  R6.flags = localFlags;
+  R6.setFlags = writeFlags;
+
+  /* تنظیمات سراسری میزبانی استاتیک — از فایل assets/site-flags.json خوانده
+     می‌شود تا حالت تعمیر روی GitHub Pages هم برای «همهٔ» بازدیدکنندگان
+     اعمال شود (نه فقط مرورگر مالک). */
+  var STATIC_FLAGS = null;
+  function loadStaticFlags() {
+    return fetch(url("assets/site-flags.json"), { credentials: "same-origin", cache: "no-cache" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { STATIC_FLAGS = j || null; return STATIC_FLAGS; })
+      .catch(function () { STATIC_FLAGS = null; return null; });
+  }
+  R6.staticFlags = function () { return STATIC_FLAGS; };
+
+  var FKEY = { ai: "aiMaintenance", consult: "consultMaintenance", site: "maintenance" };
+
+  /* ترتیب اولویت:
+     ۱) تنظیم خودِ مالک در همین مرورگر (بی‌قید و شرط، همان که خواسته شد)
+     ۲) تنظیمات سرور واقعی (برای همهٔ کاربران)
+     ۳) فایل استاتیک site-flags.json (برای میزبانی بدون سرور) */
+  function flagOn(k) {
+    var f = localFlags(), key = FKEY[k] || k;
+    if (f[key] !== undefined && f[key] !== null) return !!f[key];
+    if (SRV.settings) {
+      if (k === "ai") return !!(SRV.settings.aiMaintenance || SRV.settings.aiEnabled === false);
+      if (k === "consult") return !!(SRV.settings.consultMaintenance || SRV.settings.consultEnabled === false);
+      if (k === "site") return !!SRV.settings.maintenance;
+      return !!SRV.settings[k];
+    }
+    if (STATIC_FLAGS) return !!STATIC_FLAGS[key];
+    return false;
+  }
+  function flagNote(k) {
+    var s = SRV.settings || {}, f = localFlags() || {}, sf = STATIC_FLAGS || {};
+    if (k === "ai") return s.aiMaintenanceNote || f.aiMaintenanceNote || sf.aiMaintenanceNote || "دستیار هوشمند موقتاً در حال تعمیر و به‌روزرسانی است.";
+    if (k === "consult") return s.consultMaintenanceNote || f.consultMaintenanceNote || sf.consultMaintenanceNote || "مشاورهٔ آنلاین موقتاً در حال تعمیر و به‌روزرسانی است.";
+    return (s.maintenanceNote || f.maintenanceNote || sf.maintenanceNote) || "سایت موقتاً در حال به‌روزرسانی است.";
+  }
+  /* حذف تنظیم محلی تا سایت به پیش‌فرض خودش برگردد */
+  R6.resetFlag = function (k) {
+    var f = localFlags();
+    delete f[FKEY[k] || k];
+    writeFlags(f);
+  };
+  R6.maintenance = function (what) { return flagOn(what || "site"); };
+  R6.maintenanceNote = flagNote;
+
+  /* اعمال زندهٔ پرچم‌ها روی صفحهٔ جاری */
+  function applyFlags() {
+    try {
+      ["ai", "consult"].forEach(function (k) {
+        D.body.classList.toggle("r6-maint-" + k, flagOn(k));
+      });
+      D.body.classList.toggle("r6-maint-site", flagOn("site"));
+      var n = $("#r6-ai-panel");
+      if (n) {
+        var on = flagOn("ai");
+        var note = $("[data-r6-maint]", n);
+        if (!note) {
+          note = D.createElement("div");
+          note.setAttribute("data-r6-maint", "1");
+          note.className = "r6-ai-maint";
+          n.appendChild(note);
+        }
+        note.innerHTML = "<b>حالت تعمیر</b><br>" + esc(flagNote("ai"));
+        note.style.display = on ? "block" : "none";
+        var box = $("[data-r6-input]", n), send = $("[data-r6-send]", n);
+        if (box) box.disabled = on;
+        if (send) send.disabled = on;
+      }
+      var fab = $("#r6-ai-fab");
+      if (fab) fab.classList.toggle("is-maint", flagOn("ai"));
+    } catch (e) { }
+  }
+  R6.applyFlags = applyFlags;
+  if (R6CH) { try { R6CH.onmessage = function (ev) { if (ev && ev.data && ev.data.t === "flags") applyFlags(); }; } catch (e) { } }
+  W.addEventListener("storage", function (e) { if (e && e.key === FLAGS_KEY) applyFlags(); });
 
   /* ------------------------------------------------- پاسخ سرور با پخش زنده */
   function serverAnswer(messages, ctx, intent, onDelta) {
@@ -588,6 +697,15 @@
     function ask(q) {
       q = String(q || "").trim();
       if (!q || busy) return;
+      // حالت تعمیر: دستیار پاسخ نمی‌دهد و پیام روشن نشان می‌دهد
+      if (flagOn("ai")) {
+        var m = D.createElement("div");
+        m.className = "r6-msg ai r6-msg-maint";
+        m.innerHTML = "<b>دستیار در حالت تعمیر است</b><br>" + esc(flagNote("ai"));
+        log.appendChild(m);
+        log.scrollTop = log.scrollHeight;
+        return;
+      }
       busy = true;
       sendBtn.disabled = true;
       input.value = "";
@@ -854,18 +972,52 @@
   /* ======================================================================
      ۵) کارت‌های تازهٔ پنل مدیریت: سلامت سرور + مصرف دستیار هوشمند
      ====================================================================== */
+  /* ---------------------------------------------------------------------
+     انبار محلی درخواست‌ها و کلیدهای کلاس مجازی
+     وقتی سرور واقعی هست، از سرور استفاده می‌شود؛ روی میزبانی استاتیک،
+     همین مرورگر نقش انبار را دارد تا همهٔ اجزا کار کنند.
+     --------------------------------------------------------------------- */
+  var SUP_KEY = "g8:support";
+  function supDB() {
+    try {
+      var o = JSON.parse(W.localStorage.getItem(SUP_KEY) || "null");
+      if (!o || !o.reqs) return { reqs: [], keys: [] };
+      return o;
+    } catch (e) { return { reqs: [], keys: [] }; }
+  }
+  function supSave(o) { try { W.localStorage.setItem(SUP_KEY, JSON.stringify(o)); } catch (e) { } }
+  function supApi(method, path, body) {
+    if (SRV.static) return Promise.resolve(null);
+    return fetch("/api/" + path, {
+      method: method, credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined
+    }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+  }
+  R6.supportDB = supDB;
+  R6.supportSave = supSave;
+
+  function newKeyCode() {
+    var s = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", o = "RN-";
+    for (var i = 0; i < 6; i++) o += s[Math.floor(Math.random() * s.length)];
+    return o;
+  }
+
   function adminExtras() {
     var kpis = $("#admKpis");
-    if (!kpis || $("#r6AdmCards")) return;
+    if (!kpis) return;
+    var old = $("#r6AdmCards");
+    if (old) old.parentNode.removeChild(old);
     var box = D.createElement("div");
     box.id = "r6AdmCards";
-    box.className = "grid-2";
     box.style.margin = "4px 0 18px";
     box.innerHTML =
-      '<div class="card" data-r6-health><h4><span class="card-icon">♥</span> سلامت سرور</h4>' +
-      '<p style="color:var(--muted)">در حال بررسی…</p></div>' +
-      '<div class="card" data-r6-usage><h4><span class="card-icon">◍</span> مصرف دستیار هوشمند</h4>' +
-      '<p style="color:var(--muted)">در حال بارگذاری…</p></div>';
+      '<div class="r6-adm-grid">' +
+      '<div class="card" data-r6-health><h4><span class="card-icon">♥</span> وضعیت سیستم</h4><p style="color:var(--muted)">در حال بررسی…</p></div>' +
+      '<div class="card" data-r6-maint><h4><span class="card-icon">⏻</span> مرکز تعمیر و کنترل زنده</h4></div>' +
+      '<div class="card" data-r6-supp style="grid-column:1/-1"><h4><span class="card-icon">⚿</span> پشتیبانی کلاس مجازی</h4><p style="color:var(--muted)">در حال بارگذاری…</p></div>' +
+      '<div class="card" data-r6-usage style="grid-column:1/-1"><h4><span class="card-icon">◍</span> مصرف دستیار هوشمند</h4><p style="color:var(--muted)">در حال بارگذاری…</p></div>' +
+      "</div>";
     kpis.parentNode.insertBefore(box, kpis.nextSibling);
 
     var rows = function (list) {
@@ -874,24 +1026,175 @@
       }).join("") + "</ul>";
     };
 
-    fetch("/api/health", { credentials: "same-origin" })
-      .then(function (r) { return r.json(); })
-      .then(function (j) {
-        var el = $("[data-r6-health]", box);
-        if (!el) return;
-        el.innerHTML = "<h4><span class=\"card-icon\">♥</span> سلامت سرور</h4>" + rows([
-          ["وضعیت", j.ok ? "سالم" : "مشکل دارد"],
-          ["نسخه", j.version || "—"],
-          ["دیتابیس D1", (j.db && j.db.ok ? "متصل" : "قطع") + (j.db ? " · " + j.db.latencyMs + "ms" : "")],
-          ["کاربران", j.db ? String(j.db.users) : "—"],
-          ["دستیار", j.ai && j.ai.configured ? "فعال (" + (j.ai.providers || []).join("، ") + ")" : "خاموش — موتور محلی"],
-          ["زمان پاسخ سرور", (j.uptimeSeconds != null ? j.uptimeSeconds + " ثانیه از شروع" : "—")]
-        ]);
-      })
-      .catch(function () {
-        var el = $("[data-r6-health]", box);
-        if (el) el.innerHTML = "<h4><span class=\"card-icon\">♥</span> سلامت سرور</h4><p>ارتباط با سرور برقرار نشد.</p>";
+    /* ---------- کارت وضعیت: تفاوت «سرور قطع» و «میزبانی استاتیک» ---------- */
+    var healthEl = $("[data-r6-health]", box);
+    if (SRV.static) {
+      // سایت روی میزبانی استاتیک است؛ نبود سرور یک «خطا» نیست، یک انتخاب است.
+      healthEl.innerHTML =
+        "<h4><span class=\"card-icon\">♥</span> وضعیت سیستم</h4>" +
+        '<p style="margin:6px 0 4px"><span class="r6-pill warn">میزبانی استاتیک</span> ' +
+        "<b>سرور متصل نیست</b></p>" +
+        '<p style="font-size:.82rem;color:var(--muted);line-height:1.9">' +
+        "این نسخه از سایت روی یک میزبان فایل‌ای (مثل GitHub Pages) اجرا می‌شود؛ آن‌جا هیچ بک‌اند و پایگاه داده‌ای وجود ندارد. " +
+        "برای همین «نسخه»، «کاربران» و «زمان پاسخ سرور» مقدار ندارند. <b>این خرابی نیست</b> — سایت خودکار به «حالت محلی» می‌رود." +
+        "</p>" + rows([
+          ["وضعیت سایت", "درست کار می‌کند (حالت محلی)"],
+          ["حساب‌ها", "روی همین دستگاه ذخیره می‌شوند"],
+          ["دستیار", "موتور محلی سایت (بدون نیاز به کلید)"],
+          ["کلاس مجازی", "کد اتاق روی همین دستگاه"]
+        ]) +
+        '<p style="font-size:.8rem;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">' +
+        "برای فعال‌کردن سرور واقعی و پایگاه دادهٔ D1، راهنمای <b>deploy/GO-LIVE.md</b> را ببین " +
+        "یا در ترمینال <code>npm run deploy</code> را بزن. آن وقت همین کارت مقادیر واقعی را نشان می‌دهد." +
+        "</p>";
+    } else {
+      fetch("/api/health", { credentials: "same-origin" })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          healthEl.innerHTML = "<h4><span class=\"card-icon\">♥</span> وضعیت سیستم</h4>" + rows([
+            ["وضعیت", j.ok ? "سالم" : "نیازمند بررسی"],
+            ["نسخه", j.version || "—"],
+            ["پایگاه دادهٔ D1", (j.db && j.db.ok ? "متصل" : "قطع") + (j.db ? " · " + j.db.latencyMs + "ms" : "")],
+            ["کاربران", j.db ? String(j.db.users) : "—"],
+            ["دستیار", j.ai && j.ai.configured ? "فعال (" + (j.ai.providers || []).join("، ") + ")" : "خاموش — موتور محلی"],
+            ["سرور", (j.uptimeSeconds != null ? j.uptimeSeconds + " ثانیه از شروع" : "—")]
+          ]);
+        })
+        .catch(function () { healthEl.innerHTML = "<h4><span class=\"card-icon\">♥</span> وضعیت سیستم</h4><p>ارتباط با سرور برقرار نشد.</p>"; });
+    }
+
+    /* ---------- مرکز تعمیر: تغییرها همان لحظه اعمال می‌شوند ---------- */
+    var maintEl = $("[data-r6-maint]", box);
+    function paintMaint() {
+      var f = localFlags();
+      var item = function (k, label, hint) {
+        var on = flagOn(k);
+        return '<label class="r6-switch-row"><span><b>' + label + "</b><br>" +
+          '<small style="color:var(--muted)">' + hint + "</small></span>" +
+          '<input type="checkbox" data-r6-flag="' + k + '"' + (on ? " checked" : "") + '></label>';
+      };
+      maintEl.innerHTML = "<h4><span class=\"card-icon\">⏻</span> مرکز تعمیر و کنترل زنده</h4>" +
+        '<p style="font-size:.8rem;color:var(--muted);margin:4px 0 8px">هر تغییری این‌جا <b>همان لحظه</b> روی کل سایت اعمال می‌شود — بدون رفرش.</p>' +
+        item("ai", "دستیار هوشمند", "روشن = در حالت تعمیر") +
+        item("consult", "مشاورهٔ آنلاین", "روشن = در حالت تعمیر") +
+        item("site", "کل سایت", "روشن = صفحهٔ تعمیر") +
+        '<div class="r6-actions" style="margin-top:10px">' +
+        '<button class="btn btn-sm" data-r6-flagreset="1">بازگشت به پیش‌فرض سایت</button></div>' +
+        (SRV.static
+          ? '<p style="font-size:.76rem;color:var(--muted);margin-top:8px;line-height:1.9">' +
+          "این سایت روی میزبانی استاتیک است، پس تنظیم‌های این‌جا روی <b>همین مرورگر</b> اعمال می‌شود. " +
+          "برای اعمال روی <b>همهٔ بازدیدکنندگان</b>، فایل <code>assets/site-flags.json</code> را ویرایش و دوباره منتشر کنید — " +
+          "مقدارهای فعلی: <code>" + esc(JSON.stringify({ aiMaintenance: flagOn("ai"), consultMaintenance: flagOn("consult"), maintenance: flagOn("site") })) + "</code></p>"
+          : '<p style="font-size:.76rem;color:var(--muted);margin-top:8px">با سرور واقعی، این تنظیم‌ها برای <b>همهٔ کاربران</b> اعمال می‌شود.</p>');
+
+      $$("[data-r6-flag]", maintEl).forEach(function (inp) {
+        inp.addEventListener("change", function () {
+          var k = inp.getAttribute("data-r6-flag");
+          var on = inp.checked;
+          var f = localFlags();
+          var key = k === "ai" ? "aiMaintenance" : k === "consult" ? "consultMaintenance" : "maintenance";
+          f[key] = on;
+          writeFlags(f);
+          var b = {}; b[key] = on;
+          supApi("POST", "admin/settings", b);
+          if (R6.toastFn) R6.toastFn(on ? "حالت تعمیر روشن شد" : "حالت تعمیر خاموش شد");
+        });
       });
+      $$("[data-r6-flagreset]", maintEl).forEach(function (b) {
+        b.addEventListener("click", function () {
+          ["ai", "consult", "site"].forEach(function (k) { R6.resetFlag(k); });
+          if (R6.toastFn) R6.toastFn("به پیش‌فرض سایت برگشت");
+          paintMaint();
+          applyFlags();
+        });
+      });
+    }
+    paintMaint();
+
+    /* ---------- پشتیبانی کلاس مجازی ---------- */
+    var suppEl = $("[data-r6-supp]", box);
+    function paintSupport(srv) {
+      var local = supDB();
+      var reqs = (srv && srv.reqs) || local.reqs;
+      var keys = (srv && srv.keys) || local.keys;
+      var pending = reqs.filter(function (r) { return r.status !== "approved"; });
+      var h = "<h4><span class=\"card-icon\">⚿</span> پشتیبانی کلاس مجازی</h4>" +
+        '<p style="font-size:.82rem;color:var(--muted);margin:4px 0 10px">' +
+        "مدیران و دبیران از صفحهٔ «پشتیبانی کلاس مجازی» درخواست می‌دهند. با ساخت کلید، همان مدیر و اعضای مدرسه‌اش " +
+        "می‌توانند کلاس مجازی بسازند و به هم بپیوندند.</p>";
+
+      h += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">' +
+        '<span class="r6-pill">در انتظار: ' + pending.length + "</span>" +
+        '<span class="r6-pill">کلیدهای فعال: ' + keys.filter(function (k) { return k.active; }).length + "</span>" +
+        '<span class="r6-pill">کل کلیدها: ' + keys.length + "</span></div>";
+
+      if (!reqs.length) {
+        h += '<p style="color:var(--muted);font-size:.85rem">هنوز درخواستی ثبت نشده است.</p>';
+      } else {
+        h += '<div class="r6-tbl-wrap"><table class="r6-tbl"><thead><tr>' +
+          "<th>مدرسه</th><th>متقاضی</th><th>شهر</th><th>کلاس</th><th>وضعیت</th><th>کلید</th><th>اقدام</th>" +
+          "</tr></thead><tbody>";
+        reqs.slice(0, 40).forEach(function (r) {
+          var st = r.status === "approved"
+            ? '<span class="r6-pill ok">کلید ساخته شد</span>'
+            : '<span class="r6-pill warn">در انتظار</span>';
+          h += "<tr><td>" + esc(r.school || "—") + "</td><td>" + esc(r.byName || r.by || "—") +
+            "</td><td>" + esc(r.city || "—") + "</td><td>" + esc(String(r.classes || 1)) +
+            "</td><td>" + st + "</td><td>" + (r.keyCode ? "<code>" + esc(r.keyCode) + "</code>" : "—") +
+            '</td><td><button class="btn btn-sm" data-r6-mkkey="' + esc(r.id) + '" data-school="' + esc(r.school || "") +
+            '" data-owner="' + esc(r.by || "") + '">ساخت کلید</button></td></tr>';
+        });
+        h += "</tbody></table></div>";
+      }
+
+      if (keys.length) {
+        h += '<h4 style="margin-top:14px">کلیدهای ساخته‌شده</h4><div class="r6-tbl-wrap"><table class="r6-tbl"><thead><tr>' +
+          "<th>کلید</th><th>مدرسه</th><th>ظرفیت</th><th>اعضا</th><th>انقضا</th><th>وضعیت</th><th></th></tr></thead><tbody>";
+        keys.slice(0, 40).forEach(function (k) {
+          var exp = k.exp ? new Date(k.exp).toLocaleDateString("fa-IR") : "—";
+          h += "<tr><td><code>" + esc(k.code) + "</code></td><td>" + esc(k.school || "—") +
+            "</td><td>" + esc(String(k.seats || "—")) + "</td><td>" + esc(String((k.members || []).length)) +
+            "</td><td>" + esc(exp) + "</td><td>" +
+            (k.active ? '<span class="r6-pill ok">فعال</span>' : '<span class="r6-pill warn">غیرفعال</span>') +
+            '</td><td><button class="btn btn-sm" data-r6-tkey="' + esc(k.id) + '" data-on="' + (k.active ? "0" : "1") +
+            '">' + (k.active ? "غیرفعال کن" : "فعال کن") + "</button></td></tr>";
+        });
+        h += "</tbody></table></div>";
+      }
+
+      suppEl.innerHTML = h;
+
+      $$("[data-r6-mkkey]", suppEl).forEach(function (b) {
+        b.addEventListener("click", function () {
+          var rid = b.getAttribute("data-r6-mkkey");
+          var school = b.getAttribute("data-school") || "";
+          var owner = b.getAttribute("data-owner") || "";
+          var code = newKeyCode();
+          var local2 = supDB();
+          var rq = local2.reqs.filter(function (x) { return x.id === rid; })[0];
+          var key = { id: "sk_" + Date.now().toString(36), code: code, t: Date.now(), exp: Date.now() + 90 * 864e5, owner: owner, school: school, seats: 35, active: true, used: 0, members: [], days: 90 };
+          local2.keys.unshift(key);
+          local2.reqs.forEach(function (x) { if (x.id === rid) { x.status = "approved"; x.keyCode = code; } });
+          supSave(local2);
+          supApi("POST", "admin/support/key", { reqId: rid, code: code, school: school, seats: 35, days: 90 });
+          alert("کلید ساخته شد: " + code + "\nاین کلید را به مدیر بدهید.");
+          paintSupport(null);
+        });
+      });
+      $$("[data-r6-tkey]", suppEl).forEach(function (b) {
+        b.addEventListener("click", function () {
+          var id = b.getAttribute("data-r6-tkey"), on = b.getAttribute("data-on") === "1";
+          var local2 = supDB();
+          local2.keys.forEach(function (k) { if (k.id === id) k.active = on; });
+          supSave(local2);
+          supApi("POST", "admin/support/state", { id: id, active: on });
+          paintSupport(null);
+        });
+      });
+    }
+
+    supApi("GET", "admin/support").then(function (srv) { paintSupport(srv); });
+    if (SRV.static) setTimeout(function () { paintSupport(null); }, 0);
 
     fetch("/api/admin/ai-usage", { credentials: "same-origin" })
       .then(function (r) { return r.json(); })
@@ -920,8 +1223,128 @@
       });
   }
 
+  /* ======================================================================
+     کارت‌های پروفایل در صفحهٔ اصلی
+     ----------------------------------------------------------------------
+     بعد از ورود، دو کارت می‌آید:
+       ۱) پروفایل شخصی — تصویر/گیف، نام با فونت و رنگ دلخواه
+       ۲) کارت نقش — با پیوند پنل مخصوص همان نقش
+     ====================================================================== */
+  var FONT_CLASS = { vazir: "r6-font-vazir", system: "r6-font-system", display: "r6-font-display", serif: "r6-font-serif" };
+  R6.FONT_CLASS = FONT_CLASS;
+
+  var ROLE_PANEL = {
+    student: { fa: "دانش‌آموز", url: "panel.html", note: "پنل مطالعه، تکالیف و پیشرفت" },
+    teacher: { fa: "دبیر", url: "panel-teacher.html", note: "کلاس‌ها، حضور و غیاب و تکالیف" },
+    deputy: { fa: "ناظم", url: "panel-manager.html", note: "نظارت بر کلاس‌ها و اعضا" },
+    admin: { fa: "مدیر", url: "panel-manager.html", note: "مدیریت مدرسه، اعضا و کلاس مجازی" },
+    owner: { fa: "مالک سایت", url: "admin.html", note: "کنترل کامل سایت" }
+  };
+  R6.ROLE_PANEL = ROLE_PANEL;
+
+  function avatarHTML(u, size) {
+    var s = size || 76;
+    var av = u && u.avatar ? String(u.avatar) : "";
+    if (av) {
+      return '<span class="r6-ava" style="width:' + s + "px;height:" + s + 'px"><img src="' + esc(av) + '" alt="تصویر پروفایل"></span>';
+    }
+    var initial = esc(((u && u.name) || "؟").trim().charAt(0) || "؟");
+    var color = (u && u.color) || "#6d5efc";
+    return '<span class="r6-ava" style="width:' + s + "px;height:" + s +
+      "px;background:linear-gradient(135deg," + esc(color) + ",var(--brand-3))\">" + initial + "</span>";
+  }
+  R6.avatarHTML = avatarHTML;
+
+  function nameHTML(u) {
+    var f = (u && u.font) || "vazir";
+    var c = (u && u.nameColor) || (u && u.color) || "";
+    return '<span class="r6-uname ' + (FONT_CLASS[f] || "r6-font-vazir") + '"' +
+      (c ? ' style="color:' + esc(c) + '"' : "") + ">" + esc((u && u.name) || "کاربر") + "</span>";
+  }
+
+  function homeProfiles() {
+    if (!D.body || D.body.getAttribute("data-subject") !== "home") return;
+    var host = $("#grades");
+    if (!host || !host.parentNode) return;
+    var u = null;
+    try { u = (W.HK && W.HK.auth && W.HK.auth.me) ? W.HK.auth.me() : null; } catch (e) { u = null; }
+    var old = $("#r6HomeProf");
+    if (!u) { if (old) old.remove(); return; }
+
+    var rp = ROLE_PANEL[u.role || "student"] || ROLE_PANEL.student;
+    var roleFa = u.roleFa || rp.fa;
+    var grade = u.grade ? "پایهٔ " + u.grade : "پایه نامشخص";
+    var school = u.school ? esc(u.school) : "مدرسه ثبت نشده";
+    var tick = u.verified ? '<span class="r6-pill ok">✔ تأییدشده</span>' : "";
+    var own = (u.isOwner || u.role === "owner") ? '<span class="r6-pill brand">مالک سایت</span>' : "";
+    var keyPill = u.schoolKey ? '<span class="r6-pill ok">کلید مدرسه: <code>' + esc(u.schoolKey) + "</code></span>" : "";
+
+    var html =
+      '<section class="section" id="r6HomeProf" style="padding-bottom:0">' +
+      '<div class="wrap">' +
+      '<div class="r6-prof-grid">' +
+
+      // ---- کارت ۱: پروفایل شخصی ----
+      '<article class="card r6-prof-card">' +
+      '<div class="r6-prof-head">' + avatarHTML(u, 76) +
+      "<div>" + nameHTML(u) +
+      '<div class="r6-prof-sub">' + esc(roleFa) + " · " + esc(grade) + " · " + school + "</div>" +
+      '<div class="r6-prof-pills">' + tick + own + keyPill + "</div>" +
+      "</div></div>" +
+      (u.bio ? '<p class="r6-prof-bio">' + esc(u.bio) + "</p>" : "") +
+      '<div class="r6-prof-acts">' +
+      '<a class="btn btn-sm btn-primary" href="' + url("profile.html") + '">ویرایش پروفایل</a>' +
+      '<a class="btn btn-sm" href="' + url("settings.html") + '">تنظیمات من</a>' +
+      "</div></article>" +
+
+      // ---- کارت ۲: نقش و پنل ----
+      '<article class="card r6-prof-card">' +
+      '<h4><span class="card-icon">◆</span> نقش من: ' + esc(roleFa) + "</h4>" +
+      '<p class="r6-prof-sub" style="margin:6px 0 10px">' + esc(rp.note) + "</p>" +
+      '<div class="r6-prof-acts">' +
+      '<a class="btn btn-sm btn-primary" href="' + url(rp.url) + '">ورود به پنل ' + esc(roleFa) + "</a>" +
+      '<a class="btn btn-sm" href="' + url("class-support.html") + '">پشتیبانی کلاس مجازی</a>' +
+      "</div>" +
+      '<p class="r6-prof-note">نقش‌های <b>دبیر</b> و <b>ناظم</b> با «کد همکاران» فعال می‌شوند؛ ' +
+      "نقش <b>مدیر</b> را فقط مالک سایت تعیین می‌کند. برای کلید کلاس مجازی مدرسه، از پشتیبانی درخواست بده.</p>" +
+      "</article>" +
+
+      "</div></div></section>";
+
+    var wrap = D.createElement("div");
+    wrap.innerHTML = html;
+    var node = wrap.firstChild;
+    if (old) old.parentNode.replaceChild(node, old);
+    else host.parentNode.insertBefore(node, host);
+  }
+  R6.homeProfiles = homeProfiles;
+
+  /* ======================================================================
+     بنر حالت تعمیر برای صفحه‌های دستیار و مشاوره
+     ====================================================================== */
+  function consultBanner() {
+    var p = (W.location && W.location.pathname) || "";
+    var isAi = /\/ai\.html$/.test(p) || D.body.getAttribute("data-subject") === "ai";
+    var isConsult = /\/consult\.html$/.test(p) || D.body.getAttribute("data-subject") === "consult";
+    if (!isAi && !isConsult) return;
+    var what = isConsult ? "consult" : "ai";
+    var on = flagOn(what);
+    var old = $("#r6MaintBanner");
+    if (!on) { if (old) old.remove(); return; }
+    if (old) old.remove();
+    var b = D.createElement("div");
+    b.id = "r6MaintBanner";
+    b.className = "r6-maint-banner";
+    b.innerHTML = '<b>⏻ این بخش موقتاً در حالت تعمیر است</b><span>' + esc(flagNote(what)) + "</span>";
+    var main = $("main") || D.body;
+    main.insertBefore(b, main.firstChild);
+  }
+  R6.consultBanner = consultBanner;
+
   /* ------------------------------------------------------------ راه‌اندازی */
   function boot() {
+    // از پیام‌رسان خودِ سایت استفاده می‌کنیم (اگر باشد)
+    try { if (W.HK && W.HK.toast) R6.toastFn = W.HK.toast; } catch (e) { }
     try { skipLink(); } catch (e) {}
     try { scrollEngine(); } catch (e) {}
     try { netBadge(); } catch (e) {}
@@ -930,7 +1353,20 @@
     try { loadIndex(); } catch (e) {}     // نمایهٔ محلی را از پیش آماده می‌کند
     try { buildAI(); } catch (e) {}
     try { watchFab(); } catch (e) {}
-    try { adminExtras(); } catch (e) {}
+    try { homeProfiles(); } catch (e) {}
+    try { applyFlags(); } catch (e) {}
+    // تنظیمات استاتیک سایت (site-flags.json) — پیش از اعمال پرچم‌ها می‌خوانیم
+    loadStaticFlags().then(function () {
+      try { applyFlags(); } catch (e) {}
+      try { consultBanner(); } catch (e) {}
+    }).catch(function () { });
+    // پس از رسیدن وضعیت سرور: پرچم‌های تعمیر و کارت‌های پنل مالک تازه می‌شوند
+    probeServer().then(function () {
+      try { applyFlags(); } catch (e) {}
+      try { adminExtras(); } catch (e) {}
+      try { consultBanner(); } catch (e) {}
+      try { homeProfiles(); } catch (e) {}
+    });
     R6.buildAI = function () { return buildAI(); };
     R6.openAssistant = function (q) {
       var a = buildAI();

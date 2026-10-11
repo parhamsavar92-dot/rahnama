@@ -148,10 +148,12 @@ async function appendDoc(db, key, entries, cap) {
 }
 
 /* ------------------------------------------------------------ بارگذاری/ذخیرهٔ وضعیت برای موتور */
+// «support» = درخواست‌ها و کلیدهای کلاس مجازی؛ باید در همهٔ طرح‌ها خوانده شود
+// وگرنه نوشتن در یک درخواست و خواندن در درخواست بعدی، داده را از دست می‌دهد.
 const KV_SETS = {
-  light: ["settings"],
-  cls: ["settings", "classes", "sessions"],
-  heavy: ["settings", "events", "audit", "classes", "sessions", "messages", "reports"]
+  light: ["settings", "support"],
+  cls: ["settings", "support", "classes", "sessions"],
+  heavy: ["settings", "support", "events", "audit", "classes", "sessions", "messages", "reports"]
 };
 function planOf(seg) {
   if (seg[0] === "admin") return { kv: "heavy", all: true };
@@ -230,7 +232,7 @@ async function persist(env, ctx) {
     st.push(db.prepare("DELETE FROM sessions WHERE uid = ?").bind(id));
   }
 
-  for (const k of ["settings", "classes", "sessions", "messages", "reports"]) {
+  for (const k of ["settings", "support", "classes", "sessions", "messages", "reports"]) {
     if (!orig.loaded.has(k)) continue;
     const js = JSON.stringify(state[k]);
     if (orig.kv.get(k) !== js) st.push(db.prepare("INSERT OR REPLACE INTO kv(k,v) VALUES(?,?)").bind(k, js));
@@ -373,6 +375,11 @@ function publicSettings(s) {
     maintenance: !!s.maintenance,
     maintenanceNote: s.maintenanceNote,
     aiEnabled: s.aiEnabled !== false,
+    consultEnabled: s.consultEnabled !== false,
+    aiMaintenance: !!s.aiMaintenance,
+    consultMaintenance: !!s.consultMaintenance,
+    aiMaintenanceNote: s.aiMaintenanceNote,
+    consultMaintenanceNote: s.consultMaintenanceNote,
     allowedGrades: s.allowedGrades || ["7", "8", "9"],
     announcement: s.announcement || { active: false },
     features: s.features || {},
@@ -612,6 +619,8 @@ async function handleAI(env, req, body, uid) {
   if (!uid) return err("برای استفاده از دستیار وارد شوید.", 401);
   const s = await readSettings(env);
   if (s.aiEnabled === false) return err("دستیار موقتاً خاموش است.", 503);
+  // حالت تعمیر: مالک از پنل روشن می‌کند و بی‌درنگ روی کل سایت اعمال می‌شود
+  if (s.aiMaintenance) return err(String(s.aiMaintenanceNote || "دستیار هوشمند موقتاً در حال تعمیر است."), 503);
   if (!(await hit(env.DB, "ai:" + uid, 40, 600e3))) return err("سؤال‌های زیادی پرسیدی؛ چند دقیقه بعد دوباره امتحان کن.", 429);
   const msgs = Array.isArray(body.messages) ? body.messages.slice(-20) : [];
   if (!msgs.length) return err("پیام خالی است.");

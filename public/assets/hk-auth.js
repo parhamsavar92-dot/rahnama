@@ -69,7 +69,14 @@
         verified: owner,
         grade: String(body.grade || ""),
         school: String(body.school || "").slice(0, 60),
+        city: String(body.city || "").slice(0, 40),
         color: "#6d5efc",
+        // ---- شخصی‌سازی پروفایل: تصویر/گیف، فونت و رنگ نام ----
+        avatar: "",
+        font: "vazir",
+        nameColor: "",
+        schoolKey: "",
+        schoolVerified: false,
         bio: owner ? "مالک و مدیر سایت رهنما" : "",
         local: true,
         createdAt: Date.now(),
@@ -109,6 +116,16 @@
       if (body.city != null) me.city = String(body.city).slice(0, 40);
       if (body.bio != null) me.bio = String(body.bio).slice(0, 300);
       if (/^#[0-9a-fA-F]{6}$/.test(String(body.color || ""))) me.color = body.color;
+      // ---- شخصی‌سازی پروفایل (همان قواعد سرور) ----
+      if (/^#[0-9a-fA-F]{6}$/.test(String(body.nameColor || ""))) me.nameColor = body.nameColor;
+      if (body.font != null && ["vazir", "system", "display", "serif"].indexOf(String(body.font)) > -1) me.font = String(body.font);
+      if (body.avatar !== undefined) {
+        var av = String(body.avatar || "");
+        if (!av) me.avatar = "";
+        else if (/^https:\/\/[^\s"'<>]{6,700}$/.test(av)) me.avatar = av;
+        else if (/^data:image\/(png|jpe?g|gif|webp);base64,[A-Za-z0-9+/=]+$/.test(av) && av.length <= 200000) me.avatar = av;
+        else return Promise.reject(new Error("تصویر پروفایل پذیرفته نشد (png / jpg / gif / webp — حداکثر ۱۴۰ کیلوبایت)."));
+      }
       if (body.role && !me.isOwner && body.role !== me.role) {
         var wr = String(body.role).toLowerCase();
         if (["student", "teacher", "deputy"].indexOf(wr) < 0) return Promise.reject(new Error("نقش مدیر فقط توسط مالک سایت تعیین می‌شود."));
@@ -328,8 +345,20 @@
       var want = [
         ["panel.html", "پنل من", "hkPanelLink"],
         ["class.html", "کلاس مجازی", "hkClassLink"],
+        ["class-support.html", "پشتیبانی کلاس مجازی", "hkSuppLink"],
+        ["settings.html", "تنظیمات", "hkSetLink"],
         ["about.html", "دربارهٔ ما", "hkAboutLink"]
       ];
+      // پیوند پنل نقشی: دبیر و ناظم/مدیر پنل مخصوص خودشان را می‌گیرند
+      try {
+        var mu = (W.HK && W.HK.auth && W.HK.auth.me) ? W.HK.auth.me() : null;
+        if (mu) {
+          if (mu.isOwner) want.splice(0, 0, ["admin.html", "پنل مالک", "hkOwnerLink"]);
+          else if (mu.role === "admin") want.splice(0, 0, ["panel-manager.html", "پنل مدیریت", "hkMgLink"]);
+          else if (mu.role === "deputy") want.splice(0, 0, ["panel-manager.html", "پنل ناظم", "hkMgLink"]);
+          else if (mu.role === "teacher") want.splice(0, 0, ["panel-teacher.html", "پنل دبیر", "hkTcLink"]);
+        }
+      } catch (e2) { }
       want.forEach(function (w) {
         if (nav.querySelector("[" + w[2] + "]")) return;
         var exists = Array.prototype.some.call(nav.querySelectorAll("a"), function (a) {

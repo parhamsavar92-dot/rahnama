@@ -5,19 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>حساب کاربری و پروفایل — ثبت‌نام و ورود | رهنما</title>
 <meta name="description" content="ساخت حساب کاربری در رهنما: ثبت‌نام دانش‌آموز، ورود، پروفایل شخصی، همگامی دادهٔ مطالعه بین دستگاه‌ها، آمار پیشرفت و پشتیبان‌گیری.">
-<link rel="stylesheet" href="assets/fonts.css?v=6.4">
-<link rel="stylesheet" href="assets/style.css?v=6.4">
+<link rel="stylesheet" href="assets/fonts.css?v=6.6">
+<link rel="stylesheet" href="assets/style.css?v=6.6">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d5efc">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 <link rel="icon" href="assets/icons/favicon.png">
-<link rel="stylesheet" href="assets/enhance.css?v=6.4">
-<link rel="stylesheet" href="assets/ultra.css?v=6.4">
-<link rel="stylesheet" href="assets/ai2.css?v=6.4">
-<link rel="stylesheet" href="assets/hk.css?v=6.4">
-<link rel="stylesheet" href="assets/hk3d.css?v=6.4">
-<link rel="stylesheet" href="assets/hk-school.css?v=6.4">
-<link rel="stylesheet" href="assets/print.css?v=6.4">
+<link rel="stylesheet" href="assets/enhance.css?v=6.6">
+<link rel="stylesheet" href="assets/ultra.css?v=6.6">
+<link rel="stylesheet" href="assets/ai2.css?v=6.6">
+<link rel="stylesheet" href="assets/hk.css?v=6.6">
+<link rel="stylesheet" href="assets/hk3d.css?v=6.6">
+<link rel="stylesheet" href="assets/hk-school.css?v=6.6">
+<link rel="stylesheet" href="assets/print.css?v=6.6">
   <!-- seo:domain -->
   <link rel="canonical" href="https://www.hamkardarsi.ir/profile.html">
   <meta name="robots" content="index, follow, max-image-preview:large">
@@ -33,9 +33,9 @@
   <meta name="twitter:description" content="ساخت حساب کاربری در رهنما: ثبت‌نام دانش‌آموز، ورود، پروفایل شخصی، همگامی دادهٔ مطالعه بین دستگاه‌ها، آمار پیشرفت و پشتیبان‌گیری.">
   <meta name="twitter:image" content="https://www.hamkardarsi.ir/assets/icons/icon-512.png">
   <!-- /seo:domain -->
-<link rel="stylesheet" href="assets/polish.css?v=6.4">
-<link rel="stylesheet" href="assets/cute.css?v=6.4">
-<link rel="stylesheet" href="assets/r6.css?v=6.4">
+<link rel="stylesheet" href="assets/polish.css?v=6.6">
+<link rel="stylesheet" href="assets/cute.css?v=6.6">
+<link rel="stylesheet" href="assets/r6.css?v=6.6">
 </head>
 <body data-grade="8" data-base="" data-subject="profile">
 <div id="readbar"></div>
@@ -198,6 +198,31 @@
             style="width:100%;padding:11px 13px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);font:inherit;resize:vertical"></textarea></div>
         <div class="hk-field"><label>رنگ نمایه</label>
           <input type="color" id="pfColorIn" value="#6d5efc" style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:12px;background:var(--surface)"></div>
+
+        <!-- ---------- شخصی‌سازی تازه: تصویر/گیف، رنگ و فونت نام ---------- -->
+        <div class="hk-field"><label for="pfAvatarIn">تصویر یا گیف پروفایل</label>
+          <input id="pfAvatarIn" type="file" accept="image/png,image/jpeg,image/gif,image/webp"
+            style="width:100%;padding:9px;border:1px dashed var(--border-strong);border-radius:12px;background:var(--surface);color:var(--text);font:inherit">
+          <div style="display:flex;gap:10px;align-items:center;margin-top:8px">
+            <img id="pfAvatarPrev" alt="پیش‌نمایش" style="width:54px;height:54px;border-radius:50%;object-fit:cover;border:2px solid var(--border);display:none">
+            <button class="btn btn-sm" type="button" id="pfAvatarClear">حذف تصویر</button>
+          </div>
+          <p style="font-size:.75rem;color:var(--muted);margin:6px 0 0">گیف هم پذیرفته می‌شود. حداکثر ۱۴۰ کیلوبایت — تا سایت سبک بماند.</p></div>
+
+        <div class="hk-field"><label>رنگ نام من</label>
+          <input type="color" id="pfNameColorIn" value="#6d5efc"
+            style="width:100%;height:42px;border:1px solid var(--border-strong);border-radius:12px;background:var(--surface)"></div>
+
+        <div class="hk-field"><label>فونت نام من</label>
+          <div id="pfFontPick" style="display:flex;gap:8px;flex-wrap:wrap">
+            <button type="button" class="btn btn-sm" data-font="vazir">وزیرمتن</button>
+            <button type="button" class="btn btn-sm" data-font="system">سیستم</button>
+            <button type="button" class="btn btn-sm" data-font="display">نمایشی</button>
+            <button type="button" class="btn btn-sm" data-font="serif">سریف</button>
+          </div>
+          <p id="pfNamePrev" style="margin:10px 0 0;font-weight:800;font-size:1.15rem"></p>
+          <p style="font-size:.75rem;color:var(--muted);margin:4px 0 0">این نام با همین فونت و رنگ در صفحهٔ اصلی و پروفایل دیده می‌شود.</p></div>
+
         <button class="btn btn-primary btn-sm" id="btnSaveProfile">ذخیرهٔ پروفایل</button>
       </div>
     </div>
@@ -239,16 +264,16 @@
 
 <button id="toTop" aria-label="بازگشت به بالا"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m5 14 7-7 7 7"/></svg></button>
 
-<script src="assets/hk-server.js?v=6.4"></script>
-<script src="assets/app.js?v=6.4"></script>
-<script src="assets/enhance.js?v=6.4"></script>
-<script src="assets/grade.js?v=6.4"></script>
-<script src="assets/ultra.js?v=6.4"></script>
-<script src="assets/ai2.js?v=6.4"></script>
-<script src="assets/hk-agent.js?v=6.4"></script>
-<script src="assets/hk-panel.js?v=6.4"></script>
-<script src="assets/hk-auth.js?v=6.4"></script>
-<script src="assets/hk3d.js?v=6.4"></script>
+<script src="assets/hk-server.js?v=6.6"></script>
+<script src="assets/app.js?v=6.6"></script>
+<script src="assets/enhance.js?v=6.6"></script>
+<script src="assets/grade.js?v=6.6"></script>
+<script src="assets/ultra.js?v=6.6"></script>
+<script src="assets/ai2.js?v=6.6"></script>
+<script src="assets/hk-agent.js?v=6.6"></script>
+<script src="assets/hk-panel.js?v=6.6"></script>
+<script src="assets/hk-auth.js?v=6.6"></script>
+<script src="assets/hk3d.js?v=6.6"></script>
 <script>
 (function () {
   "use strict";
@@ -389,6 +414,9 @@
       city: $("#pfCityIn").value.trim(),
       bio: $("#pfBioIn").value.trim(),
       color: $("#pfColorIn").value,
+      avatar: (window.__pfAvatar == null ? $("#pfAvatarPrev").dataset.src || undefined : window.__pfAvatar),
+      nameColor: $("#pfNameColorIn") ? $("#pfNameColorIn").value : undefined,
+      font: window.__pfFont || undefined,
       role: $("#pfRoleIn") ? $("#pfRoleIn").value : undefined,
       staffCode: $("#pfCodeIn") ? $("#pfCodeIn").value.trim() : ""
     }).then(function (r) { toast("پروفایل ذخیره شد"); HK.auth.setMe(r.user); paint(r.user); busy($("#btnSaveProfile"), false); })
@@ -468,8 +496,87 @@
   setInterval(refreshNote, 5000);
 })();
 </script>
-  <script src="assets/hk-jozve.js?v=6.4"></script>
-<script src="assets/polish.js?v=6.4" defer></script>
-<script src="assets/r6.js?v=6.4" defer></script>
+  <script src="assets/hk-jozve.js?v=6.6"></script>
+<script src="assets/polish.js?v=6.6" defer></script>
+<script src="assets/r6.js?v=6.6" defer></script>
+<script>
+/* ---------------------------------------------------------------------------
+   شخصی‌سازی پروفایل: تصویر/گیف، رنگ نام و فونت نام
+   --------------------------------------------------------------------------- */
+(function () {
+  "use strict";
+  var $ = function (s) { return document.querySelector(s); };
+  var box = $("#pfAvatarIn");
+  if (!box) return;
+
+  var FONT_CLASS = { vazir: "r6-font-vazir", system: "r6-font-system", display: "r6-font-display", serif: "r6-font-serif" };
+  window.__pfAvatar = null;   // null = دست‌نخورده
+  window.__pfFont = "";
+
+  function paintPreview() {
+    var nm = ($("#pfNameIn") && $("#pfNameIn").value) || "";
+    var col = ($("#pfNameColorIn") && $("#pfNameColorIn").value) || "";
+    var f = window.__pfFont || "vazir";
+    var p = $("#pfNamePrev");
+    if (!p) return;
+    p.textContent = nm || "نام تو";
+    p.style.color = col;
+    ["r6-font-vazir", "r6-font-system", "r6-font-display", "r6-font-serif"].forEach(function (c) { p.classList.remove(c); });
+    p.classList.add(FONT_CLASS[f] || "r6-font-vazir");
+    var btns = document.querySelectorAll("#pfFontPick [data-font]");
+    Array.prototype.forEach.call(btns, function (b) {
+      var on = b.getAttribute("data-font") === f;
+      b.classList.toggle("btn-primary", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  function showAvatar(src) {
+    var img = $("#pfAvatarPrev");
+    if (!img) return;
+    img.dataset.src = src || "";
+    if (src) { img.src = src; img.style.display = "block"; }
+    else { img.removeAttribute("src"); img.style.display = "none"; }
+  }
+
+  // پرکردن مقادیر از حساب کاربر
+  (function wait() {
+    var u = null;
+    try { u = (window.HK && HK.auth && HK.auth.me) ? HK.auth.me() : null; } catch (e) { u = null; }
+    if (!u) { setTimeout(wait, 250); return; }
+    showAvatar(u.avatar || "");
+    window.__pfFont = u.font || "vazir";
+    if ($("#pfNameColorIn")) $("#pfNameColorIn").value = u.nameColor || u.color || "#6d5efc";
+    paintPreview();
+  })();
+
+  box.addEventListener("change", function () {
+    var f = box.files && box.files[0];
+    if (!f) return;
+    if (!/^image\/(png|jpeg|gif|webp)$/.test(f.type)) { alert("فقط png، jpg، gif یا webp."); box.value = ""; return; }
+    if (f.size > 140 * 1024) { alert("حجم تصویر باید کمتر از ۱۴۰ کیلوبایت باشد."); box.value = ""; return; }
+    var fr = new FileReader();
+    fr.onload = function () { window.__pfAvatar = String(fr.result); showAvatar(window.__pfAvatar); };
+    fr.readAsDataURL(f);
+  });
+
+  if ($("#pfAvatarClear")) $("#pfAvatarClear").addEventListener("click", function () {
+    window.__pfAvatar = "";
+    box.value = "";
+    showAvatar("");
+  });
+
+  var pick = $("#pfFontPick");
+  if (pick) pick.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("[data-font]") : null;
+    if (!b) return;
+    window.__pfFont = b.getAttribute("data-font");
+    paintPreview();
+  });
+
+  if ($("#pfNameIn")) $("#pfNameIn").addEventListener("input", paintPreview);
+  if ($("#pfNameColorIn")) $("#pfNameColorIn").addEventListener("input", paintPreview);
+})();
+</script>
 </body>
 </html>

@@ -181,5 +181,68 @@ t("admin sees AI usage stats", r.s === 200 && r.j.total >= 2 && r.j.providers.in
 r = await anon.call("GET", "/api/admin/ai-usage");
 t("ai-usage blocked for anonymous (after work)", r.s === 401);
 
+// ============================================================ نسخهٔ ۶٫۵
+// پشتیبانی کلاس مجازی، شخصی‌سازی پروفایل، حالت تعمیر
+
+// ۱) site/status نباید تنظیمات مدیریتی را بیرون بدهد
+r = await anon.call("GET", "/api/site/status");
+t("site/status hides admin-only settings (broadcast/support)",
+  r.s === 200 && r.j.settings && r.j.settings.broadcast === undefined &&
+  r.j.settings.support === undefined && r.j.settings.aiMaintenance !== undefined);
+
+// ۲) ساخت حساب و ارتقا به دبیر توسط مالک
+const tch = new Jar();
+r = await tch.call("POST", "/api/auth/register", { name: "دبیر نمونه", email: "teacher1@x.test", password: "Teach12345", grade: "8" });
+t("teacher account created", r.s === 200 && !!r.j.user);
+r = await o2.call("POST", "/api/admin/user", { email: "teacher1@x.test", role: "teacher" });
+t("owner promotes account to teacher", r.s === 200 && r.j.user.role === "teacher");
+
+// ۳) درخواست کلید کلاس مجازی
+r = await tch.call("POST", "/api/support/request", { school: "دبیرستان نمونه", city: "تهران", classes: 4, students: 120 });
+t("teacher can file a class-support request", r.s === 200 && r.j.request && r.j.request.school === "دبیرستان نمونه");
+const supReqId = r.j.request.id;
+
+const st5 = new Jar();
+await st5.call("POST", "/api/auth/register", { name: "دانش‌آموز تازه", email: "st5@x.test", password: "Stu123456", grade: "8" });
+r = await st5.call("POST", "/api/support/request", { school: "x" });
+t("student cannot file a support request", r.s === 403);
+
+// ۴) صدور کلید توسط مالک و پیوستن اعضای مدرسه
+r = await o2.call("GET", "/api/admin/support");
+t("owner sees support requests", r.s === 200 && (r.j.reqs || []).length >= 1);
+r = await o2.call("POST", "/api/admin/support/key", { reqId: supReqId, seats: 40, days: 120 });
+t("owner issues a school key", r.s === 200 && /^RN-/.test(r.j.key.code) && r.j.key.school === "دبیرستان نمونه");
+const schoolKey = r.j.key.code;
+
+r = await tch.call("GET", "/api/support/my");
+t("teacher sees their own school key", r.s === 200 && r.j.key && r.j.key.code === schoolKey);
+
+r = await st5.call("POST", "/api/support/redeem", { code: schoolKey });
+t("school member redeems the key", r.s === 200 && r.j.school === "دبیرستان نمونه");
+r = await st5.call("POST", "/api/support/redeem", { code: "RN-NOPE99" });
+t("invalid school key rejected", r.s === 404);
+
+// ۵) شخصی‌سازی پروفایل: تصویر/گیف، فونت، رنگ نام
+const tinyGif = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+r = await st5.call("POST", "/api/me/profile", { name: "دانش‌آموز تازه", grade: "8", avatar: tinyGif, font: "display", nameColor: "#ff0055" });
+t("profile accepts avatar/font/nameColor",
+  r.s === 200 && r.j.user.avatar === tinyGif && r.j.user.font === "display" && r.j.user.nameColor === "#ff0055");
+r = await st5.call("POST", "/api/me/profile", { name: "دانش‌آموز تازه", avatar: "javascript:alert(1)" });
+t("profile rejects unsafe avatar value", r.s === 400);
+r = await st5.call("POST", "/api/me/profile", { name: "دانش‌آموز تازه", font: "comic-sans" });
+t("profile ignores unknown font name", r.s === 200 && r.j.user.font === "display");
+
+// ۶) حالت تعمیر دستیار و مشاوره — مالک روشن می‌کند، بی‌درنگ اعمال می‌شود
+r = await o2.call("POST", "/api/admin/settings", { aiMaintenance: true, consultMaintenance: true });
+t("owner enables maintenance for AI + consult",
+  r.s === 200 && r.j.settings.aiMaintenance === true && r.j.settings.consultMaintenance === true);
+r = await anon.call("GET", "/api/site/status");
+t("maintenance flags are public so the site can show the banner",
+  r.j.settings.aiMaintenance === true && r.j.settings.consultMaintenance === true);
+r = await oai.call("POST", "/api/ai/chat/completions", { messages: [{ role: "user", content: "سلام" }] });
+t("AI returns 503 while in maintenance", r.s === 503);
+r = await o2.call("POST", "/api/admin/settings", { aiMaintenance: false, consultMaintenance: false });
+t("owner turns maintenance off", r.s === 200 && r.j.settings.aiMaintenance === false);
+
 console.log(fails ? "FAILED " + fails : "ALL PASSED");
 process.exit(fails ? 1 : 0);

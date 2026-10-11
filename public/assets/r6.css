@@ -427,3 +427,149 @@ body {
   overflow-y: visible !important;
   overscroll-behavior-y: auto !important;
 }
+
+/* ==========================================================================
+   ۱۲. اجزای نسخهٔ ۶٫۵ — پنل مالک، پروفایل، تنظیمات، پشتیبانی کلاس مجازی
+   ========================================================================== */
+
+/* ---------- نشان‌ها ---------- */
+.r6-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 999px; font-size: .74rem; font-weight: 600;
+  background: var(--surface-3, #eef); color: var(--muted); border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.r6-pill.ok { background: color-mix(in srgb, #16a34a 14%, transparent); color: #15803d; border-color: color-mix(in srgb, #16a34a 35%, transparent); }
+.r6-pill.warn { background: color-mix(in srgb, #d97706 15%, transparent); color: #b45309; border-color: color-mix(in srgb, #d97706 35%, transparent); }
+.r6-pill.brand { background: color-mix(in srgb, var(--brand) 14%, transparent); color: var(--brand); border-color: color-mix(in srgb, var(--brand) 35%, transparent); }
+.r6-pill code { font-size: .72rem; }
+html[data-theme="dark"] .r6-pill.ok { color: #4ade80; }
+html[data-theme="dark"] .r6-pill.warn { color: #fbbf24; }
+
+/* ---------- جدول‌های پنل ---------- */
+.r6-tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border); border-radius: 12px; }
+.r6-tbl { width: 100%; border-collapse: collapse; font-size: .82rem; min-width: 640px; }
+.r6-tbl th, .r6-tbl td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.r6-tbl th { background: var(--surface-2, #f6f7fb); font-weight: 700; font-size: .78rem; color: var(--muted); }
+.r6-tbl tr:last-child td { border-bottom: 0; }
+.r6-tbl tbody tr:hover { background: color-mix(in srgb, var(--brand) 5%, transparent); }
+
+/* ---------- کارت‌های پنل مالک ---------- */
+.r6-adm-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.r6-adm-grid .card { margin: 0; }
+.r6-switch-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 9px 0; border-bottom: 1px dashed var(--border); cursor: pointer;
+}
+.r6-switch-row:last-of-type { border-bottom: 0; }
+.r6-switch-row input[type="checkbox"] { width: 44px; height: 24px; accent-color: var(--brand); cursor: pointer; }
+
+/* ---------- کارت‌های پروفایل صفحهٔ اصلی ---------- */
+.r6-prof-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.r6-prof-card { padding: 18px; }
+.r6-prof-head { display: flex; align-items: center; gap: 14px; }
+.r6-prof-sub { font-size: .83rem; color: var(--muted); margin-top: 3px; }
+.r6-prof-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.r6-prof-bio { font-size: .86rem; margin: 10px 0 0; line-height: 1.9; }
+.r6-prof-acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.r6-prof-note { font-size: .78rem; color: var(--muted); line-height: 1.9; margin-top: 10px; }
+.r6-ava {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; overflow: hidden; flex: 0 0 auto;
+  color: #fff; font-weight: 800; font-size: 1.6rem;
+  border: 2px solid var(--surface);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--brand) 22%, transparent);
+}
+.r6-ava img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.r6-uname { font-weight: 800; font-size: 1.1rem; line-height: 1.5; }
+
+/* ---------- فونت‌های نام (همه از فونت‌های موجود سایت) ---------- */
+.r6-font-vazir { font-family: var(--font); }
+.r6-font-system { font-family: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif; }
+.r6-font-display { font-family: var(--font); font-weight: 900; letter-spacing: -.02em; }
+.r6-font-serif { font-family: Georgia, "Times New Roman", serif; }
+
+/* ---------- حالت تعمیر ---------- */
+.r6-ai-maint {
+  margin: 10px 12px 0; padding: 12px 14px; border-radius: 12px; font-size: .84rem; line-height: 1.9;
+  background: color-mix(in srgb, #d97706 12%, transparent);
+  border: 1px solid color-mix(in srgb, #d97706 32%, transparent);
+  color: var(--text);
+}
+.r6-msg-maint { background: color-mix(in srgb, #d97706 12%, transparent) !important; border-color: color-mix(in srgb, #d97706 32%, transparent) !important; }
+#r6-ai-fab.is-maint { filter: grayscale(.55); opacity: .85; }
+#r6-ai-fab.is-maint::after {
+  content: "⏻"; position: absolute; inset-block-start: -4px; inset-inline-start: -4px;
+  width: 22px; height: 22px; border-radius: 50%; background: #d97706; color: #fff;
+  font-size: .72rem; display: grid; place-items: center; box-shadow: 0 3px 8px rgba(0,0,0,.25);
+}
+body.r6-maint-ai #r6-ai-panel .r6-ai-chips,
+body.r6-maint-ai #r6-ai-panel .r6-ai-row { opacity: .55; }
+
+.r6-maint-banner {
+  display: flex; flex-direction: column; gap: 4px;
+  margin: 0 0 18px; padding: 14px 16px; border-radius: 14px; line-height: 1.9;
+  background: color-mix(in srgb, #d97706 12%, transparent);
+  border: 1px solid color-mix(in srgb, #d97706 32%, transparent);
+}
+.r6-maint-banner b { font-size: .95rem; }
+
+/* ---------- صفحه‌های تازه (پشتیبانی، تنظیمات، پنل نقش) ---------- */
+.r6-page { max-width: 1040px; margin: 0 auto; padding: 22px 16px 60px; }
+.r6-page > h1 { font-size: clamp(1.3rem, 3vw, 1.7rem); margin-bottom: 6px; }
+.r6-page > .r6-lead { color: var(--muted); font-size: .9rem; margin-bottom: 18px; line-height: 1.95; }
+.r6-grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.r6-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+.r6-field > label { font-size: .82rem; font-weight: 700; }
+.r6-field input, .r6-field select, .r6-field textarea {
+  padding: 9px 11px; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font: inherit; font-size: .88rem; width: 100%;
+}
+.r6-field textarea { min-height: 90px; resize: vertical; }
+.r6-field small { color: var(--muted); font-size: .75rem; }
+.r6-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.r6-kv { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--border); font-size: .85rem; }
+.r6-kv:last-child { border-bottom: 0; }
+.r6-kv b { color: var(--muted); font-weight: 600; }
+.r6-code {
+  display: inline-block; padding: 6px 12px; border-radius: 10px; font-size: 1.05rem; font-weight: 800;
+  letter-spacing: .06em; background: var(--surface-3, #eef); border: 1px dashed var(--border);
+}
+.r6-swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+.r6-swatches button {
+  width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer;
+}
+.r6-swatches button[aria-pressed="true"] { outline: 3px solid color-mix(in srgb, var(--brand) 45%, transparent); }
+.r6-fontpick { display: flex; flex-wrap: wrap; gap: 8px; }
+.r6-fontpick button { padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; }
+.r6-fontpick button[aria-pressed="true"] { border-color: var(--brand); background: color-mix(in srgb, var(--brand) 10%, transparent); }
+.r6-empty { padding: 22px; text-align: center; color: var(--muted); font-size: .88rem; }
+
+/* پهنای ستون مطالعه — انتخاب کاربر در صفحهٔ تنظیمات */
+body.r6-w-narrow .wrap, body.r6-w-narrow .lesson { max-width: 780px; margin-inline: auto; }
+body.r6-w-wide .wrap { max-width: 1280px; }
+
+/* «حرکت کم» برای دستگاه‌های ضعیف و مطالعهٔ راحت‌تر */
+html.r6-no-motion *, html.r6-no-motion *::before, html.r6-no-motion *::after {
+  animation-duration: .001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .001ms !important;
+  scroll-behavior: auto !important;
+}
+html.r6-no-motion .hk-aura,
+html.r6-no-motion [class*="aurora"] { display: none !important; }
+
+/* پیام کوتاه صفحه‌های تازه */
+.r6p-toast {
+  position: fixed; inset-block-end: 22px; inset-inline-start: 22px; z-index: 500;
+  max-width: min(90vw, 380px); padding: 12px 16px; border-radius: 12px;
+  background: var(--text); color: var(--surface); font-size: .85rem; line-height: 1.8;
+  opacity: 0; transform: translateY(10px); pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .28);
+}
+.r6p-toast.on { opacity: 1; transform: translateY(0); }
+@media (max-width: 640px) {
+  .r6-page { padding: 16px 12px 48px; }
+  .r6-tbl { min-width: 520px; }
+}

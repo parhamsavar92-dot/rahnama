@@ -116,6 +116,12 @@
     maintenance: false,
     maintenanceNote: "سایت موقتاً در حال به‌روزرسانی است؛ چند دقیقهٔ دیگر برگرد.",
     aiEnabled: true,
+    consultEnabled: true,
+    // حالت تعمیر — مالک از پنل روشن/خاموش می‌کند و بی‌درنگ روی سایت اعمال می‌شود
+    aiMaintenance: false,
+    consultMaintenance: false,
+    aiMaintenanceNote: "دستیار هوشمند موقتاً در حال تعمیر و به‌روزرسانی است. لطفاً کمی بعد برگرد.",
+    consultMaintenanceNote: "مشاورهٔ آنلاین موقتاً در حال تعمیر و به‌روزرسانی است. لطفاً کمی بعد برگرد.",
     allowedGrades: ["7", "8", "9"],
     announcement: { active: false, level: "info", text: "" },
     features: {
@@ -131,10 +137,12 @@
     siteNotice: "کاملاً آنلاین"
   };
 
+  function emptySupport() { return { reqs: [], keys: [] }; }
+
   function seedDB() {
     var d = {
       v: 4, users: [], settings: clone(DEFAULT_SETTINGS), events: [], audit: [], classes: [],
-      sessions: [], rooms: {}, messages: [], reports: [], rate: {}
+      sessions: [], rooms: {}, messages: [], reports: [], rate: {}, support: emptySupport()
     };
     ensureOwner(d);
     return d;
@@ -143,7 +151,13 @@
   var DB = jload(DB_KEY, null);
   function db() {
     if (!DB || DB.v !== 4 || !DB.users) { DB = seedDB(); jsave(DB_KEY, DB); }
-    else if (!DB._chk) { DB._chk = 1; if (ensureOwner(DB)) jsave(DB_KEY, DB); }
+    else {
+      var dirty = false;
+      if (!DB._chk) { DB._chk = 1; if (ensureOwner(DB)) dirty = true; }
+      // مهاجرت پایگاه‌های قدیمی: بخش «پشتیبانی کلاس مجازی» تازه اضافه شده است
+      if (!DB.support || !DB.support.reqs) { DB.support = emptySupport(); dirty = true; }
+      if (dirty) jsave(DB_KEY, DB);
+    }
     return DB;
   }
   function save() { jsave(DB_KEY, DB); }
@@ -403,6 +417,49 @@
     var g = needAdmin(); if (g) return g;
     if (sub === "stats") return J({ stats: statsOf(), settings: d.settings });
 
+    /* ---- پشتیبانی کلاس مجازی — فقط مالک/مدیر ---- */
+    if (sub === "support") {
+      return J({ reqs: d.support.reqs, keys: d.support.keys });
+    }
+    if (sub === "support/key") {
+      var gk = needOwner(); if (gk) return gk;
+      var rq = d.support.reqs.filter(function (x) { return x.id === String(body.reqId || ""); })[0] || null;
+      var ownerId = rq ? rq.by : String(body.userId || "");
+      if (!ownerId) return bad("درخواست یا کاربر مقصد مشخص نیست.");
+      var kcode = String(body.code || "").trim().toUpperCase() || ("RN-" + code(6));
+      if (d.support.keys.filter(function (k) { return k.code === kcode; }).length) return bad("این کلید قبلاً ساخته شده است.");
+      var kdays = Math.max(1, Math.min(730, +body.days || 90));
+      var kobj = {
+        id: uid("sk"), code: kcode, t: now(), exp: now() + kdays * 864e5,
+        owner: ownerId, school: String(body.school || (rq && rq.school) || "").slice(0, 80),
+        seats: Math.max(1, Math.min(5000, +body.seats || 35)),
+        active: true, used: 0, members: [], days: kdays
+      };
+      d.support.keys.unshift(kobj);
+      d.support.keys = d.support.keys.slice(0, 400);
+      // مدیر همان لحظه صاحب کلید می‌شود و می‌تواند برای مدرسه‌اش کلاس بسازد
+      var tu = d.users.filter(function (x) { return x.id === ownerId; })[0];
+      if (tu) {
+        tu.schoolKey = kcode;
+        if (kobj.school) tu.school = kobj.school;
+        tu.schoolVerified = true; tu.classKey = kcode;
+        touch(tu);
+      }
+      if (rq) { rq.status = "approved"; rq.keyCode = kcode; rq.t2 = now(); }
+      save(); audit("support.key", kobj.school + " / " + kcode);
+      return J({ key: kobj, request: rq });
+    }
+    if (sub === "support/state") {
+      var gs = needOwner(); if (gs) return gs;
+      var sk = d.support.keys.filter(function (k) { return k.id === String(body.id || ""); })[0];
+      if (!sk) return bad("کلید پیدا نشد.", 404);
+      if (body.active != null) sk.active = !!body.active;
+      if (body.seats != null) sk.seats = Math.max(1, Math.min(5000, +body.seats));
+      if (body.days != null) sk.exp = now() + Math.max(1, Math.min(730, +body.days)) * 864e5;
+      save(); audit("support.key.update", sk.code + " → " + (sk.active ? "فعال" : "غیرفعال"));
+      return J({ key: sk });
+    }
+
     if (sub === "users") {
       var list = d.users.slice();
       var qq = (q.q || "").toLowerCase(), role = q.role || "", grade = q.grade || "", sort = q.sort || "new";
@@ -511,7 +568,9 @@
     }
     if (sub === "settings") {
       var s = d.settings;
-      ["registrationOpen", "maintenance", "aiEnabled", "maintenanceNote", "allowedGrades"].forEach(function (k) { if (body[k] != null) s[k] = body[k]; });
+      ["registrationOpen", "maintenance", "aiEnabled", "consultEnabled",
+        "aiMaintenance", "consultMaintenance", "aiMaintenanceNote", "consultMaintenanceNote",
+        "maintenanceNote", "allowedGrades"].forEach(function (k) { if (body[k] != null) s[k] = body[k]; });
       if (s.allowedGrades) s.allowedGrades = s.allowedGrades.map(String);
       save(); audit("settings.update", "site", body);
       return J({ settings: s });
@@ -618,11 +677,28 @@
     var seg = path.replace(/^\/api\//, "").split("/");
 
     if (method === "GET" && path === "/api/site/status") {
+      var st = d.settings;
+      // ⚠️ امنیت: پیش‌تر کلِ d.settings به بیرون داده می‌شد و پیام‌های سراسری
+      // مدیر (broadcast) و سایر داده‌های مدیریتی عمومی می‌شد. حالا فقط
+      // بخش‌های عمومی برگردانده می‌شود.
       return J({
         ok: true, online: true, version: "6.0",
-        announcement: d.settings.announcement, settings: d.settings, features: d.settings.features,
-        hero: d.settings.hero, contact: d.settings.contact, theme: d.settings.theme,
-        note: d.settings.siteNotice, users: d.users.length
+        announcement: st.announcement,
+        features: st.features,
+        settings: {
+          registrationOpen: st.registrationOpen !== false,
+          maintenance: !!st.maintenance,
+          maintenanceNote: st.maintenanceNote,
+          aiEnabled: st.aiEnabled !== false,
+          consultEnabled: st.consultEnabled !== false,
+          aiMaintenance: !!st.aiMaintenance,
+          consultMaintenance: !!st.consultMaintenance,
+          aiMaintenanceNote: st.aiMaintenanceNote,
+          consultMaintenanceNote: st.consultMaintenanceNote,
+          allowedGrades: st.allowedGrades || ["7", "8", "9"]
+        },
+        hero: st.hero, contact: st.contact, theme: st.theme,
+        note: st.siteNotice, users: d.users.length
       });
     }
     if (seg[0] === "auth") {
@@ -678,6 +754,19 @@
         if (body.city != null) mu2.city = String(body.city).slice(0, 40);
         if (body.bio != null) mu2.bio = String(body.bio).slice(0, 300);
         if (body.color != null && /^#[0-9a-fA-F]{6}$/.test(String(body.color))) mu2.color = String(body.color);
+        // ---- شخصی‌سازی پروفایل: تصویر/گیف، فونت نام و رنگ نام ----
+        if (body.nameColor != null && /^#[0-9a-fA-F]{6}$/.test(String(body.nameColor))) mu2.nameColor = String(body.nameColor);
+        if (body.font != null) {
+          var fk = String(body.font);
+          if (["vazir", "system", "display", "serif"].indexOf(fk) > -1) mu2.font = fk;
+        }
+        if (body.avatar !== undefined) {
+          var av = String(body.avatar || "");
+          if (!av) { mu2.avatar = ""; }
+          else if (/^https:\/\/[^\s"'<>]{6,700}$/.test(av)) { mu2.avatar = av; }
+          else if (/^data:image\/(png|jpe?g|gif|webp);base64,[A-Za-z0-9+/=]+$/.test(av) && av.length <= 200000) { mu2.avatar = av; }
+          else return bad("تصویر پروفایل پذیرفته نشد (png / jpg / gif / webp — حداکثر ۱۴۰ کیلوبایت).");
+        }
         // تغییر نقش: دانش‌آموز آزاد است؛ دبیر/ناظم/مدیر با «کد همکاران»
         if (body.role && !mu2.isOwner && body.role !== mu2.role) {
           var wr = String(body.role).toLowerCase();
@@ -703,6 +792,62 @@
         return ok();
       }
       return ok();
+    }
+
+    /* ---------------- پشتیبانی کلاس مجازی (درخواست کلید) ----------------
+       مدیر/ناظم/دبیر از صفحهٔ «پشتیبانی کلاس مجازی» درخواست می‌دهد و تیم
+       مدیریت از پنل مالک برای همان مدرسه کلید می‌سازد. اعضای آن مدرسه هم
+       با همان کلید به مدرسه وصل می‌شوند. */
+    if (seg[0] === "support") {
+      var sa = seg.slice(1).join("/"), su = me();
+      if (sa === "request") {
+        if (!su) return bad("برای ثبت درخواست وارد شوید.", 401);
+        if (!(su.isOwner || ["teacher", "deputy", "admin", "owner"].indexOf(su.role) > -1)) {
+          return bad("ثبت درخواست کلاس مجازی برای مدیر، ناظم و دبیر فعال است.", 403);
+        }
+        var rq = {
+          id: uid("sr"), t: now(), by: su.id, byName: su.name, byEmail: su.email,
+          school: String(body.school || su.school || "").slice(0, 80),
+          city: String(body.city || su.city || "").slice(0, 40),
+          classes: Math.max(1, Math.min(200, +body.classes || 1)),
+          students: Math.max(1, Math.min(5000, +body.students || 30)),
+          phone: String(body.phone || "").slice(0, 30),
+          note: String(body.note || "").slice(0, 400),
+          status: "pending", keyCode: "", t2: 0
+        };
+        if (!rq.school) return bad("نام مدرسه را وارد کنید.");
+        d.support.reqs.unshift(rq);
+        d.support.reqs = d.support.reqs.slice(0, 300);
+        save(); audit("support.request", rq.school); logEvent("support", { school: rq.school });
+        return J({ request: rq });
+      }
+      if (sa === "my") {
+        if (!su) return bad("وارد شوید.", 401);
+        return J({
+          requests: d.support.reqs.filter(function (x) { return x.by === su.id; }),
+          key: d.support.keys.filter(function (k) { return k.owner === su.id && k.active; })[0] || null
+        });
+      }
+      if (sa === "redeem") {
+        if (!su) return bad("وارد شوید.", 401);
+        var rc = String(body.code || "").trim().toUpperCase();
+        var kk = d.support.keys.filter(function (k) { return k.code === rc; })[0];
+        if (!kk) return bad("این کلید معتبر نیست.", 404);
+        if (!kk.active) return bad("این کلید غیرفعال شده است.", 403);
+        if (kk.exp && now() > kk.exp) return bad("این کلید منقضی شده است.", 403);
+        su.school = kk.school || su.school; su.schoolKey = kk.code; su.schoolVerified = true;
+        kk.used = (kk.used || 0) + 1; kk.members = kk.members || [];
+        if (kk.members.indexOf(su.id) < 0) kk.members.push(su.id);
+        touch(su); save(); audit("support.redeem", su.email + " → " + kk.school);
+        return J({ ok: true, school: kk.school, user: pub(su) });
+      }
+      if (sa === "keys") {
+        if (!su) return bad("وارد شوید.", 401);
+        var iAmBoss = !!(su.isOwner || su.role === "owner" || su.role === "admin");
+        var ks = iAmBoss ? d.support.keys : d.support.keys.filter(function (k) { return k.owner === su.id || su.schoolKey === k.code; });
+        return J({ keys: ks });
+      }
+      return bad("مسیر نامعتبر", 404);
     }
 
     if (seg[0] === "admin") return adminHandler(seg.slice(1).join("/"), m, body, q);
