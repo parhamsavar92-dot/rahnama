@@ -2,7 +2,7 @@
    پایهٔ هشتم — Service Worker  |  sw.js
    مطالعهٔ آفلاین کامل: پیش‌بارگذاری همهٔ صفحه‌ها، تصاویر و دادهٔ مطالعه
    ========================================================================== */
-const VERSION = "g8-v27";
+const VERSION = "g8-v28";
 const CORE = VERSION + "-core";
 const PAGES = VERSION + "-pages";
 const RUNTIME = VERSION + "-runtime";
@@ -76,7 +76,12 @@ const CORE_ASSETS = [
   "assets/icons/icon-192.png",
   "assets/icons/icon-512.png",
   "assets/icons/maskable-512.png",
-  "assets/icons/favicon.png"
+    "assets/r7.css",
+  "assets/r8.css",
+  "assets/r7.js",
+  "assets/r8.js",
+  "assets/r7-pdf.js",
+"assets/icons/favicon.png"
 ];
 
 self.addEventListener("install", (e) => {
@@ -98,65 +103,112 @@ function isHTML(req) {
   return req.mode === "navigate" || (req.headers.get("accept") || "").includes("text/html");
 }
 
+/* ---------------------------------------------------------------------------
+   ▼ رفع باگ ERR_FAILED
+   پیش‌تر هنگام ناوبری، پاسخ شبکه بدون هیچ بررسی‌ای در حافظهٔ نهان نوشته
+   می‌شد:  caches.open(PAGES).then((c) => c.put(req, copy));
+   اگر پاسخْ ریدایرکت‌شده بود (مثل «/exam.html» که Cloudflare با ۳۰۷ به
+   «/exam» می‌فرستاد) نوشتن در حافظهٔ نهان رد می‌شد، آن رد شدن مدیریت
+   نمی‌شد و کل ناوبری با ERR_FAILED می‌ترکید.
+   حالا: هر نوشتنْ محافظت‌شده است، پاسخ ریدایرکت‌شده هرگز ذخیره نمی‌شود،
+   و زنجیرهٔ ناوبری در هیچ حالتی رد نمی‌شود.
+--------------------------------------------------------------------------- */
+
+/* اگر شبکه کند بود، بی‌پایان منتظر نمان؛ از حافظهٔ نهان بده (سرعت بیشتر). */
+function withTimeout(p, ms) {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error("timeout")), ms);
+    p.then(
+      (v) => { clearTimeout(t); resolve(v); },
+      (err) => { clearTimeout(t); reject(err); }
+    );
+  });
+}
+
+/* ذخیره در حافظهٔ نهان فقط وقتی امن است. */
+function saveIfOk(event, cacheName, req, res) {
+  try {
+    if (!res || res.status !== 200 || res.type !== "basic" || res.redirected) return;
+    const copy = res.clone();
+    event.waitUntil(
+      caches.open(cacheName).then((c) => c.put(req, copy)).catch(function () { })
+    );
+  } catch (err) { /* هرگز نباید صفحه را خراب کند */ }
+}
+
+function fromCache(req) {
+  return caches.match(req).then(
+    (r) => r || caches.match(new URL("offline.html", self.registration.scope).href)
+  );
+}
+
+/* آخرین سنگر: اگر نه شبکه بود و نه حافظهٔ نهان، یک صفحهٔ ساده و سالم. */
+function offlineFallback() {
+  return new Response(
+    '<!doctype html><html lang="fa" dir="rtl"><meta charset="utf-8">' +
+    "<title>اتصال برقرار نشد</title>" +
+    '<body style="font-family:system-ui;background:#eef3fb;display:grid;place-items:center;height:100vh;margin:0">' +
+    '<div style="text-align:center"><h1>اتصال برقرار نشد</h1>' +
+    "<p>اینترنت را بررسی کن و دوباره تلاش کن.</p>" +
+    '<p><button onclick="location.reload()">تلاش دوباره</button></p></div></body></html>',
+    { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } }
+  );
+}
+
 self.addEventListener("fetch", (e) => {
   const req = e.request;
-  if (req.method !== "GET") return;
-  const u = new URL(req.url);
-  if (u.origin !== self.location.origin) return; // فونت و منابع بیرونی: بدون دخالت
+  try {
+    if (req.method !== "GET") return;
+    const u = new URL(req.url);
+    if (u.origin !== self.location.origin) return; // فونت و منابع بیرونی: بدون دخالت
 
-  // پاسخ‌های API هرگز نباید از حافظهٔ نهان بیایند:
-  // پیش‌تر وضعیت ورود، اعلان سراسری و پیام‌های به‌صورت کهنه دیده می‌شدند.
-  if (u.pathname.indexOf("/api/") === 0 || u.pathname === "/__status" || u.pathname === "/healthz") return;
+    // پاسخ‌های API هرگز نباید از حافظهٔ نهان بیایند:
+    // پیش‌تر وضعیت ورود، اعلان سراسری و پیام‌های به‌صورت کهنه دیده می‌شدند.
+    if (u.pathname.indexOf("/api/") === 0 || u.pathname === "/__status" || u.pathname === "/healthz") return;
 
-  if (isHTML(req)) {
+    if (isHTML(req)) {
+      /* ناوبری: اول شبکه، بعد حافظهٔ نهان، آخر صفحهٔ آفلاین.
+         این زنجیره هرگز رد نمی‌شود تا هیچ‌وقت ERR_FAILED نبینیم. */
+      e.respondWith(
+        withTimeout(fetch(req), 12000)
+          .then((res) => { saveIfOk(e, PAGES, req, res); return res; })
+          .catch(() => fromCache(req))
+          .catch(() => offlineFallback())
+      );
+      return;
+    }
+
+    /* CSS و JS: اول شبکه، بعد حافظهٔ نهان. */
+    if (/\.(css|js|webmanifest)$/.test(u.pathname)) {
+      e.respondWith(
+        withTimeout(fetch(req), 12000)
+          .then((res) => { saveIfOk(e, RUNTIME, req, res); return res; })
+          .catch(() => caches.match(req).then((r) => r || caches.match(u.pathname)))
+          .catch(() => Response.error())
+      );
+      return;
+    }
+
+    // دارایی‌های ایستا: ابتدا حافظه، سپس شبکه (با به‌روزرسانی در پس‌زمینه)
     e.respondWith(
-      fetch(req)
-        .then((res) => {
-          const copy = res.clone();
-          caches.open(PAGES).then((c) => c.put(req, copy));
-          return res;
-        })
-        .catch(() =>
-          caches.match(req).then((r) => r || caches.match(new URL("offline.html", self.registration.scope).href))
-        )
+      caches.match(req).then((hit) => {
+        if (hit) {
+          e.waitUntil(
+            fetch(req)
+              .then((res) => { saveIfOk(e, RUNTIME, req, res); return res; })
+              .catch(() => { })
+          );
+          return hit;
+        }
+        return fetch(req)
+          .then((res) => { saveIfOk(e, RUNTIME, req, res); return res; })
+          .catch(() => Response.error());
+      })
     );
-    return;
+  } catch (err) {
+    /* اگر همین‌جا خطایی رخ داد، هیچ respondWith نکن تا مرورگر
+       خودش درخواست را طبیعی انجام دهد (سالم‌ترین حالت). */
   }
-
-  /* CSS و JS: اول شبکه، بعد حافظهٔ نهان.
-     پیش‌تر «اول حافظه» بود و کاربر نسخهٔ کهنهٔ طرح را می‌دید (پس از هر
-     تغییر ظاهر، باید نسخهٔ تازه را می‌دید ولی نمی‌دید). آفلاین هم چون
-     fallback حافظه دارد، همان‌طور کار می‌کند. */
-  if (/\.(css|js|webmanifest)$/.test(u.pathname)) {
-    e.respondWith(
-      fetch(req)
-        .then((res) => {
-          if (res && res.status === 200 && res.type === "basic") {
-            const copy = res.clone();
-            caches.open(RUNTIME).then((c) => c.put(req, copy));
-          }
-          return res;
-        })
-        .catch(() => caches.match(req).then((r) => r || caches.match(u.pathname)))
-    );
-    return;
-  }
-
-  // دارایی‌های ایستا: ابتدا حافظه، سپس شبکه (با به‌روزرسانی در پس‌زمینه)
-  e.respondWith(
-    caches.match(req).then((hit) => {
-      const net = fetch(req)
-        .then((res) => {
-          if (res && res.status === 200 && res.type === "basic") {
-            const copy = res.clone();
-            caches.open(RUNTIME).then((c) => c.put(req, copy));
-          }
-          return res;
-        })
-        .catch(() => hit);
-      return hit || net;
-    })
-  );
 });
 
 self.addEventListener("message", (e) => {

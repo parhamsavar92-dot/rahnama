@@ -6,7 +6,12 @@
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*"]
+    /* «none» یعنی Cloudflare دیگر «/x.html» را با ۳۰۷ به «/x» نفرستد.
+       آن ۳۰۷ باعث ERR_FAILED در Service Worker می‌شد (توضیح کامل در src/worker.js). */
+    "html_handling": "none",
+    "run_worker_first": [
+      "/api/*"
+    ]
   },
   "d1_databases": [
     {

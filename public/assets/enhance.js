@@ -404,7 +404,22 @@
   function registerSW() {
     if (!("serviceWorker" in navigator)) return;
     if (location.protocol !== "http:" && location.protocol !== "https:") return;
-    navigator.serviceWorker.register(url("sw.js")).catch(function () {});
+    /* updateViaCache:"none" → مرورگر همیشه نسخهٔ تازهٔ sw.js را می‌گیرد.
+       پیش‌تر نسخهٔ کهنه در حافظهٔ HTTP می‌ماند و اصلاح باگ ERR_FAILED
+       به دست کاربر نمی‌رسید. */
+    navigator.serviceWorker.register(url("sw.js"), { updateViaCache: "none" }).then(function (reg) {
+      try { reg.update(); } catch (e) { }
+      /* اگر پیش‌تر Service Worker داشتیم (نسخهٔ خراب) و حالا نسخهٔ تازه
+         کنترل را گرفت، یک‌بار صفحه را نو می‌کنیم تا همان لحظه نسخهٔ سالم
+         دیده شود. برای کاربری که تازه آمده، نو کردن لازم نیست. */
+      if (!navigator.serviceWorker.controller) return;
+      var done = false;
+      navigator.serviceWorker.addEventListener("controllerchange", function () {
+        if (done) return;
+        done = true;
+        location.reload();
+      });
+    }).catch(function () { });
   }
 
   /* ---------- حافظهٔ محل مطالعه ---------- */

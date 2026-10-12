@@ -1,0 +1,273 @@
+/* ==========================================================================
+   رهنما — لایهٔ ۸: «یخ و شیشه»  |  r8.css
+   --------------------------------------------------------------------------
+   ظاهر سه‌بعدی و یخی با انیمیشن‌های نرم — یکدست روی همهٔ صفحه‌ها.
+
+   نکته‌های مهم این لایه:
+     • از ::before و ::after روی body و کارت‌ها استفاده نمی‌کند، چون لایه‌های
+       پیشین (hk3d.css و hk-school.css و ultra.css) آنها را گرفته‌اند.
+       شفق یخی روی یک عنصر اختصاصی (div.r8-aurora) ساخته می‌شود.
+     • همهٔ انیمیشن‌ها فقط روی transform و opacity کار می‌کنند (شتاب گرافیکی)
+     • backdrop-filter فقط روی سطح‌های بزرگ (هدر، نوار پایین) — نه هر کارت
+     • برای دستگاه ضعیف کلاس r8-lite روی body گذاشته می‌شود: بلور و ذره‌ها خاموش
+     • اگر کاربر «کاهش حرکت» سیستم را روشن کرده باشد، همه چیز ثابت می‌شود
+   ========================================================================== */
+
+/* ------------------------------------------------ ۱. توکن‌های یخی و ژرفا */
+:root {
+  --r8-ice-1: #7ee7ff;          /* فیروزه‌ای یخی */
+  --r8-ice-2: #a8c8ff;          /* آبی شبنمی */
+  --r8-ice-3: #c9b8ff;          /* بنفش شبنمی */
+  --r8-glass-bg: rgba(255, 255, 255, .60);
+  --r8-glass-bg-2: rgba(255, 255, 255, .44);
+  --r8-glass-brd: rgba(255, 255, 255, .80);
+  --r8-glass-blur: 16px;
+  --r8-hair: rgba(255, 255, 255, .55);
+  --r8-depth-1: 0 1px 2px rgba(20, 22, 45, .05);
+  --r8-depth-2: 0 10px 28px rgba(20, 22, 45, .10), 0 2px 6px rgba(20, 22, 45, .06);
+  --r8-depth-3: 0 28px 70px rgba(20, 22, 45, .17), 0 6px 18px rgba(20, 22, 45, .08);
+}
+html[data-theme="dark"] {
+  --r8-glass-bg: rgba(30, 36, 58, .64);
+  --r8-glass-bg-2: rgba(24, 29, 48, .48);
+  --r8-glass-brd: rgba(120, 140, 210, .30);
+  --r8-hair: rgba(150, 170, 235, .20);
+  --r8-depth-1: 0 1px 2px rgba(0, 0, 0, .42);
+  --r8-depth-2: 0 10px 30px rgba(0, 0, 0, .50);
+  --r8-depth-3: 0 30px 80px rgba(0, 0, 0, .62);
+}
+
+/* --------------------------------------------------------------------------
+   برقراری نظم لایه‌ها: body یک زمینهٔ چیدمان می‌شود تا شفق یخی
+   (z-index: -1) پشتِ همهٔ محتوا ولی روی رنگ پایهٔ صفحه بنشیند.
+   هیچ z-index روی main یا هدر گذاشته نمی‌شود تا پنجره‌های شیشه‌ای و
+   نوار پایین دقیقاً مثل قبل روی هم بنشینند (بدون باگ لایه‌بندی).
+--------------------------------------------------------------------------- */
+body {
+  position: relative;
+  z-index: 0;
+}
+
+/* ======================================================== ۲. شفق یخی شناور */
+.r8-aurora {
+  position: fixed;
+  inset: -18vmax;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .82;
+  background:
+    radial-gradient(34vmax 34vmax at 16% 10%, color-mix(in srgb, var(--r8-ice-1) 44%, transparent), transparent 62%),
+    radial-gradient(30vmax 30vmax at 86% 18%, color-mix(in srgb, var(--r8-ice-3) 40%, transparent), transparent 64%),
+    radial-gradient(38vmax 38vmax at 52% 96%, color-mix(in srgb, var(--r8-ice-2) 38%, transparent), transparent 66%);
+  animation: r8-drift 52s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+html[data-theme="dark"] .r8-aurora { opacity: .58; }
+@keyframes r8-drift {
+  0%   { transform: translate3d(-1.5%, -1%, 0) scale(1.02) rotate(0deg); }
+  50%  { transform: translate3d(1.2%, .8%, 0) scale(1.07) rotate(1.5deg); opacity: .95; }
+  100% { transform: translate3d(2.2%, 1.6%, 0) scale(1.03) rotate(-1.5deg); }
+}
+
+/* ================================================ ۳. شیشهٔ مات (سطح‌های بزرگ) */
+.site-header {
+  background: var(--r8-glass-bg) !important;
+  -webkit-backdrop-filter: blur(var(--r8-glass-blur)) saturate(1.55);
+  backdrop-filter: blur(var(--r8-glass-blur)) saturate(1.55);
+  border-block-end: 1px solid var(--r8-glass-brd);
+  box-shadow: 0 10px 34px rgba(20, 22, 45, .09), inset 0 1px 0 var(--r8-hair);
+}
+html[data-theme="dark"] .site-header {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .55), inset 0 1px 0 var(--r8-hair);
+}
+.r7-tabbar {
+  background: var(--r8-glass-bg) !important;
+  -webkit-backdrop-filter: blur(var(--r8-glass-blur)) saturate(1.55);
+  backdrop-filter: blur(var(--r8-glass-blur)) saturate(1.55);
+  border-block-start: 1px solid var(--r8-glass-brd);
+  box-shadow: 0 -10px 34px rgba(20, 22, 45, .10), inset 0 1px 0 var(--r8-hair);
+}
+
+/* ============================================ ۴. کارت‌های سه‌بعدی و ژرفا */
+/* فقط transform و box-shadow و border-color — بدون دست‌زدن به ::after
+   تا جلوه‌های درخشش موجود در لایه‌های قبلی سالم بمانند. */
+.card, .subject-card, .tool-card, .cls-card, .hk-card, .r7-empty {
+  border: 1px solid var(--r8-glass-brd);
+  background-image: linear-gradient(160deg, var(--r8-glass-bg-2), transparent 44%);
+  box-shadow: var(--r8-depth-2), inset 0 1px 0 var(--r8-hair);
+  transform: translate3d(0, 0, 0);
+  transition: transform .34s cubic-bezier(.2, .7, .3, 1),
+              box-shadow .34s cubic-bezier(.2, .7, .3, 1),
+              border-color .34s ease;
+}
+@media (hover: hover) {
+  .card:hover, .subject-card:hover, .tool-card:hover, .cls-card:hover, .hk-card:hover {
+    transform: translate3d(0, -6px, 0);
+    box-shadow: var(--r8-depth-3), inset 0 1px 0 var(--r8-hair);
+    border-color: color-mix(in srgb, var(--accent, #6d5efc) 34%, var(--r8-glass-brd));
+  }
+}
+/* شیب سه‌بعدی واقعی — جاوااسکریپت متغیرهای --r8-rx / --r8-ry را می‌گذارد */
+body.r8-tilt .card.r8-3d,
+body.r8-tilt .subject-card.r8-3d,
+body.r8-tilt .tool-card.r8-3d {
+  transform: perspective(900px)
+             rotateX(var(--r8-rx, 0deg))
+             rotateY(var(--r8-ry, 0deg))
+             translate3d(0, -3px, 0);
+  transition: transform .12s ease-out, box-shadow .34s ease, border-color .34s ease;
+}
+
+/* ======================================================== ۵. دکمه‌ها و ژرفا */
+.btn {
+  transition: transform .16s cubic-bezier(.2, .7, .3, 1), box-shadow .22s ease, filter .2s ease;
+  box-shadow: var(--r8-depth-1), inset 0 1px 0 rgba(255, 255, 255, .45);
+}
+.btn:hover { transform: translate3d(0, -2px, 0); box-shadow: var(--r8-depth-2); }
+.btn:active { transform: translate3d(0, 1px, 0) scale(.985); }
+.btn-primary {
+  background-image: linear-gradient(135deg, var(--brand, #6d5efc),
+      color-mix(in srgb, var(--r8-ice-1) 40%, var(--brand, #6d5efc)));
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--brand, #6d5efc) 32%, transparent),
+              inset 0 1px 0 rgba(255, 255, 255, .32);
+}
+/* برق یخ روی دکمهٔ اصلی (ultra.css از .btn::before استفاده کرده، پس ::after آزاد است) */
+.btn-primary { position: relative; overflow: hidden; }
+.btn-primary::after {
+  content: "";
+  position: absolute;
+  inset-block: -40%;
+  inline-size: 36%;
+  inset-inline-start: -46%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .5), transparent);
+  transform: skewX(-18deg);
+  pointer-events: none;
+}
+.btn-primary:hover::after { animation: r8-glint .8s ease-out; }
+@keyframes r8-glint {
+  from { inset-inline-start: -46%; }
+  to   { inset-inline-start: 116%; }
+}
+
+/* ============================================================ ۶. ورودی‌ها */
+.pd-in, input[type="text"], input[type="email"], input[type="password"],
+input[type="number"], input[type="search"], select, textarea {
+  background: var(--r8-glass-bg-2);
+  border: 1px solid var(--r8-glass-brd);
+  box-shadow: inset 0 1px 0 var(--r8-hair);
+  transition: box-shadow .2s ease, border-color .2s ease, background .2s ease;
+}
+.pd-in:focus, input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #6d5efc) 58%, var(--r8-glass-brd));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #6d5efc) 15%, transparent);
+}
+
+/* ================================================== ۷. برچسب، فهرست، جدول */
+.badge, .chip, .pill, .hk-badge {
+  border: 1px solid var(--r8-glass-brd);
+  background-image: linear-gradient(160deg, var(--r8-glass-bg), transparent);
+  box-shadow: inset 0 1px 0 var(--r8-hair);
+}
+.toc-list a { border-radius: 12px; transition: background .2s ease, transform .2s ease; }
+.toc-list a:hover {
+  background: color-mix(in srgb, var(--r8-ice-1) 16%, transparent);
+  transform: translateX(-3px);
+}
+table thead th {
+  background-image: linear-gradient(180deg, var(--r8-glass-bg), transparent);
+  border-block-end: 1px solid var(--r8-glass-brd);
+}
+
+/* ==================================================== ۸. انیمیشن‌های خاص */
+/* ورود نرم صفحه: فقط محو شدن و بالا آمدن (بدون بلور، برای سرعت) */
+main { animation: r8-enter .5s cubic-bezier(.2, .7, .3, 1) both; }
+@keyframes r8-enter {
+  from { opacity: 0; transform: translate3d(0, 12px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+/* شناوری آرام برای نشان‌ها و آیکون‌ها */
+.brand-mark, .subject-icon, .hk-ava, .card-icon {
+  animation: r8-float 6.5s ease-in-out infinite;
+}
+@keyframes r8-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0, -4px, 0); }
+}
+/* ظهور پله‌ای هنگام اسکرول */
+.r8-reveal {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition: opacity .6s cubic-bezier(.2, .7, .3, 1),
+              transform .6s cubic-bezier(.2, .7, .3, 1);
+  transition-delay: calc(var(--r8-i, 0) * 55ms);
+  will-change: opacity, transform;
+}
+.r8-reveal.r8-in { opacity: 1; transform: translate3d(0, 0, 0); }
+
+/* ============================================== ۹. بلورهای یخی در هدر */
+.r8-crystal {
+  position: absolute;
+  top: -12px;
+  inline-size: 7px;
+  block-size: 7px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, var(--r8-ice-1), var(--r8-ice-3));
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--r8-ice-1) 70%, transparent);
+  animation: r8-crystal var(--r8-dur, 14s) linear var(--r8-delay, 0s) infinite;
+}
+@keyframes r8-crystal {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+  12%  { opacity: .85; }
+  88%  { opacity: .5; }
+  100% { transform: translate3d(var(--r8-dx, 14px), 116px, 0) rotate(300deg); opacity: 0; }
+}
+
+/* ============================================================== ۱۰. کارایی */
+/* بخش‌های پایین صفحه تا وقتی دیده نشوند رندر نمی‌شوند */
+.r8-lazy { content-visibility: auto; contain-intrinsic-size: auto 620px; }
+/* تبِ پنهان: همهٔ انیمیشن‌ها متوقف تا پردازنده آزاد شود */
+body.r8-paused *, body.r8-paused::before { animation-play-state: paused !important; }
+
+/* دستگاه ضعیف: جلوه‌های گران‌قیمت خاموش */
+body.r8-lite .r8-aurora { display: none; }
+body.r8-lite .site-header,
+body.r8-lite .r7-tabbar {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+body.r8-lite .r8-crystal { display: none; }
+body.r8-lite main { animation: none; }
+body.r8-lite .brand-mark,
+body.r8-lite .subject-icon,
+body.r8-lite .hk-ava,
+body.r8-lite .card-icon { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .r8-aurora { animation: none; }
+  main { animation: none; }
+  .brand-mark, .subject-icon, .hk-ava, .card-icon { animation: none; }
+  .r8-crystal { display: none; }
+  .r8-reveal { opacity: 1; transform: none; transition: none; }
+  .card, .subject-card, .tool-card, .cls-card, .hk-card { transition: none; }
+  .card:hover, .subject-card:hover, .tool-card:hover, .cls-card:hover, .hk-card:hover { transform: none; }
+  .btn, .toc-list a { transition: none; }
+  .btn:hover { transform: none; }
+  .btn-primary:hover::after { animation: none; }
+}
+
+/* چاپ: بدون شفق، بدون شیشه، بدون سایه */
+@media print {
+  .r8-aurora { display: none !important; }
+  .site-header, .r7-tabbar {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: #fff !important;
+  }
+  .card, .subject-card, .tool-card, .cls-card, .hk-card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+}

@@ -780,6 +780,29 @@ export default {
     const url = new URL(req.url);
     if (!url.pathname.startsWith("/api/")) {
       if (!env.ASSETS) return new Response("Not found", { status: 404, headers: SEC_HEADERS });
+      /* ── رفع باگ ERR_FAILED ─────────────────────────────────────────────────
+         پیش‌تر Cloudflare خودش «/x.html» را با کد ۳۰۷ به «/x» می‌فرستاد
+         (رفتار پیش‌فرض html_handling). آن ریدایرکت باعث می‌شد Service Worker
+         نتواند پاسخ را در حافظهٔ نهان بنویسد و کل ناوبری با ERR_FAILED
+         می‌ترکید — روی همهٔ صفحه‌هایی که کاربر با پسوند .html باز می‌کرد.
+         حالا هیچ ریدایرکتی در کار نیست: هر دو شکل آدرس («/exam» و
+         «/exam.html») مستقیم با کد ۲۰۰ سرو می‌شوند. */
+      const p = url.pathname;
+      if (req.method === "GET" && !/\.[a-z0-9]{2,5}$/i.test(p)) {
+        /* نامزدها به ترتیب: صفحهٔ هم‌نام با مسیر، یا index.html همان پوشه.
+           مثال: «/exam» → exam.html و «/g7» → g7/index.html.
+           هر دو با کد ۲۰۰ سرو می‌شوند؛ چون هیچ ریدایرکتی نمی‌دهیم،
+           Service Worker هیچ‌وقت پاسخ ریدایرکت‌شده نمی‌بیند و خطا نمی‌گیرد. */
+        const cands = p.endsWith("/") ? [p + "index.html"] : [p + ".html", p + "/index.html"];
+        for (const cand of cands) {
+          try {
+            const alt = new URL(url.href);
+            alt.pathname = cand;
+            const hit = await env.ASSETS.fetch(new Request(alt.href, req));
+            if (hit && hit.status === 200) return withSec(hit);
+          } catch (e) { /* نامزد بعدی */ }
+        }
+      }
       return withSec(await env.ASSETS.fetch(req));
     }
     try {
