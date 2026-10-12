@@ -98,12 +98,17 @@
   }
 
   /* ------------------------------------------- درخواست آنلاین */
+  /* ▼ دستیار بدون تنظیم کار می‌کند.
+     خواستهٔ کاربر: «کاربر نیاز نباشد کلید API وارد کند یا مدل انتخاب کند.»
+     پس همیشه از موتور متصل به خودِ سایت (/api/ai) استفاده می‌کنیم که
+     روی سرور با هوش مصنوعی قوی کار می‌کند و کلیدی لازم ندارد.
+     اگر آن لحظه اینترنت یا سرویس در دسترس نباشد، خودکار به موتور
+     مستقل داخلی برمی‌گردیم تا باز هم پاسخ بگیرد. */
   function resolveProvider() {
-    if (CFG.mode === "offline") return null;
-    if (CFG.mode === "auto") return CFG.key ? (CFG.provider || "openai") : "proxy";
-    if (CFG.mode === "proxy") return "proxy";
-    return CFG.mode;
+    return "proxy";
   }
+  /* موتور مستقل، فقط وقتی اتصال ممکن نبود به‌کار می‌آید. */
+  function allowOfflineFallback() { return true; }
 
   function sysPrompt(context) {
     var g = grade();
@@ -309,6 +314,22 @@
   function boot() {
     var root = $("[data-ai-chat]");
     if (root) { W.HK_AI = mount(root); mountSettings(root); }
+    /* نمایش وضعیت خودکار موتور هوش مصنوعی (بدون نیاز به تنظیم کاربر) */
+    var st = D.getElementById("aiAutoState");
+    if (st) {
+      st.textContent = "در حال بررسی موتور…";
+      fetch("/api/health", { credentials: "same-origin", cache: "no-store" })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          var on = !!(j && j.ok && j.ai && j.ai.configured);
+          st.textContent = on
+            ? "✅ موتور هوش مصنوعی سایت فعال است — آمادهٔ پاسخ به هر پرسش."
+            : "⚠️ موتور آنلاین در دسترس نیست؛ دستیار با موتور مستقل داخلی پاسخ می‌دهد.";
+        })
+        .catch(function () {
+          st.textContent = "⚠️ اتصال بررسی نشد؛ دستیار در صورت نیاز با موتور داخلی پاسخ می‌دهد.";
+        });
+    }
   }
   if (D.readyState === "loading") D.addEventListener("DOMContentLoaded", boot); else boot();
 

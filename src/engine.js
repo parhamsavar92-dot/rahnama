@@ -567,6 +567,19 @@ export function createEngine(LS, CFG) {
         sessions: d.sessions
       });
     }
+    /* حذف کلاس — فقط مالک/مدیر، یا سازندهٔ همان کلاس */
+    if (sub === "del") {
+      var cdel = d.classes.filter(function (x) { return x.id === String(body.id || ""); })[0];
+      if (!cdel) return bad("کلاس پیدا نشد.", 404);
+      var mayDel = !!(u && (u.isOwner || u.role === "owner" || u.role === "admin" || cdel.ownerId === u.id));
+      if (!mayDel) return bad("اجازهٔ حذف این کلاس را نداری.", 403);
+      d.classes = d.classes.filter(function (x) { return x.id !== cdel.id; });
+      if (d.sessions) d.sessions = d.sessions.filter(function (x) { return x.classId !== cdel.id; });
+      if (d.rooms) delete d.rooms[cdel.id];
+      save(); audit("class.del", cdel.name || cdel.id);
+      return J({ ok: true, id: cdel.id });
+    }
+
     /* سایر کنش‌های کلاس زنده (نظرسنجی، دست‌بلند، واکنش، تایمر، اعلام) */
     var ra = getRoom(body.sessionId);
     if (!ra) return ok();
@@ -630,7 +643,16 @@ export function createEngine(LS, CFG) {
     if (sub === "support/key") {
       var gk = needOwner(); if (gk) return gk;
       var rq = d.support.reqs.filter(function (x) { return x.id === String(body.reqId || ""); })[0] || null;
-      var ownerId = rq ? rq.by : String(body.userId || "");
+      /* ▼ رفع باگ «با زدن ثبت، کلید ساخته نمی‌شود»
+         پیش‌تر اگر درخواست متناظر روی سرور پیدا نمی‌شد (چون درخواست
+         فقط در مرورگر ذخیره شده بود) و کاربر مقصدی هم داده نمی‌شد، سرور
+         با «درخواست یا کاربر مقصد مشخص نیست» رد می‌کرد؛ ولی کلاینت آن
+         خطا را نمی‌دید و پیام «کلید ساخته شد» نشان می‌داد — در نتیجه کلید
+         هیچ‌وقت روی سرور ثبت نمی‌شد و کد در کلاس مجازی کار نمی‌کرد.
+         حالا اگر مقصدی تعیین نشده باشد، کلید به خودِ مالکِ درخواست‌دهنده
+         (یعنی همین مدیری که کلید را می‌سازد) بسته می‌شود. */
+      var meU = me();
+      var ownerId = (rq && rq.by) || String(body.userId || "") || (meU && meU.id) || "";
       if (!ownerId) return bad("درخواست یا کاربر مقصد مشخص نیست.");
       var kcode = String(body.code || "").trim().toUpperCase() || ("RN-" + code(6));
       if (d.support.keys.filter(function (k) { return k.code === kcode; }).length) return bad("این کلید قبلاً ساخته شده است.");

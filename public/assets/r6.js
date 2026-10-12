@@ -1010,6 +1010,19 @@
   R6.supportDB = supDB;
   R6.supportSave = supSave;
 
+  /* نسخهٔ «خام» فراخوانی سرور: برخلاف supApi که خطاها را null می‌کند،
+     اینجا بدنهٔ پاسخ (همراه با پیام خطا) برگردانده می‌شود تا بتوانیم
+     دلیل واقعی ناموفق‌بودن را به کاربر نشان بدهیم. */
+  function supApiRaw(method, path, body) {
+    return fetch("/api/" + path, {
+      method: method, credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined
+    }).then(function (r) {
+      return r.json().catch(function () { return null; });
+    }).catch(function () { return null; });
+  }
+
   function newKeyCode() {
     var s = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", o = "RN-";
     for (var i = 0; i < 6; i++) o += s[Math.floor(Math.random() * s.length)];
@@ -1160,6 +1173,30 @@
         h += "</tbody></table></div>";
       }
 
+      /* ── ساخت کلید جدید، بدون نیاز به درخواست ────────────────────────
+         پیش‌تر کلید فقط از روی یک «درخواست» ساخته می‌شد؛ اگر درخواستی
+         در انتظار نبود، راهی برای ساخت کلید وجود نداشت. این فرم همیشه
+         کار می‌کند و کلید را مستقیم روی سرور ثبت می‌کند. */
+      h = '<div class="card" style="padding:14px;margin-bottom:14px">' +
+        '<h4 style="margin:0 0 4px">ساخت کلید جدید</h4>' +
+        '<p style="font-size:.82rem;color:var(--muted);margin:0 0 10px">' +
+        "با ساخت کلید، یک کلاس واقعی با همین کد روی سرور ساخته می‌شود؛ " +
+        "هر کس این کد را در کلاس مجازی بزند، مستقیم وارد می‌شود.</p>" +
+        '<div class="r6-grid2">' +
+        '<label style="display:block"><span style="font-size:.78rem;font-weight:800">نام مدرسه (اختیاری)</span>' +
+        '<input id="r6NewKeySchool" class="input" style="width:100%" type="text" placeholder="مثلاً: مدرسهٔ رهنما"></label>' +
+        '<label style="display:block"><span style="font-size:.78rem;font-weight:800">اعتبار (روز)</span>' +
+        '<input id="r6NewKeyDays" class="input" style="width:100%" type="number" min="1" max="730" value="90" dir="ltr"></label>' +
+        '<label style="display:block"><span style="font-size:.78rem;font-weight:800">ظرفیت اعضا</span>' +
+        '<input id="r6NewKeySeats" class="input" style="width:100%" type="number" min="1" max="5000" value="35" dir="ltr"></label>' +
+        '<label style="display:block"><span style="font-size:.78rem;font-weight:800">کد دلخواه (اختیاری)</span>' +
+        '<input id="r6NewKeyCode" class="input" style="width:100%" type="text" placeholder="خالی = خودکار" dir="ltr"></label>' +
+        "</div>" +
+        '<div class="r6-actions" style="margin-top:10px">' +
+        '<button class="btn btn-sm" id="r6NewKeyBtn">ساخت کلید</button></div>' +
+        '<div id="r6NewKeyOut" style="font-size:.84rem;margin-top:8px"></div>' +
+        "</div>" + h;
+
       if (keys.length) {
         h += '<h4 style="margin-top:14px">کلیدهای ساخته‌شده</h4><div class="r6-tbl-wrap"><table class="r6-tbl"><thead><tr>' +
           "<th>کلید</th><th>مدرسه</th><th>ظرفیت</th><th>اعضا</th><th>انقضا</th><th>وضعیت</th><th></th></tr></thead><tbody>";
@@ -1177,21 +1214,68 @@
 
       suppEl.innerHTML = h;
 
+      /* دکمهٔ ساخت کلید جدید */
+      var nkBtn = $("#r6NewKeyBtn", suppEl);
+      if (nkBtn) {
+        nkBtn.addEventListener("click", function () {
+          var school = ($("#r6NewKeySchool", suppEl).value || "").trim();
+          var days = Math.max(1, Math.min(730, +$("#r6NewKeyDays", suppEl).value || 90));
+          var seats = Math.max(1, Math.min(5000, +$("#r6NewKeySeats", suppEl).value || 35));
+          var want = ($("#r6NewKeyCode", suppEl).value || "").trim().toUpperCase();
+          var out = $("#r6NewKeyOut", suppEl);
+          nkBtn.disabled = true;
+          if (out) out.innerHTML = "در حال ساخت کلید…";
+          supApiRaw("POST", "admin/support/key", {
+            code: want, school: school, seats: seats, days: days
+          }).then(function (r) {
+            nkBtn.disabled = false;
+            if (!r || r.error) {
+              if (out) out.innerHTML = '<span style="color:var(--err);font-weight:700">کلید ساخته نشد: ' +
+                esc((r && r.error) || "ارتباط با سرور برقرار نشد.") + "</span>";
+              return;
+            }
+            var k = r.key || {};
+            var local2 = supDB();
+            local2.keys.unshift(k);
+            supSave(local2);
+            if (out) {
+              out.innerHTML = '<span style="color:var(--ok);font-weight:800">کلید ساخته شد و روی سرور ثبت شد ✅</span>' +
+                '<div style="margin-top:6px">کد کلاس: <code style="font-size:1.05rem">' + esc(k.code || "") + "</code></div>" +
+                '<div style="font-size:.8rem;color:var(--muted);margin-top:4px">' +
+                "این کد را به بچه‌ها بده؛ در صفحهٔ کلاس مجازی که بزنند، مستقیم وارد کلاس می‌شوند.</div>";
+            }
+            paintSupport(null);
+          });
+        });
+      }
+
       $$("[data-r6-mkkey]", suppEl).forEach(function (b) {
         b.addEventListener("click", function () {
           var rid = b.getAttribute("data-r6-mkkey");
           var school = b.getAttribute("data-school") || "";
           var owner = b.getAttribute("data-owner") || "";
           var code = newKeyCode();
-          var local2 = supDB();
-          var rq = local2.reqs.filter(function (x) { return x.id === rid; })[0];
-          var key = { id: "sk_" + Date.now().toString(36), code: code, t: Date.now(), exp: Date.now() + 90 * 864e5, owner: owner, school: school, seats: 35, active: true, used: 0, members: [], days: 90 };
-          local2.keys.unshift(key);
-          local2.reqs.forEach(function (x) { if (x.id === rid) { x.status = "approved"; x.keyCode = code; } });
-          supSave(local2);
-          supApi("POST", "admin/support/key", { reqId: rid, code: code, school: school, seats: 35, days: 90 });
-          alert("کلید ساخته شد: " + code + "\nاین کلید را به مدیر بدهید.");
-          paintSupport(null);
+          /* ▼ رفع باگ: پیش‌تر بدون توجه به پاسخ سرور، همیشه پیام
+             «کلید ساخته شد» نشان داده می‌شد. حالا تا سرور تأیید نکند
+             کلید ساخته‌شده اعلام نمی‌شود و پیام خطا هم دیده می‌شود. */
+          b.disabled = true;
+          supApiRaw("POST", "admin/support/key", { reqId: rid, code: code, school: school, seats: 35, days: 90 })
+            .then(function (r) {
+              b.disabled = false;
+              if (!r || (r.error)) {
+                alert("کلید ساخته نشد.\n" + ((r && r.error) || "ارتباط با سرور برقرار نشد.") +
+                  "\nاگر مشکل ادامه داشت، یک‌بار صفحه را تازه کن و دوباره بزن.");
+                return;
+              }
+              var local2 = supDB();
+              var key = r.key || { id: "sk_" + Date.now().toString(36), code: code, t: Date.now(), exp: Date.now() + 90 * 864e5, owner: owner, school: school, seats: 35, active: true, used: 0, members: [], days: 90 };
+              local2.keys.unshift(key);
+              local2.reqs.forEach(function (x) { if (x.id === rid) { x.status = "approved"; x.keyCode = key.code; } });
+              supSave(local2);
+              alert("کلید ساخته شد و روی سرور ثبت شد ✅\n\nکد کلاس: " + key.code +
+                "\nاین کد را به مدیر و بچه‌ها بده؛ با زدن آن، مستقیم وارد کلاس می‌شوند.");
+              paintSupport(null);
+            });
         });
       });
       $$("[data-r6-tkey]", suppEl).forEach(function (b) {

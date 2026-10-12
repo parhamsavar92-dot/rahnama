@@ -521,5 +521,102 @@
     }).catch(function () {});
   }
 
+  /* ══════════════════════════════════════════════════════════════════════
+     بخش «زنگ تفریح» در پنل مالک
+     ----------------------------------------------------------------------
+     همان دیوار اجتماعی سایت، این‌جا هم دیده می‌شود تا مالک بتواند
+     نوشته‌ها را ببیند، حذف کند و وضعیت زنده را بپاید.
+     خودکار هر ۱۵ ثانیه تازه می‌شود (هم‌زمان، بدون رفرش).
+     ══════════════════════════════════════════════════════════════════════ */
+  function wallCard() {
+    if (!isOwner()) return;
+    var body = D.getElementById("admBody");
+    if (!body || D.getElementById("admWall")) return;
+
+    var sec = D.createElement("section");
+    sec.className = "card";
+    sec.id = "admWall";
+    sec.style.margin = "16px";
+    sec.innerHTML =
+      '<h4><span class="card-icon">🎉</span> زنگ تفریح — دیوار گفت‌وگوی سایت</h4>' +
+      '<p style="font-size:.84rem;color:var(--muted);margin:0 0 10px">' +
+      "نوشته‌های بچه‌ها همان‌جا که منتشر می‌شوند، این‌جا هم زنده دیده می‌شوند. " +
+      "هر نوشتهٔ نامناسب را می‌توانی همین‌جا حذف کنی.</p>" +
+      '<div class="flex" style="flex-wrap:wrap;gap:6px;margin-bottom:10px">' +
+      '<span class="chip">🟢 <b id="admWallOnline">۰</b> آنلاین</span>' +
+      '<span class="chip">✍ <b id="admWallTotal">۰</b> نوشته</span>' +
+      '<button type="button" class="btn btn-sm" id="admWallRefresh">تازه‌سازی</button>' +
+      '<a class="btn btn-sm btn-ghost" href="community.html" target="_blank">باز کردن دیوار</a>' +
+      "</div>" +
+      '<div id="admWallList" style="font-size:.86rem"><div style="color:var(--muted)">در حال خواندن…</div></div>';
+    body.appendChild(sec);
+
+    function loadWall() {
+      api("GET", "/api/feed/list").then(function (j) {
+        var on = D.getElementById("admWallOnline"), tt = D.getElementById("admWallTotal");
+        if (on) on.textContent = fa(j.online || 0);
+        if (tt) tt.textContent = fa(j.total || 0);
+        var box = D.getElementById("admWallList");
+        if (!box) return;
+        var posts = j.posts || [];
+        if (!posts.length) {
+          box.innerHTML = '<div style="color:var(--muted)">هنوز نوشته‌ای نیست.</div>';
+          return;
+        }
+        box.innerHTML = posts.slice(0, 30).map(function (p) {
+          return '<div style="border:1px solid var(--border);border-radius:12px;padding:9px 11px;margin-bottom:7px">' +
+            '<div><b>' + esc(p.name) + "</b>" +
+            (p.grade ? ' <span class="chip" style="font-size:.68rem">پایهٔ ' + esc(String(p.grade)) + "</span>" : "") +
+            ' <span style="color:var(--muted);font-size:.74rem">' +
+            esc(p.t ? new Date(p.t).toLocaleString("fa-IR") : "") + "</span></div>" +
+            '<div style="margin:5px 0;line-height:1.9">' + esc(p.text) + "</div>" +
+            '<div style="display:flex;gap:8px;align-items:center;color:var(--muted);font-size:.76rem">' +
+            "<span>♥ " + fa(p.likes) + "</span><span>💬 " + fa((p.comments || []).length) + "</span>" +
+            '<button type="button" class="btn btn-sm" style="margin-inline-start:auto" data-wall-del="' + esc(p.id) + '">حذف</button>' +
+            "</div></div>";
+        }).join("");
+      }).catch(function () {
+        var box = D.getElementById("admWallList");
+        if (box) box.innerHTML = '<div style="color:var(--muted)">خواندن دیوار ممکن نشد.</div>';
+      });
+    }
+
+    sec.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("[data-wall-del]");
+      if (b) {
+        var id = b.getAttribute("data-wall-del");
+        if (!W.confirm("این نوشته از دیوار حذف شود؟")) return;
+        api("POST", "/api/feed/del", { id: id }).then(function () {
+          toast("حذف شد");
+          loadWall();
+        }).catch(function (err) { toast(err.message || "حذف نشد"); });
+        return;
+      }
+      if (e.target.closest && e.target.closest("#admWallRefresh")) loadWall();
+    });
+
+    loadWall();
+    setInterval(function () { if (!D.hidden) loadWall(); }, 15000);
+  }
+
+  function boot() {
+    injectTabs();
+    buildPanes();
+    wire();
+    api("GET", "/api/auth/me").then(function (r) {
+      ME = r.user; ROLE = ME ? ME.role : null;
+      if (!ME || (ROLE !== "admin" && ROLE !== "teacher" && ROLE !== "owner")) return;
+      if (!isOwner()) {
+        TABS.forEach(function (x) {
+          if (!x.owner) return;
+          var b = $('.adm-nav button[data-nav="' + x.n + '"]'); if (b) b.hidden = true;
+          var p = $('[data-pane="' + x.n + '"]'); if (p) p.setAttribute("data-owner-only", "1");
+        });
+      }
+      paintQuick();
+      try { wallCard(); } catch (e) { }
+    }).catch(function () { });
+  }
+
   if (D.readyState === "loading") D.addEventListener("DOMContentLoaded", boot); else boot();
 })();

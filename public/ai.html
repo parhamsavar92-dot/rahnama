@@ -9,17 +9,17 @@
 <meta name="theme-color" content="#6d5efc">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 <link rel="icon" href="assets/icons/favicon.png">
-<link rel="stylesheet" href="assets/fonts.css?v=8.9">
-<link rel="stylesheet" href="assets/style.css?v=8.9">
-<link rel="stylesheet" href="assets/enhance.css?v=8.9">
-<link rel="stylesheet" href="assets/ai.css?v=8.9">
-<link rel="stylesheet" href="assets/annotate.css?v=8.9">
-  <link rel="stylesheet" href="assets/ultra.css?v=8.9">
-  <link rel="stylesheet" href="assets/ai2.css?v=8.9">
-  <link rel="stylesheet" href="assets/print.css?v=8.9">
-  <link rel="stylesheet" href="assets/hk.css?v=8.9">
-  <link rel="stylesheet" href="assets/hk3d.css?v=8.9">
-<link rel="stylesheet" href="assets/hk-school.css?v=8.9">
+<link rel="stylesheet" href="assets/fonts.css?v=9.0">
+<link rel="stylesheet" href="assets/style.css?v=9.0">
+<link rel="stylesheet" href="assets/enhance.css?v=9.0">
+<link rel="stylesheet" href="assets/ai.css?v=9.0">
+<link rel="stylesheet" href="assets/annotate.css?v=9.0">
+  <link rel="stylesheet" href="assets/ultra.css?v=9.0">
+  <link rel="stylesheet" href="assets/ai2.css?v=9.0">
+  <link rel="stylesheet" href="assets/print.css?v=9.0">
+  <link rel="stylesheet" href="assets/hk.css?v=9.0">
+  <link rel="stylesheet" href="assets/hk3d.css?v=9.0">
+<link rel="stylesheet" href="assets/hk-school.css?v=9.0">
   <!-- seo:domain -->
   <link rel="canonical" href="https://www.hamkardarsi.ir/ai.html">
   <meta name="robots" content="index, follow, max-image-preview:large">
@@ -35,13 +35,13 @@
   <meta name="twitter:description" content="دستیار هوشمند آموزشی پایهٔ هشتم: پرسش و پاسخ از محتوای ۱۷۵ درس، خلاصه‌سازی، ساخت نمونه سؤال، ماشین‌حساب علمی و بلندخوانی — با حالت آنلاین و حالت متصل به هوش مصنوعی.">
   <meta name="twitter:image" content="https://www.hamkardarsi.ir/assets/icons/icon-512.png">
   <!-- /seo:domain -->
-<link rel="stylesheet" href="assets/polish.css?v=8.9">
-<link rel="stylesheet" href="assets/cute.css?v=8.9">
-<link rel="stylesheet" href="assets/r6.css?v=8.9">
- <link rel="stylesheet" href="assets/r7.css?v=8.9">
- <link rel="stylesheet" href="assets/r8.css?v=8.9">
- <link rel="stylesheet" href="assets/r9.css?v=8.9">
- <link rel="stylesheet" href="assets/r10.css?v=8.9">
+<link rel="stylesheet" href="assets/polish.css?v=9.0">
+<link rel="stylesheet" href="assets/cute.css?v=9.0">
+<link rel="stylesheet" href="assets/r6.css?v=9.0">
+ <link rel="stylesheet" href="assets/r7.css?v=9.0">
+ <link rel="stylesheet" href="assets/r8.css?v=9.0">
+ <link rel="stylesheet" href="assets/r9.css?v=9.0">
+ <link rel="stylesheet" href="assets/r10.css?v=9.0">
 </head>
 <body data-grade="8" data-base="" data-subject="home" data-page="ai">
 
@@ -158,35 +158,19 @@
             <a class="btn btn-sm btn-primary" href="tel:09398062273" data-support-call style="width:100%">تماس: ۰۹۳۹۸۰۶۲۲۷۳</a>
           </div>
 
-          <div class="ai-card">
-            <h4><span class="card-icon">⚙</span> حالت پیشرفتهٔ متصل <span class="chip" style="font-size:.66rem">کاملاً اختیاری</span></h4>
-            <p style="font-size:.8rem;color:var(--muted)">
-              دستیار <b>بدون این بخش هم کامل کار می‌کند</b>. اگر روزی خواستی پاسخ‌های آزادتر و خلاقانه‌تر بگیری،
-              می‌توانی کلید یک سرویس هوش مصنوعی را اینجا وارد کنی. کلید فقط روی همین دستگاه ذخیره می‌شود و
-              مستقیماً به سرویس خودت فرستاده می‌شود. اگر اتصال برقرار نشود، دستیار خودکار به موتور مستقل برمی‌گردد.
+          <div class="ai-card" id="aiAutoCard">
+            <h4><span class="card-icon">✦</span> آماده به کار — بدون تنظیم</h4>
+            <p style="font-size:.84rem;line-height:1.9;margin:0 0 10px">
+              دستیار رهنما به‌صورت <b>خودکار</b> از قوی‌ترین موتور هوش مصنوعیِ متصل به سایت استفاده می‌کند.
+              <b>نیازی نیست هیچ کلیدی وارد کنی و لازم نیست مدلی انتخاب کنی.</b>
+              کافی است پرسشت را بنویسی.
             </p>
-            <div class="field">
-              <label for="cfg-base">آدرس سرویس (سازگار با OpenAI)</label>
-              <input id="cfg-base" data-cfg-base type="text" dir="ltr" placeholder="https://api.openai.com/v1">
-              <div class="hint">اگر سرویس شما آدرس متفاوتی دارد، همان را بنویسید. به‌طور پیش‌فرض <code dir="ltr">/chat/completions</code> به انتهای آن اضافه می‌شود.</div>
-            </div>
-            <div class="field">
-              <label for="cfg-key">کلید API</label>
-              <input id="cfg-key" data-cfg-key type="password" dir="ltr" placeholder="sk-...">
-            </div>
-            <div class="field">
-              <label for="cfg-model">نام مدل</label>
-              <input id="cfg-model" data-cfg-model type="text" dir="ltr" placeholder="gpt-4o-mini">
-            </div>
-            <div class="field">
-              <label for="cfg-temp">خلاقیت (۰ تا ۱)</label>
-              <input id="cfg-temp" data-cfg-temp type="number" min="0" max="1" step="0.1" value="0.4">
-            </div>
-            <div class="flex">
-              <button class="btn btn-sm btn-primary" data-cfg-save>ذخیره</button>
-              <button class="btn btn-sm btn-ghost" data-cfg-test>آزمایش اتصال</button>
-              <button class="btn btn-sm btn-ghost" data-cfg-clear>حذف کلید</button>
-            </div>
+            <ul class="ticks" style="font-size:.8rem">
+              <li>بدون کلید، بدون حساب، بدون تنظیم.</li>
+              <li>اگر اینترنت ضعیف باشد، خودکار روی موتور مستقل سایت برمی‌گردد و باز جواب می‌دهد.</li>
+              <li>شدت و نوع پاسخ را خود دستیار انتخاب می‌کند — سؤال کوتاه، پاسخ کوتاه؛ سؤال مفهومی، پاسخ مفصل.</li>
+            </ul>
+            <div id="aiAutoState" style="font-size:.8rem;color:var(--muted);margin-top:8px"></div>
           </div>
 
           <div class="ai-card">
@@ -222,25 +206,25 @@
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m5 14 7-7 7 7"/></svg>
 </button>
 
-<script src="assets/hk-server.js?v=8.9"></script>
-<script src="assets/app.js?v=8.9"></script>
-<script src="assets/enhance.js?v=8.9"></script>
-<script src="assets/grade.js?v=8.9"></script>
-<script src="assets/ai.js?v=8.9"></script>
-<script src="assets/annotate.js?v=8.9"></script>
-  <script src="assets/ultra.js?v=8.9"></script>
-  <script src="assets/ai2.js?v=8.9"></script>
-  <script src="assets/hk-agent.js?v=8.9"></script>
-  <script src="assets/hk-panel.js?v=8.9"></script>
-  <script src="assets/hk-jozve.js?v=8.9"></script>
-  <script src="assets/hk3d.js?v=8.9"></script>
-  <script src="assets/hk-auth.js?v=8.9"></script>
-<script src="assets/polish.js?v=8.9" defer></script>
-<script src="assets/r6.js?v=8.9" defer></script>
- <script src="assets/r7.js?v=8.9" defer></script>
- <script src="assets/r8.js?v=8.9" defer></script>
- <script src="assets/r9.js?v=8.9" defer></script>
- <script src="assets/r9-owner.js?v=8.9" defer></script>
- <script src="assets/r10.js?v=8.9" defer></script>
+<script src="assets/hk-server.js?v=9.0"></script>
+<script src="assets/app.js?v=9.0"></script>
+<script src="assets/enhance.js?v=9.0"></script>
+<script src="assets/grade.js?v=9.0"></script>
+<script src="assets/ai.js?v=9.0"></script>
+<script src="assets/annotate.js?v=9.0"></script>
+  <script src="assets/ultra.js?v=9.0"></script>
+  <script src="assets/ai2.js?v=9.0"></script>
+  <script src="assets/hk-agent.js?v=9.0"></script>
+  <script src="assets/hk-panel.js?v=9.0"></script>
+  <script src="assets/hk-jozve.js?v=9.0"></script>
+  <script src="assets/hk3d.js?v=9.0"></script>
+  <script src="assets/hk-auth.js?v=9.0"></script>
+<script src="assets/polish.js?v=9.0" defer></script>
+<script src="assets/r6.js?v=9.0" defer></script>
+ <script src="assets/r7.js?v=9.0" defer></script>
+ <script src="assets/r8.js?v=9.0" defer></script>
+ <script src="assets/r9.js?v=9.0" defer></script>
+ <script src="assets/r9-owner.js?v=9.0" defer></script>
+ <script src="assets/r10.js?v=9.0" defer></script>
 </body>
 </html>
