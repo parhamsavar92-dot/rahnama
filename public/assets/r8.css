@@ -95,28 +95,28 @@ html[data-theme="dark"] .site-header {
   border: 1px solid var(--r8-glass-brd);
   background-image: linear-gradient(160deg, var(--r8-glass-bg-2), transparent 44%);
   box-shadow: var(--r8-depth-2), inset 0 1px 0 var(--r8-hair);
-  transform: translate3d(0, 0, 0);
+  /* عمداً transform پایه گذاشته نمی‌شود: مقدار identity روی کارت
+     هم لایه‌سازی بی‌دلیل می‌سازد و هم می‌تواند با قواعد هاور و
+     شیب سه‌بعدیِ hk3d.js تعارض پیدا کند. */
   transition: transform .34s cubic-bezier(.2, .7, .3, 1),
               box-shadow .34s cubic-bezier(.2, .7, .3, 1),
               border-color .34s ease;
 }
-@media (hover: hover) {
+/* شرط را گسترده گذاشته‌ام: بعضی مرورگرها و لپ‌تاپ‌های دوحالته
+   فقط (any-pointer: fine) را تأیید می‌کنند و (hover: hover) را نه.
+   اگر هیچ‌کدام نبود (صفحهٔ لمسی خالص)، اثر هاور اعمال نمی‌شود تا
+   روی موبایل «چسبیده» نماند. */
+@media (hover: hover), (any-pointer: fine) {
   .card:hover, .subject-card:hover, .tool-card:hover, .cls-card:hover, .hk-card:hover {
     transform: translate3d(0, -6px, 0);
     box-shadow: var(--r8-depth-3), inset 0 1px 0 var(--r8-hair);
     border-color: color-mix(in srgb, var(--accent, #6d5efc) 34%, var(--r8-glass-brd));
   }
 }
-/* شیب سه‌بعدی واقعی — جاوااسکریپت متغیرهای --r8-rx / --r8-ry را می‌گذارد */
-body.r8-tilt .card.r8-3d,
-body.r8-tilt .subject-card.r8-3d,
-body.r8-tilt .tool-card.r8-3d {
-  transform: perspective(900px)
-             rotateX(var(--r8-rx, 0deg))
-             rotateY(var(--r8-ry, 0deg))
-             translate3d(0, -3px, 0);
-  transition: transform .12s ease-out, box-shadow .34s ease, border-color .34s ease;
-}
+/* توجه: شیب سه‌بعدی کارت‌ها این‌جا تعریف نمی‌شود.
+   آن کار وظیفهٔ assets/hk3d.js است (تنظیم کاربر: data-hk-3d).
+   پیش‌تر یک تعریف موازی این‌جا بود و با hk3d.js بر سر یک transform
+   می‌جنگید و نتیجه ناهماهنگ می‌داد. حالا فقط یک سیستم ۳بعدی داریم. */
 
 /* ======================================================== ۵. دکمه‌ها و ژرفا */
 .btn {
@@ -180,30 +180,41 @@ table thead th {
 }
 
 /* ==================================================== ۸. انیمیشن‌های خاص */
-/* ورود نرم صفحه: فقط محو شدن و بالا آمدن (بدون بلور، برای سرعت) */
-main { animation: r8-enter .5s cubic-bezier(.2, .7, .3, 1) both; }
+/* ورود نرم صفحه — عمداً فقط «محو شدن».
+   اگر روی main انیمیشنِ transform بگذاریم، main برای همیشه
+   «حاویِ عناصر شناور» می‌شود و پنجره‌های مودالِ داخل آن به‌جای
+   پنجرهٔ مرورگر، نسبت به main جای‌گذاری می‌شوند. پس transform
+   را دست نمی‌زنیم. */
+main { animation: r8-enter .45s ease-out both; }
 @keyframes r8-enter {
-  from { opacity: 0; transform: translate3d(0, 12px, 0); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
-/* شناوری آرام برای نشان‌ها و آیکون‌ها */
+/* شناوری آرام برای نشان‌ها و آیکون‌ها
+   از خاصیت مستقل translate استفاده می‌کنیم (نه transform) تا اگر
+   لایه‌های دیگر برای همین عنصر هاورِ transform داشتند، خنثی نشود. */
 .brand-mark, .subject-icon, .hk-ava, .card-icon {
   animation: r8-float 6.5s ease-in-out infinite;
 }
 @keyframes r8-float {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50%      { transform: translate3d(0, -4px, 0); }
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -4px; }
 }
-/* ظهور پله‌ای هنگام اسکرول */
+/* ظهور پله‌ای هنگام اسکرول
+   باز هم خاصیت مستقل «translate» به‌جای transform.
+   دلیل: پیش‌تر .r8-reveal.r8-in با transform: translate3d(0,0,0)
+   روی قاعدهٔ .card:hover نوشته می‌شد و بالا آمدن کارت‌ها را خنثی
+   می‌کرد (هم‌ویژگی ولی بعدتر در فایل). با translate این تعارض
+   کاملاً از بین می‌رود. جاوااسکریپت هم بعد از پایان انیمیشن
+   کلاس‌ها را برمی‌دارد تا هیچ حالت بازمانده‌ای نماند. */
 .r8-reveal {
   opacity: 0;
-  transform: translate3d(0, 18px, 0);
+  translate: 0 18px;
   transition: opacity .6s cubic-bezier(.2, .7, .3, 1),
-              transform .6s cubic-bezier(.2, .7, .3, 1);
+              translate .6s cubic-bezier(.2, .7, .3, 1);
   transition-delay: calc(var(--r8-i, 0) * 55ms);
-  will-change: opacity, transform;
 }
-.r8-reveal.r8-in { opacity: 1; transform: translate3d(0, 0, 0); }
+.r8-reveal.r8-in { opacity: 1; translate: 0 0; }
 
 /* ============================================== ۹. بلورهای یخی در هدر */
 .r8-crystal {
@@ -250,7 +261,7 @@ body.r8-lite .card-icon { animation: none; }
   main { animation: none; }
   .brand-mark, .subject-icon, .hk-ava, .card-icon { animation: none; }
   .r8-crystal { display: none; }
-  .r8-reveal { opacity: 1; transform: none; transition: none; }
+  .r8-reveal { opacity: 1; translate: none; transition: none; }
   .card, .subject-card, .tool-card, .cls-card, .hk-card { transition: none; }
   .card:hover, .subject-card:hover, .tool-card:hover, .cls-card:hover, .hk-card:hover { transform: none; }
   .btn, .toc-list a { transition: none; }
