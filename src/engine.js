@@ -1,4 +1,4 @@
-// فایل تولیدشده از public/assets/hk-server.js با tools/build-engine.py — دستی ویرایش نکنید.
+﻿// فایل تولیدشده از public/assets/hk-server.js با tools/build-engine.py — دستی ویرایش نکنید.
 /* eslint-disable */
 /* ==========================================================================
    رهنما — لایهٔ سرورِ سایت  |  hk-server.js
@@ -131,7 +131,7 @@ export function createEngine(LS, CFG) {
       signup: true, notes: true, highlight: true, speak: true
     },
     hero: { title: "جزوهٔ کامل پایه‌های هفتم، هشتم و نهم", sub: "آنلاین، رایگان و همیشه در دسترس" },
-    contact: { email: "info@rahnama.ir", telegram: "@rahnama_site", instagram: "rahnama.site", phone: "" },
+    contact: { email: "", telegram: "", instagram: "", phone: "" },
     theme: "#6d5efc",
     examDefaults: { count: 20, minutes: 15, pass: 60 },
     broadcast: [],

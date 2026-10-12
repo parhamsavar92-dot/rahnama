@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    رهنما — لایهٔ سرورِ سایت  |  hk-server.js
    --------------------------------------------------------------------------
    همهٔ درخواست‌های ‎/api/*‎ را در همین مرورگر پاسخ می‌دهد تا پنل مالک، حساب
@@ -130,7 +130,7 @@
       signup: true, notes: true, highlight: true, speak: true
     },
     hero: { title: "جزوهٔ کامل پایه‌های هفتم، هشتم و نهم", sub: "آنلاین، رایگان و همیشه در دسترس" },
-    contact: { email: "info@rahnama.ir", telegram: "@rahnama_site", instagram: "rahnama.site", phone: "" },
+    contact: { email: "", telegram: "", instagram: "", phone: "" },
     theme: "#6d5efc",
     examDefaults: { count: 20, minutes: 15, pass: 60 },
     broadcast: [],
