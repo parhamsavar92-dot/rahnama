@@ -230,3 +230,12 @@
 .r11-voice { margin-block: 4px; }
 .r11-voice audio { vertical-align: middle; }
 @media (prefers-reduced-motion: reduce) { .r11-btn.is-rec { animation: none; } }
+
+.r11-live {
+  flex: 1 1 100%;
+  margin-block-start: 8px; padding: 9px 12px;
+  border-radius: 12px;
+  border: 1px dashed var(--r8-glass-brd, #d8d8e6);
+  background: var(--r8-glass-bg-2, rgba(255,255,255,.44));
+}
+.r11-live-h { font-size: .76rem; color: var(--muted); margin-block-end: 6px; line-height: 1.8; }

@@ -264,7 +264,7 @@
     var p = $("#r11LivePanel");
     if (p) p.hidden = !inLive;
     var mb = $("#r11MuteBtn");
-    if (mb) mb.innerHTML = muted ? "🔊 باز کردن صدا" : "🔇 بی‌صدا";
+    if (mb) { mb.hidden = !inLive; mb.innerHTML = muted ? "🔊 باز کردن صدا" : "🔇 بی‌صدا"; }
     if (inLive) paintPeers();
   }
 
@@ -327,6 +327,11 @@
       '<span style="flex:1"></span>' +
       '<button type="button" class="r11-btn" id="r11LiveBtn">📞 تماس صوتی زنده</button>' +
       '<button type="button" class="r11-btn" id="r11MuteBtn" hidden>🔇 بی‌صدا</button>' +
+      "</div>" +
+      /* پنل اتاق زنده — وقتی در تماس هستی باز می‌شود */
+      '<div class="r11-live" id="r11LivePanel" hidden>' +
+      '<div class="r11-live-h">🎧 در اتاق صدای کلاس هستی — صدای شما مستقیم بین مرورگرها می‌رود ' +
+      "(از سرور عبور نمی‌کند). برای خروج، دکمهٔ «در تماس» را بزن.</div>" +
       '<div class="r11-peers" id="r11Peers"></div>' +
       "</div>";
   }
