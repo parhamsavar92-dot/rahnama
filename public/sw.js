@@ -2,7 +2,7 @@
    پایهٔ هشتم — Service Worker  |  sw.js
    مطالعهٔ آفلاین کامل: پیش‌بارگذاری همهٔ صفحه‌ها، تصاویر و دادهٔ مطالعه
    ========================================================================== */
-const VERSION = "g8-v29";
+const VERSION = "g8-v31";
 const CORE = VERSION + "-core";
 const PAGES = VERSION + "-pages";
 const RUNTIME = VERSION + "-runtime";
@@ -81,6 +81,12 @@ const CORE_ASSETS = [
   "assets/r7.js",
   "assets/r8.js",
   "assets/r7-pdf.js",
+  "study-tools.html",
+  "pdf-tools.html",
+  "assets/r9.css",
+  "assets/r9.js",
+  "assets/r9-tools.js",
+  "assets/r9-hub.js",
 "assets/icons/favicon.png"
 ];
 

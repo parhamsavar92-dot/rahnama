@@ -27,6 +27,8 @@
     { k: "thinking", n: "تفکر و سبک زندگی", f: "pages/thinking.html", c: "#7c3aed", n2: "۷ بخش" }
   ];
   var EXTRAS = [
+    { n: "مرکز ابزارها", f: "study-tools.html", i: "🧰" },
+    { n: "ابزار PDF", f: "pdf-tools.html", i: "🗂" },
     { n: "دستیار هوشمند", f: "ai.html", i: "✦" },
     { n: "داشبورد مطالعه", f: "dashboard.html", i: "◧" },
     { n: "آزمون جامع", f: "exam.html", i: "✓" },

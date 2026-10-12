@@ -90,8 +90,24 @@
       if (a.target === "_blank" || href.indexOf("://") > -1 && href.indexOf(location.host) < 0) return;
       if (!/\.html($|\?|#)/.test(href)) return;
       if (W.matchMedia && W.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      /* ▼ رفع باگ مهم ─────────────────────────────────────────────────────
+         این کلاس پیش‌تر هیچ‌وقت برداشته نمی‌شد. اگر ناوبری انجام نمی‌شد
+         (لغو شدن، برگشت با دکمهٔ Back، یا بازیابی از حافظهٔ نهان مرورگر)،
+         body با opacity:0 باقی می‌ماند: صفحه محو و «خراب» به‌نظر می‌رسید
+         و چون حالت ترکْ transform هم داشت، body «حاویِ عناصر شناور»
+         می‌شد و همهٔ position:fixedها (هدر، نوار پایین، پنجره‌ها و
+         حالت تمرکز) از جای خود بیرون می‌زدند.
+         حالا هم زمان‌دار پاک می‌شود، هم هنگام بازگشت به صفحه. */
       D.body.classList.add("r7-leaving");
+      clearTimeout(LEAVE_T);
+      LEAVE_T = setTimeout(clearLeave, 1400);
     }, true);
+  }
+
+  /* پاک‌کردن حالت «ترک صفحه» تا صفحه هیچ‌وقت محو نماند */
+  var LEAVE_T = 0;
+  function clearLeave() {
+    try { D.body.classList.remove("r7-leaving"); } catch (e) { }
   }
 
   /* ------------------------------------------------ ۳) ابزارهای درس */
@@ -218,6 +234,11 @@
 
   /* ------------------------------------------------ راه‌اندازی */
   function boot() {
+    /* اگر صفحه از حافظهٔ نهان برگشت یا آخرین تلاش برای رفتن نیمه‌کاره ماند،
+       حالت محو را همین اول کار پاک کن (وگرنه صفحه خالی دیده می‌شود). */
+    clearLeave();
+    W.addEventListener("pageshow", clearLeave);
+    D.addEventListener("visibilitychange", function () { if (!D.hidden) clearLeave(); });
     try { tabbar(); } catch (e) { }
     try { navBoost(); } catch (e) { }
     try { lessonTools(); } catch (e) { }

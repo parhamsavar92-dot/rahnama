@@ -48,10 +48,14 @@
 html { scrollbar-gutter: stable; }
 body { animation: r7-in .28s ease-out both; }
 @keyframes r7-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-body.r7-leaving { opacity: 0; transform: translateY(-6px); transition: opacity .16s, transform .16s; }
+/* حالت «ترک صفحه» — عمداً بدون transform.
+   اگر روی body هر transformی بگذاریم (حتی translateY کوچک)، body
+   «حاویِ عناصر شناور» می‌شود و همهٔ position:fixedها — هدر، نوار پایین،
+   پنجره‌های مودال و حالت تمرکز — از جای خود بیرون می‌زنند. */
+body.r7-leaving { opacity: 0; transition: opacity .16s; }
 @media (prefers-reduced-motion: reduce) {
   body { animation: none !important; }
-  body.r7-leaving { opacity: 1; transform: none; }
+  body.r7-leaving { opacity: 1; }
 }
 
 /* --------------------------------------------- ۳) نوار ابزار درس */
