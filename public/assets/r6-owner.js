@@ -425,10 +425,21 @@
     Promise.all([
       api("GET", "/api/admin/owners").catch(function () { return {}; }),
       api("GET", "/api/site/status").catch(function () { return {}; }),
-      api("GET", "/api/health").catch(function () { return {}; })
+      api("GET", "/api/health").catch(function () { return {}; }),
+      /* ▼ رفع باگ: «فقط یک کاربر نشان داده می‌شد»
+         پیش‌تر فهرست آنلاین‌ها فقط از مالک‌ها و کاربران تیک‌دار ساخته
+         می‌شد:  (ow.owners||[]).concat(ow.verified||[])
+         یعنی هیچ دانش‌آموز یا کاربر عادی هرگز در این فهرست نمی‌آمد و
+         نتیجه همیشه یک نفر (خودِ مالک) بود — حتی با ورود از دستگاه دیگر.
+         حالا فهرست کامل کاربران خوانده می‌شود و از روی زمان آخرین
+         فعالیت، آنلاین‌ها تشخیص داده می‌شوند. */
+      api("GET", "/api/admin/users?per=100&sort=active").catch(function () { return {}; })
     ]).then(function (a) {
-      var ow = a[0] || {}, st = a[1] || {}, h = a[2] || {};
-      var all = (ow.owners || []).concat(ow.verified || []);
+      var ow = a[0] || {}, st = a[1] || {}, h = a[2] || {}, ul = a[3] || {};
+      var everyone = (ul.users || []).slice();
+      var all = everyone.concat(ow.owners || [], ow.verified || []);
+      var seen = {};
+      all = all.filter(function (u) { if (!u || seen[u.id]) return false; seen[u.id] = 1; return true; });
       var online = all.filter(function (u) { return u.online; });
       var banned = (ow.banned || []);
       var size = 0;
@@ -443,11 +454,30 @@
         kpi(size ? Math.round(size / 1024) + " KB" : "—", "حجم وضعیت سایت", "خروجی /api/site/status", "🗄") +
         "</div>";
 
-      html += card("کاربران آنلاین",
-        online.length ? '<div class="adm-list">' + online.map(function (u) {
+      function seenTxt(u) {
+        var t = u.lastSeen || u.lastAt;
+        if (!t) return "بدون فعالیت";
+        try { return new Date(t).toLocaleString("fa-IR"); } catch (e) { return "—"; }
+      }
+      var onlineBody;
+      if (online.length) {
+        onlineBody = '<div class="adm-list">' + online.map(function (u) {
           return '<div class="adm-row"><div class="who"><b>' + esc(u.name) + "</b><small>" + esc(u.email) +
             "</small></div><span class=\"chip\">آنلاین</span></div>";
-        }).join("") + "</div>" : '<p style="color:var(--muted)">در این لحظه کسی آنلاین نیست.</p>');
+        }).join("") + "</div>";
+      } else {
+        onlineBody = '<p style="color:var(--muted);font-size:.85rem">در این لحظه کسی آنلاین نیست ' +
+          "(آنلاین یعنی فعالیت در ۱۵ دقیقهٔ گذشته).</p>";
+      }
+      /* فهرست همهٔ کاربران با زمان آخرین فعالیت — تا مالک همیشه همه را
+         ببیند، حتی وقتی کسی «آنلاین» نیست. */
+      onlineBody += all.length
+        ? '<div class="adm-list" style="margin-top:10px">' + all.slice(0, 12).map(function (u) {
+          return '<div class="adm-row"><div class="who"><b>' + esc(u.name) + "</b><small>" + esc(u.email) +
+            "</small></div><span class=\"chip\">" + esc(seenTxt(u)) + "</span></div>";
+        }).join("") + "</div>"
+        : "";
+      html += card("کاربران (" + fa(online.length) + " آنلاین از " + fa(all.length) + ")", onlineBody);
 
       html += card("سلامت زیرساخت",
         '<table class="adm-table"><tbody>' +

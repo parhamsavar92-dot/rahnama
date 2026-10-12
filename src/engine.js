@@ -367,6 +367,105 @@ export function createEngine(LS, CFG) {
   }
   function bump(r) { r.rev = (r.rev || 0) + 1; }
 
+  /* ==========================================================================
+     بخش هم‌زمان «زنگ تفریح» (شبیه توییتر)
+     --------------------------------------------------------------------------
+     نوشته‌ها در d.messages با نشانهٔ kind="feed" نگه داشته می‌شوند؛ همین
+     آرایه از قبل در طرح‌های بارگذاری و ذخیرهٔ پایگاه داده هست، پس خطر
+     از‌دست‌رفتن داده ندارد.
+     ========================================================================== */
+  function findFeed(id) {
+    var d = db();
+    return (d.messages || []).filter(function (x) { return x.kind === "feed" && x.id === String(id || ""); })[0] || null;
+  }
+  function pubPost(p, u) {
+    return {
+      id: p.id, t: p.t || 0, text: p.text || "",
+      name: p.name || "کاربر رهنما", userId: p.userId || "",
+      grade: p.grade || "", color: p.color || "#6d5efc",
+      likes: (p.likes || []).length,
+      liked: !!(u && (p.likes || []).indexOf(u.id) > -1),
+      comments: (p.comments || []).map(function (c) {
+        return { id: c.id, t: c.t || 0, name: c.name || "کاربر", userId: c.userId || "", text: c.text || "" };
+      }),
+      mine: !!(u && p.userId === u.id),
+      canDel: !!(u && (p.userId === u.id || u.isOwner || u.role === "owner" || u.role === "admin"))
+    };
+  }
+  function feedHandler(sub, method, body, q) {
+    var d = db(), u = me();
+    var feed = function () {
+      return (d.messages || []).filter(function (x) { return x.kind === "feed"; })
+        .sort(function (a, b) { return (b.t || 0) - (a.t || 0); });
+    };
+
+    if (sub === "list") {
+      var since = +q.since || 0;
+      var list = feed();
+      if (since) list = list.filter(function (x) { return (x.t || 0) > since; });
+      var posts = list.slice(0, 60).map(function (p) { return pubPost(p, u); });
+      var onlineCut = now() - 9e5;
+      return J({
+        posts: posts,
+        now: now(),
+        total: feed().length,
+        online: (d.users || []).filter(function (x) { return (x.lastAt || 0) > onlineCut; }).length,
+        me: u ? { id: u.id, name: u.name, grade: u.grade, color: u.color } : null
+      });
+    }
+
+    if (sub === "post") {
+      if (!u) return bad("برای نوشتن، اول وارد حساب شو.", 401);
+      var text = String(body.text || "").trim().slice(0, 800);
+      if (!text) return bad("متن نوشته خالی است.");
+      var p = {
+        id: uid("fd"), kind: "feed", t: now(),
+        userId: u.id, name: u.name || "کاربر", grade: u.grade || "", color: u.color || "#6d5efc",
+        text: text, likes: [], comments: []
+      };
+      d.messages.unshift(p);
+      d.messages = d.messages.slice(0, 500);
+      save(); logEvent("feed_post", { id: p.id });
+      return J({ post: pubPost(p, u) });
+    }
+
+    if (sub === "like") {
+      if (!u) return bad("برای پسندیدن، اول وارد شو.", 401);
+      var p2 = findFeed(body.id);
+      if (!p2) return bad("نوشته پیدا نشد.", 404);
+      p2.likes = p2.likes || [];
+      var ix = p2.likes.indexOf(u.id);
+      if (ix > -1) p2.likes.splice(ix, 1); else p2.likes.push(u.id);
+      save();
+      return J({ id: p2.id, likes: p2.likes.length, liked: p2.likes.indexOf(u.id) > -1 });
+    }
+
+    if (sub === "comment") {
+      if (!u) return bad("برای پاسخ دادن، اول وارد شو.", 401);
+      var p3 = findFeed(body.id);
+      if (!p3) return bad("نوشته پیدا نشد.", 404);
+      var ctext = String(body.text || "").trim().slice(0, 400);
+      if (!ctext) return bad("متن پاسخ خالی است.");
+      p3.comments = p3.comments || [];
+      p3.comments.push({ id: uid("cm"), t: now(), userId: u.id, name: u.name || "کاربر", text: ctext });
+      if (p3.comments.length > 60) p3.comments = p3.comments.slice(-60);
+      save();
+      return J({ id: p3.id, comments: pubPost(p3, u).comments });
+    }
+
+    if (sub === "del") {
+      var p4 = findFeed(body.id);
+      if (!p4) return bad("نوشته پیدا نشد.", 404);
+      var allowed = !!(u && (p4.userId === u.id || u.isOwner || u.role === "owner" || u.role === "admin"));
+      if (!allowed) return bad("اجازهٔ حذف این نوشته را نداری.", 403);
+      d.messages = (d.messages || []).filter(function (x) { return x.id !== p4.id; });
+      save(); audit("feed.del", p4.id);
+      return J({ ok: true, id: p4.id });
+    }
+
+    return bad("مسیر نامعتبر", 404);
+  }
+
   function classHandler(sub, method, body, q) {
     var d = db(), u = me();
     if (sub === "list") {
@@ -384,6 +483,25 @@ export function createEngine(LS, CFG) {
     if (sub === "join") {
       var cd = String(body.code || "").trim().toUpperCase();
       var c = d.classes.filter(function (x) { return x.code === cd; })[0];
+      /* اگر کدی که زده شده «کلید کلاس مجازی» باشد (ساخته‌شده توسط تیم
+         مدیریت) ولی کلاسش هنوز ساخته نشده باشد — مثلاً کلید پیش از این
+         تغییر ساخته شده — همین‌جا کلاسش ساخته می‌شود و کاربر مستقیم
+         وارد می‌شود. پس هیچ کلید معتبری بی‌جواب نمی‌ماند. */
+      if (!c) {
+        var sk2 = d.support.keys.filter(function (k) { return k.code === cd; })[0];
+        if (sk2) {
+          if (!sk2.active) return bad("این کلید غیرفعال شده است.", 403);
+          if (sk2.exp && now() > sk2.exp) return bad("این کلید منقضی شده است.", 403);
+          c = {
+            id: uid("c"),
+            name: (sk2.school ? sk2.school + " — " : "") + "کلاس مجازی",
+            grade: "", subject: "", code: cd,
+            ownerId: sk2.owner || "", school: sk2.school || "",
+            members: [], createdAt: now(), fromKey: true
+          };
+          d.classes.unshift(c);
+        }
+      }
       if (!c) return bad("کلاسی با این کد پیدا نشد.", 404);
       if (u && (c.members || []).indexOf(u.id) === -1) { c.members.push(u.id); save(); }
       var s = liveSession(c.id);
@@ -534,6 +652,23 @@ export function createEngine(LS, CFG) {
         touch(tu);
       }
       if (rq) { rq.status = "approved"; rq.keyCode = kcode; rq.t2 = now(); }
+      /* ▼ کلید کلاس مجازی، همان لحظه روی سرور ثبت می‌شود ──────────────────
+         پیش‌تر این کلید فقط یک «کلید مدرسه» بود و در جدول کلاس‌ها وجود
+         نداشت؛ پس هر کس آن را در کادر کلاس مجازی می‌زد، پیام «کلاسی با
+         این کد پیدا نشد» می‌گرفت. حالا با ساخت کلید، یک کلاس واقعی با
+         همان کد ساخته می‌شود تا زدن کد = ورود مستقیم به کلاس. */
+      if (!d.classes.filter(function (c) { return c.code === kcode; }).length) {
+        var kclass = {
+          id: uid("c"),
+          name: (kobj.school ? kobj.school + " — " : "") + "کلاس مجازی",
+          grade: "", subject: "",
+          code: kcode, ownerId: ownerId,
+          school: kobj.school, members: [],
+          createdAt: now(), fromKey: true
+        };
+        d.classes.unshift(kclass);
+        d.classes = d.classes.slice(0, 800);
+      }
       save(); audit("support.key", kobj.school + " / " + kcode);
       return J({ key: kobj, request: rq });
     }
@@ -960,6 +1095,7 @@ export function createEngine(LS, CFG) {
 
     if (seg[0] === "admin") return adminHandler(seg.slice(1).join("/"), m, body, q);
     if (seg[0] === "class") return classHandler(seg.slice(1).join("/"), m, body, q);
+    if (seg[0] === "feed") return feedHandler(seg.slice(1).join("/"), m, body, q);
 
     if (seg[0] === "ai-local") return J({ error: "دستیار آنلاین در این نسخه به سرور وصل نیست؛ حالت محلی فعال است.", offline: true }, 503);
     if (seg[0] === "__status" || path === "/__status") return J({ ok: true, online: true });

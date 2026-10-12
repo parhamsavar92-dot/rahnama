@@ -1,0 +1,195 @@
+/* ==========================================================================
+   رهنما — لایهٔ ۱۰: «زنگ تفریح» (بخش هم‌زمان سایت)  |  r10.css
+   --------------------------------------------------------------------------
+   ظاهری تمیز و آشنا مثل توییتر، هم‌خوان با لایهٔ «یخ و شیشه».
+   همهٔ انیمیشن‌ها سبک (transform/opacity) تا سایت روان بماند.
+   ========================================================================== */
+
+.zt-wrap { max-inline-size: 720px; margin-inline: auto; }
+
+/* ---------------------------------------------------------- نوار وضعیت زنده */
+.zt-live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-block: 12px;
+  font-size: .82rem;
+  color: var(--text-soft);
+}
+.zt-dot {
+  inline-size: 9px; block-size: 9px; border-radius: 50%;
+  background: var(--ok, #16a34a);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok, #16a34a) 60%, transparent);
+  animation: zt-pulse 2.4s ease-out infinite;
+}
+.zt-dot.off { background: var(--muted); animation: none; box-shadow: none; }
+@keyframes zt-pulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok, #16a34a) 55%, transparent); }
+  70%  { box-shadow: 0 0 0 9px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.zt-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--r8-glass-brd);
+  background: var(--r8-glass-bg-2);
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------- کادر نوشتن */
+.zt-compose {
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid var(--r8-glass-brd);
+  background-image: linear-gradient(160deg, var(--r8-glass-bg-2), transparent 55%), var(--surface, #fff);
+  box-shadow: var(--r8-depth-2);
+}
+.zt-compose .zt-ava { flex: 0 0 auto; }
+.zt-compose .zt-body { flex: 1 1 auto; min-inline-size: 0; }
+.zt-ta {
+  inline-size: 100%;
+  min-block-size: 62px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: .95rem;
+  line-height: 1.9;
+  resize: vertical;
+  outline: none;
+}
+.zt-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-block-start: 6px;
+  padding-block-start: 8px;
+  border-block-start: 1px solid var(--r8-glass-brd);
+}
+.zt-count { font-size: .76rem; color: var(--muted); margin-inline-start: auto; }
+.zt-count.bad { color: var(--err); font-weight: 800; }
+.zt-btn {
+  padding: 8px 15px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background-image: linear-gradient(135deg, var(--brand, #6d5efc),
+      color-mix(in srgb, var(--r8-ice-1, #7ee7ff) 40%, var(--brand, #6d5efc)));
+  color: #fff;
+  font: inherit;
+  font-size: .86rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.zt-btn:disabled { opacity: .5; cursor: default; }
+.zt-btn.ghost {
+  background-image: none; background: transparent;
+  border-color: var(--r8-glass-brd); color: var(--text);
+}
+
+/* ---------------------------------------------------------------- آواتار */
+.zt-ava {
+  inline-size: 42px; block-size: 42px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 800; font-size: .95rem;
+  flex: 0 0 auto;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35);
+}
+
+/* ------------------------------------------------------------- نوشته‌ها */
+.zt-feed { display: grid; gap: 10px; margin-block-start: 14px; }
+.zt-post {
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid var(--r8-glass-brd);
+  background-image: linear-gradient(160deg, var(--r8-glass-bg-2), transparent 60%), var(--surface, #fff);
+  box-shadow: var(--r8-depth-1);
+  animation: zt-in .34s cubic-bezier(.2, .7, .3, 1) both;
+}
+@keyframes zt-in {
+  from { opacity: 0; translate: 0 10px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+.zt-post.is-new { border-color: color-mix(in srgb, var(--brand, #6d5efc) 45%, var(--r8-glass-brd)); }
+.zt-main { flex: 1 1 auto; min-inline-size: 0; }
+.zt-head {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  font-size: .84rem;
+}
+.zt-head b { font-weight: 800; }
+.zt-head .zt-meta { color: var(--muted); font-size: .76rem; }
+.zt-grade {
+  font-size: .7rem; padding: 2px 8px; border-radius: 999px;
+  background: color-mix(in srgb, var(--brand, #6d5efc) 14%, transparent);
+  color: var(--brand, #6d5efc); font-weight: 700;
+}
+.zt-text {
+  margin: 7px 0 0;
+  font-size: .94rem;
+  line-height: 2;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.zt-acts {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  margin-block-start: 9px;
+}
+.zt-act {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px; border-radius: 999px;
+  border: 1px solid var(--r8-glass-brd);
+  background: transparent; color: var(--text-soft);
+  font: inherit; font-size: .8rem; font-weight: 700; cursor: pointer;
+  transition: transform .14s ease, color .16s ease, border-color .16s ease;
+}
+.zt-act:hover { transform: translate3d(0, -1px, 0); color: var(--text); }
+.zt-act.on {
+  color: var(--brand, #6d5efc);
+  border-color: color-mix(in srgb, var(--brand, #6d5efc) 45%, var(--r8-glass-brd));
+  background: color-mix(in srgb, var(--brand, #6d5efc) 10%, transparent);
+}
+.zt-act.danger:hover { color: var(--err); border-color: color-mix(in srgb, var(--err) 45%, var(--r8-glass-brd)); }
+
+/* ------------------------------------------------------------- پاسخ‌ها */
+.zt-comments { margin-block-start: 10px; display: grid; gap: 7px; }
+.zt-cm {
+  display: flex; gap: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--r8-glass-bg-2);
+  border: 1px solid var(--r8-glass-brd);
+  font-size: .85rem;
+}
+.zt-cm .zt-cm-t { flex: 1; }
+.zt-cm b { font-weight: 800; }
+.zt-cm small { color: var(--muted); font-size: .72rem; display: block; }
+.zt-cmform { display: flex; gap: 7px; margin-block-start: 7px; }
+.zt-cmin {
+  flex: 1; padding: 8px 11px; border-radius: 999px;
+  border: 1px solid var(--r8-glass-brd);
+  background: var(--r8-glass-bg-2); color: var(--text); font: inherit; font-size: .85rem;
+}
+.zt-cmin:focus { outline: none; border-color: color-mix(in srgb, var(--brand, #6d5efc) 55%, var(--r8-glass-brd)); }
+
+.zt-empty {
+  padding: 30px 18px; text-align: center; color: var(--muted);
+  border: 1px dashed var(--r8-glass-brd); border-radius: 18px;
+}
+.zt-more { display: block; margin: 12px auto 0; }
+
+@media (max-width: 560px) {
+  .zt-ava { inline-size: 36px; block-size: 36px; font-size: .84rem; }
+  .zt-post { padding: 12px; border-radius: 15px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zt-dot { animation: none; }
+  .zt-post { animation: none; }
+  .zt-act { transition: none; }
+}

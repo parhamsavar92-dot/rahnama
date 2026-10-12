@@ -153,10 +153,15 @@ async function appendDoc(db, key, entries, cap) {
 const KV_SETS = {
   light: ["settings", "support"],
   cls: ["settings", "support", "classes", "sessions"],
+  /* «social» برای بخش هم‌زمانِ سایت (زنگ تفریح). بدون این مجموعه،
+     نوشته‌ها در یک درخواست نوشته می‌شدند و در درخواست بعدی خوانده
+     نمی‌شدند — یعنی پست‌ها گم می‌شدند. */
+  social: ["settings", "support", "messages"],
   heavy: ["settings", "support", "events", "audit", "classes", "sessions", "messages", "reports"]
 };
 function planOf(seg) {
   if (seg[0] === "admin") return { kv: "heavy", all: true };
+  if (seg[0] === "feed") return { kv: "social", all: false };
   if (seg[0] === "class") {
     const sub = seg.slice(1).join("/");
     return { kv: "cls", all: sub === "create" || sub === "overview" || sub === "attendance" };
@@ -216,7 +221,9 @@ async function persist(env, ctx) {
 
   for (const u of state.users) {
     seen.add(u.id);
-    const np = u._np; delete u._np; delete u.ph; delete u.pass;
+    /* u.ph (شمارهٔ تماس) دیگر حذف نمی‌شود تا در پنل مالک بماند و
+       ویرایشش کار کند؛ بقیهٔ فیلدهای حساس مثل رمز همچنان حذف می‌شوند. */
+    const np = u._np; delete u._np; delete u.pass;
     const js = JSON.stringify(u);
     const o = orig.users.get(u.id);
     if (!o || o.js !== js) {
