@@ -193,3 +193,40 @@
   .zt-post { animation: none; }
   .zt-act { transition: none; }
 }
+
+/* ═══════════════════ صدا و تماس زندهٔ کلاس (r11-voice.js) ═══════════════════ */
+.r11-bar {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  margin-block-start: 8px; padding-block-start: 8px;
+  border-block-start: 1px dashed var(--r8-glass-brd, #d8d8e6);
+}
+.r11-btn {
+  padding: 7px 13px; border-radius: 999px;
+  border: 1px solid var(--r8-glass-brd, #d8d8e6);
+  background-image: linear-gradient(160deg, var(--r8-glass-bg, rgba(255,255,255,.6)), transparent);
+  color: var(--text); font: inherit; font-size: .82rem; font-weight: 800; cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease;
+}
+.r11-btn:hover { transform: translate3d(0, -1px, 0); }
+.r11-btn.is-rec {
+  color: #fff; border-color: transparent;
+  background-image: linear-gradient(135deg, #dc2626, #f87171);
+  animation: r11-pulse 1.4s ease-in-out infinite;
+}
+.r11-btn.is-on {
+  color: #fff; border-color: transparent;
+  background-image: linear-gradient(135deg, var(--ok, #16a34a), #4ade80);
+}
+@keyframes r11-pulse { 0%,100% { opacity: 1 } 50% { opacity: .68 } }
+.r11-status { font-size: .76rem; color: var(--muted); font-weight: 700; }
+.r11-peers { display: flex; gap: 6px; flex-wrap: wrap; }
+.r11-chip {
+  font-size: .72rem; padding: 4px 9px; border-radius: 999px;
+  border: 1px solid var(--r8-glass-brd, #d8d8e6);
+  background: var(--r8-glass-bg-2, rgba(255,255,255,.44));
+  color: var(--text-soft);
+}
+.r11-chip.is-me { color: var(--brand, #6d5efc); font-weight: 800; }
+.r11-voice { margin-block: 4px; }
+.r11-voice audio { vertical-align: middle; }
+@media (prefers-reduced-motion: reduce) { .r11-btn.is-rec { animation: none; } }

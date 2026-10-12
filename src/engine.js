@@ -531,8 +531,99 @@ export function createEngine(LS, CFG) {
     if (sub === "ping") return ok();
     if (sub === "chat") {
       var r3 = getRoom(body.sessionId); if (!r3) return bad("جلسه پیدا نشد.", 404);
-      r3.msgs.push({ id: uid("m"), t: now(), from: u ? u.name : "مهمان", role: u ? u.role : "student", text: String(body.text || "").slice(0, 500) });
+      r3.msgs.push({
+        id: uid("m"), t: now(), from: u ? u.name : "مهمان", role: u ? u.role : "student",
+        userId: u ? u.id : "", text: String(body.text || "").slice(0, 500)
+      });
       r3.msgs = r3.msgs.slice(-200); bump(r3); save(); return ok();
+    }
+
+    /* ── پیام صوتی (ویس) ────────────────────────────────────────────────
+       صدای ضبط‌شده به‌صورت data URL ذخیره می‌شود. برای اینکه حجم پایگاه
+       داده بی‌دلیل بالا نرود، سه سقف گذاشته شده: طول صدا، حجم هر فایل،
+       و تعداد کل ویس‌های هر کلاس. */
+    if (sub === "voice") {
+      if (!u) return bad("برای فرستادن صدا اول وارد شو.", 401);
+      var rv = getRoom(body.sessionId); if (!rv) return bad("جلسه پیدا نشد.", 404);
+      var data = String(body.data || "");
+      var secs = Math.max(0, Math.min(120, +body.secs || 0));
+      if (!/^data:audio\//.test(data)) return bad("فایل صوتی نامعتبر است.");
+      if (data.length > 300000) return bad("صدای ضبط‌شده خیلی سنگین است؛ کوتاه‌تر بگیر (تا حدود ۳۰ ثانیه).");
+      rv.voices = rv.voices || [];
+      rv.voices.push({
+        id: uid("v"), t: now(), from: u.name, userId: u.id,
+        role: u.role, secs: Math.round(secs), data: data
+      });
+      /* سقف دوگانه: هم تعداد و هم مجموع حجم — تا حجم پایگاه داده
+         با چند صدای طولانی بی‌دلیل بالا نرود. */
+      rv.voices = rv.voices.slice(-8);
+      var total = 0, keep = [];
+      for (var vi = rv.voices.length - 1; vi >= 0; vi--) {
+        total += (rv.voices[vi].data || "").length;
+        if (total > 1400000) break;
+        keep.unshift(rv.voices[vi]);
+      }
+      rv.voices = keep;
+      bump(rv); save(); return ok();
+    }
+    if (sub === "voiceDel") {
+      var rd = getRoom(body.sessionId); if (!rd) return bad("جلسه پیدا نشد.", 404);
+      rd.voices = (rd.voices || []).filter(function (v) {
+        return !(v.id === body.id && u && (v.userId === u.id || u.isOwner || u.role === "owner" || u.role === "teacher"));
+      });
+      bump(rd); save(); return ok();
+    }
+
+    /* ── اتاق صدای زنده (لایو) ─────────────────────────────────────────
+       صدا به‌صورت مستقیم بین مرورگرها (WebRTC) رد و بدل می‌شود و سرور
+       فقط نقش «تلفن‌خانه» را دارد: چه کسانی حاضرند و پیام‌های
+       معرفی/پاسخ آدرس (offer/answer/ICE) را جابه‌جا می‌کند. */
+    if (sub === "rtc") {
+      if (!u) return bad("برای تماس صوتی اول وارد شو.", 401);
+      var rr = getRoom(body.sessionId); if (!rr) return bad("جلسه پیدا نشد.", 404);
+      /* صندوق پیام‌های سیگنالینگ داخل خودِ اتاق نگه داشته می‌شود تا با
+         همان کلید اتاق ذخیره شود و بین درخواست‌ها گم نشود. */
+      rr.mail = rr.mail || {};
+      var sid = String(body.sessionId || "");
+      var peer = String(body.peer || "").slice(0, 40);
+      if (!peer) return bad("شناسهٔ کاربر نامعتبر است.");
+
+      rr.live = rr.live || {};
+      var cut = now() - 20000;
+      Object.keys(rr.live).forEach(function (k) { if ((rr.live[k].at || 0) < cut) delete rr.live[k]; });
+
+      var act = String(body.action || "poll");
+      if (act === "join") {
+        rr.live[peer] = {
+          id: peer, name: u.name, role: u.role, at: now(),
+          muted: !!body.muted, grade: u.grade || ""
+        };
+        bump(rr); save();
+      } else if (act === "leave") {
+        delete rr.live[peer];
+        Object.keys(rr.mail).forEach(function (k) { if (k === peer) delete rr.mail[k]; });
+        bump(rr); save();
+      } else if (act === "state") {
+        if (rr.live[peer]) { rr.live[peer].at = now(); rr.live[peer].muted = !!body.muted; }
+      } else if (act === "send") {
+        var to = String(body.to || "").slice(0, 40);
+        if (!to) return bad("گیرنده مشخص نیست.");
+        rr.mail[to] = rr.mail[to] || [];
+        rr.mail[to].push({ from: peer, kind: String(body.kind || "").slice(0, 12), payload: body.payload || null, t: now() });
+        if (rr.mail[to].length > 40) rr.mail[to] = rr.mail[to].slice(-40);
+        save();
+      }
+
+      var inbox = rr.mail[peer] || [];
+      var hadMail = inbox.length > 0;
+      rr.mail[peer] = [];
+      /* ▼ رفع باگ: پاک‌کردن صندوق و تغییر وضعیت بی‌صدا باید ذخیره شود،
+         وگرنه در درخواست بعدی اتاق از پایگاه داده کهنه خوانده می‌شد و
+         همان پیام‌های معرفی دوباره تحویل داده می‌شدند (و صدای بی‌صدا
+         دیده نمی‌شد). */
+      if (hadMail || act === "state" || act === "join" || act === "leave" || act === "send") save();
+      var peersList = Object.keys(rr.live || {}).map(function (k) { return rr.live[k]; });
+      return J({ ok: true, peers: peersList, inbox: inbox, me: peer, live: !!rr.live[peer] });
     }
     if (sub === "board") {
       var r4 = getRoom(body.sessionId); if (!r4) return bad("جلسه پیدا نشد.", 404);
