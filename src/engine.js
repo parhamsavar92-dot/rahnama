@@ -561,10 +561,23 @@ export function createEngine(LS, CFG) {
         if (sort === "study") return (b.studyMinutes || 0) - (a.studyMinutes || 0);
         return (b.createdAt || 0) - (a.createdAt || 0);
       });
-      var per = 12, pages = Math.max(1, Math.ceil(list.length / per)), page = Math.min(Math.max(1, +q.page || 1), pages);
+      /* پیش‌تر تعداد ردیف هر صفحه ثابت روی ۱۲ بود و درخواست کلاینت
+         (per=25) نادیده گرفته می‌شد؛ نتیجه این بود که شمارهٔ صفحه‌ها و
+         شمارش کاربران با جدول نمی‌خواند و کاربران «گم» به‌نظر می‌رسیدند. */
+      var per = Math.max(5, Math.min(100, +(q.per || 12)));
+      var pages = Math.max(1, Math.ceil(list.length / per));
+      var page = Math.min(Math.max(1, +q.page || 1), pages);
       var mine = me();
       var rows = list.slice((page - 1) * per, page * per).map(function (u) {
-        var c = pub(u); c.canEdit = !u.isOwner || (mine && mine.isOwner); return c;
+        var c = pub(u);
+        c.canEdit = !u.isOwner || (mine && mine.isOwner);
+        /* جزئیات کامل برای پنل مالک: شمارهٔ تماس، تاریخ عضویت و وضعیت‌ها.
+           این اطلاعات فقط برای مدیر/مالک فرستاده می‌شود (این نقطهٔ پایانی
+           به‌هرحال نیازمند دسترسی مدیریتی است). */
+        c.phone = u.ph || "";
+        c.hasPass = !!u.pass;
+        c.lastSeen = u.lastAt || u.lastLogin || 0;
+        return c;
       });
       return J({ users: rows, page: page, pages: pages, total: list.length });
     }
@@ -583,6 +596,8 @@ export function createEngine(LS, CFG) {
       }
       if (body.banned != null) u.banned = !!body.banned;
       if (body.verified != null && (me().isOwner || me().role === "owner")) u.verified = !!body.verified;
+      /* شمارهٔ تماس را هم مالک/مدیر می‌تواند در پنل ویرایش کند */
+      if (body.phone != null) u.ph = String(body.phone).replace(/[^\d+]/g, "").slice(0, 16);
       u.roleFa = ROLE_FA[u.role] || u.role;
       if (u.isOwner) { u.role = "owner"; u.roleFa = ROLE_FA.owner; u.banned = false; u.verified = true; }
       save(); audit("user.update", u.email, { role: u.role, banned: u.banned });

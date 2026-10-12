@@ -56,7 +56,7 @@
     if (!h) return;
     if (h.querySelector(".r8-crystal")) return;
     if (W.getComputedStyle(h).position === "static") h.style.position = "relative";
-    var n = 5;
+    var n = 3;
     for (var i = 0; i < n; i++) {
       var s = D.createElement("i");
       s.className = "r8-crystal";
@@ -133,7 +133,51 @@
     });
   }
 
-  /* ------------------------------------- ۷. توقف انیمیشن‌ها در تبِ پنهان */
+  /* ------------------------------------- ۷. روان‌سازی اسکرول
+     backdrop-filter هدر چسبان در هر فریم اسکرول از نو حساب می‌شود و
+     بزرگ‌ترین عامل کندی بود. هنگام اسکرول موقتاً خاموشش می‌کنیم و
+     بعد از ایستِ اسکرول برمی‌گردانیم. هیچ تفاوت بصری محسوسی ندارد. */
+  function scrollBlur() {
+    var t = 0, raf = 0, on = false;
+    function idle() {
+      on = false;
+      try { D.body.classList.remove("r8-scrolling"); } catch (e) { }
+    }
+    W.addEventListener("scroll", function () {
+      if (!on) { on = true; try { D.body.classList.add("r8-scrolling"); } catch (e) { } }
+      clearTimeout(t);
+      t = setTimeout(idle, 250);
+      if (!raf) raf = W.requestAnimationFrame(function () { raf = 0; });
+    }, { passive: true });
+  }
+
+  /* ------------------------------------- ۸. نگهبان سرعت (خودکار)
+     نرخ فریم را در دو ثانیهٔ اول می‌سنجد. اگر دستگاه ضعیف بود یا مرورگر
+     درگیر بود، حالت سبک را روشن می‌کند: شفق یخی، شیشهٔ مات و انیمیشن‌های
+     پیوسته خاموش می‌شوند تا سایت روان بماند. این‌طور روی همهٔ دستگاه‌ها
+     بدون حدس‌زدن، بهترین حالت انتخاب می‌شود. */
+  function fpsWatch() {
+    if (LITE) return;
+    if (D.hidden) return;
+    var frames = 0, t0 = 0, done = false;
+    function tick(ts) {
+      if (done) return;
+      if (!t0) t0 = ts;
+      frames++;
+      var el = ts - t0;
+      if (el < 1600) { W.requestAnimationFrame(tick); return; }
+      done = true;
+      var fps = frames / (el / 1000);
+      try { W.R8 && (W.R8.fps = Math.round(fps)); } catch (e) { }
+      if (fps < 45) {
+        D.body.classList.add("r8-lite");
+        try { W.R8 && (W.R8.lite = true); W.R8 && (W.R8.autoLite = true); } catch (e) { }
+      }
+    }
+    try { W.requestAnimationFrame(tick); } catch (e) { }
+  }
+
+  /* ------------------------------------- ۹. توقف انیمیشن‌ها در تبِ پنهان */
   function pauseHidden() {
     D.addEventListener("visibilitychange", function () {
       try { D.body.classList.toggle("r8-paused", D.hidden); } catch (e) { }
@@ -142,7 +186,7 @@
 
   /* ------------------------------------------------------------ اجرا */
   function run() {
-    var jobs = [buildAurora, buildCrystals, buildReveal, buildLazy, pauseHidden];
+    var jobs = [buildAurora, buildCrystals, buildReveal, buildLazy, scrollBlur, pauseHidden, fpsWatch];
     jobs.forEach(function (fn) {
       try { fn(); } catch (e) { /* یک جلوه خراب شود، بقیه سالم می‌مانند */ }
     });

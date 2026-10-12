@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    رهنما — لایهٔ ۸: «یخ و شیشه»  |  r8.css
    --------------------------------------------------------------------------
    ظاهر سه‌بعدی و یخی با انیمیشن‌های نرم — یکدست روی همهٔ صفحه‌ها.
@@ -21,7 +21,7 @@
   --r8-glass-bg: rgba(255, 255, 255, .60);
   --r8-glass-bg-2: rgba(255, 255, 255, .44);
   --r8-glass-brd: rgba(255, 255, 255, .80);
-  --r8-glass-blur: 16px;
+  --r8-glass-blur: 12px;
   --r8-hair: rgba(255, 255, 255, .55);
   --r8-depth-1: 0 1px 2px rgba(20, 22, 45, .05);
   --r8-depth-2: 0 10px 28px rgba(20, 22, 45, .10), 0 2px 6px rgba(20, 22, 45, .06);
@@ -56,33 +56,52 @@ body {
 }
 
 /* ======================================================== ۲. شفق یخی شناور */
+/* شفق یخی — سبک‌سازی‌شده برای رفع لگ.
+   پیش‌تر این لایه یک عنصر غول‌آسا (inset: -18vmax) با سه گرادیان و
+   انیمیشن پیوستهٔ transform+scale و will-change بود؛ یعنی یک لایهٔ
+   ترکیبی بسیار بزرگ که مدام دوباره رستر می‌شد و روی کارت‌های گرافیکی
+   معمولی سایت را کند می‌کرد.
+   حالا: دو گرادیان، عنصر کوچک‌تر، بدون will-change، و انیمیشن فقط روی
+   opacity (نسبت به transform بسیار ارزان‌تر) با چرخهٔ آرام ۹۰ ثانیه. */
 .r8-aurora {
   position: fixed;
-  inset: -18vmax;
+  inset: -6vmax;
   z-index: -1;
   pointer-events: none;
-  opacity: .82;
-  background:
-    radial-gradient(34vmax 34vmax at 16% 10%, color-mix(in srgb, var(--r8-ice-1) 44%, transparent), transparent 62%),
-    radial-gradient(30vmax 30vmax at 86% 18%, color-mix(in srgb, var(--r8-ice-3) 40%, transparent), transparent 64%),
-    radial-gradient(38vmax 38vmax at 52% 96%, color-mix(in srgb, var(--r8-ice-2) 38%, transparent), transparent 66%);
-  animation: r8-drift 52s ease-in-out infinite alternate;
-  will-change: transform, opacity;
+  opacity: .8;
+  background-image:
+    radial-gradient(30vmax 30vmax at 18% 12%, color-mix(in srgb, var(--r8-ice-1) 42%, transparent), transparent 62%),
+    radial-gradient(34vmax 34vmax at 82% 84%, color-mix(in srgb, var(--r8-ice-3) 36%, transparent), transparent 66%),
+    /* کاغذ شطرنجی خیلی کمرنگ — حس «دفتر مشق» می‌دهد و چون ثابت است
+       هزینهٔ رندر ندارد. */
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--brand, #6d5efc) 4%, transparent) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--brand, #6d5efc) 4%, transparent) 0 1px, transparent 1px 28px);
+  animation: r8-drift 90s ease-in-out infinite alternate;
 }
-html[data-theme="dark"] .r8-aurora { opacity: .58; }
+html[data-theme="dark"] .r8-aurora { opacity: .5; }
 @keyframes r8-drift {
-  0%   { transform: translate3d(-1.5%, -1%, 0) scale(1.02) rotate(0deg); }
-  50%  { transform: translate3d(1.2%, .8%, 0) scale(1.07) rotate(1.5deg); opacity: .95; }
-  100% { transform: translate3d(2.2%, 1.6%, 0) scale(1.03) rotate(-1.5deg); }
+  0%   { opacity: .62; }
+  50%  { opacity: .92; }
+  100% { opacity: .70; }
 }
 
 /* ================================================ ۳. شیشهٔ مات (سطح‌های بزرگ) */
 .site-header {
   background: var(--r8-glass-bg) !important;
-  -webkit-backdrop-filter: blur(var(--r8-glass-blur)) saturate(1.55);
-  backdrop-filter: blur(var(--r8-glass-blur)) saturate(1.55);
+  -webkit-backdrop-filter: blur(var(--r8-glass-blur)) saturate(1.5);
+  backdrop-filter: blur(var(--r8-glass-blur)) saturate(1.5);
   border-block-end: 1px solid var(--r8-glass-brd);
   box-shadow: 0 10px 34px rgba(20, 22, 45, .09), inset 0 1px 0 var(--r8-hair);
+}
+/* ▼ رفع لگ اسکرول ─────────────────────────────────────────────────────
+   backdrop-filter روی هدر چسبان باعث می‌شود مرورگر در هر فریم اسکرول،
+   پشت هدر را از نو محاسبه کند؛ همین بزرگ‌ترین عامل کندی هنگام کار بود.
+   حالا هنگام اسکرول موقتاً خاموش می‌شود و ۲۵۰ میلی‌ثانیه بعد از ایست،
+   برمی‌گردد. کاربر تفاوت بصری محسوسی نمی‌بیند ولی اسکرول روان می‌شود. */
+body.r8-scrolling .site-header,
+body.r8-scrolling .r7-tabbar {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 html[data-theme="dark"] .site-header {
   box-shadow: 0 12px 40px rgba(0, 0, 0, .55), inset 0 1px 0 var(--r8-hair);
@@ -93,6 +112,24 @@ html[data-theme="dark"] .site-header {
   backdrop-filter: blur(var(--r8-glass-blur)) saturate(1.55);
   border-block-start: 1px solid var(--r8-glass-brd);
   box-shadow: 0 -10px 34px rgba(20, 22, 45, .10), inset 0 1px 0 var(--r8-hair);
+}
+
+/* ── رفع بزرگ‌ترین عامل کندی ───────────────────────────────────────────
+   در لایه‌های پیشین روی «هر کارت» این گذاشته شده بود:
+       .card, .subject-card, .kpi, .hero-card, .tool-card { will-change: transform; }
+   will-change: transform به مرورگر می‌گوید «این عنصر را همیشه در لایهٔ
+   گرافیکی جدا نگه دار». با ۲۰ تا ۴۰ کارت در یک صفحه، یعنی ۲۰ تا ۴۰ لایهٔ
+   دائمی؛ همین حافظهٔ کارت گرافیکی را پر می‌کند و اسکرول و کار کردن با
+   سایت را کند می‌کند — بدون این‌که ظاهر هیچ تغییری داشته باشد.
+   حالا ترفیع لایه فقط لحظهٔ هاور/حرکت انجام می‌شود (روش درست). */
+.card, .subject-card, .kpi, .hero-card, .tool-card, .cls-card, .hk-card,
+.r7-empty, .h3-tilt, .grid-2 > .card, .grid-3 > .card {
+  will-change: auto;
+}
+@media (hover: hover), (any-pointer: fine) {
+  .card:hover, .subject-card:hover, .tool-card:hover, .kpi:hover, .h3-tilt:hover {
+    will-change: transform;
+  }
 }
 
 /* ============================================ ۴. کارت‌های سه‌بعدی و ژرفا */
@@ -197,11 +234,11 @@ main { animation: r8-enter .45s ease-out both; }
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-/* شناوری آرام برای نشان‌ها و آیکون‌ها
-   از خاصیت مستقل translate استفاده می‌کنیم (نه transform) تا اگر
-   لایه‌های دیگر برای همین عنصر هاورِ transform داشتند، خنثی نشود. */
-.brand-mark, .subject-icon, .hk-ava, .card-icon {
-  animation: r8-float 6.5s ease-in-out infinite;
+/* شناوری آرام — فقط روی نشان برند و آواتار (چند عنصر انگشت‌شمار).
+   پیش‌تر روی .subject-icon و .card-icon هم بود؛ در صفحه‌هایی با ۲۰ کارت
+   یعنی ۲۰ انیمیشن بی‌پایان روی هم، که پردازنده را بی‌دلیل مشغول می‌کرد. */
+.brand-mark, .hk-ava {
+  animation: r8-float 7s ease-in-out infinite;
 }
 @keyframes r8-float {
   0%, 100% { translate: 0 0; }
@@ -257,11 +294,9 @@ body.r8-lite .r7-tabbar {
   backdrop-filter: none;
 }
 body.r8-lite .r8-crystal { display: none; }
+body.r8-lite .r8-reveal { opacity: 1; translate: none; transition: none; }
 body.r8-lite main { animation: none; }
-body.r8-lite .brand-mark,
-body.r8-lite .subject-icon,
-body.r8-lite .hk-ava,
-body.r8-lite .card-icon { animation: none; }
+body.r8-lite .brand-mark, body.r8-lite .hk-ava { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .r8-aurora { animation: none; }

@@ -29,7 +29,11 @@
     catch (e) { return "—"; }
   }
 
-  var STATE = { user: null, stats: null, settings: null, users: [], page: 1, pages: 1, q: "", role: "", grade: "", sort: "new", audit: [], events: [] };
+  var STATE = {
+    user: null, stats: null, settings: null, users: [], page: 1, pages: 1, per: 25,
+    q: "", role: "", grade: "", sort: "new", audit: [], events: [],
+    usersTotal: null, usersLoadedAt: 0, usersTimer: 0
+  };
 
   /* --------------------------------------------------- دسترسی */
   function guard() {
@@ -75,6 +79,9 @@
       STATE.stats = r.stats; STATE.settings = r.settings;
       paintStats();
       paintSettings(r.settings);
+      /* اگر تعداد کاربران از زمان بارگذاری جدول تغییر کرده، جدول را تازه کن
+         (کاربر تازه ثبت‌نام کرده ولی جدول کهنه مانده بود). */
+      try { syncUsersIfStale(); } catch (e) { }
       return r;
     }).catch(function (e) { toast(e.message); });
   }
@@ -265,12 +272,40 @@
   function loadUsers(page) {
     if (page) STATE.page = page;
     var qs = "?q=" + encodeURIComponent(STATE.q) + "&role=" + STATE.role + "&grade=" + STATE.grade +
-      "&sort=" + STATE.sort + "&page=" + STATE.page + "&per=25";
+      "&sort=" + STATE.sort + "&page=" + STATE.page + "&per=" + STATE.per;
     return api("GET", "/api/admin/users" + qs).then(function (r) {
       STATE.users = r.users; STATE.pages = r.pages; STATE.page = r.page;
+      STATE.usersTotal = r.total;
+      STATE.usersLoadedAt = Date.now();
       $("#admUsersCount").textContent = num(r.total) + " کاربر";
       paintUsers(r);
     }).catch(function (e) { toast(e.message); });
+  }
+
+  /* ── تازه‌سازی خودکار جدول کاربران ────────────────────────────────────
+     مشکل گزارش‌شده: «کاربر ثبت‌نام می‌کند ولی در پنل دیده نمی‌شود».
+     دلیلش این بود که بج تب از آمار (که مرتب تازه می‌شد) می‌آمد، اما جدول
+     کاربران فقط یک‌بار هنگام باز کردن آن تب خوانده می‌شد و کهنه می‌ماند.
+     حالا: هر بار آمار تغییر کند جدول هم تازه می‌شود، و تا وقتی تب کاربران
+     باز است هر ۲۵ ثانیه و با برگشتن به پنجره هم بازبینی می‌شود. */
+  function syncUsersIfStale() {
+    var t = STATE.stats && STATE.stats.users && STATE.stats.users.total;
+    if (t == null) return;
+    var stale = (STATE.usersTotal == null) || (t !== STATE.usersTotal);
+    if (stale) loadUsers();
+  }
+  function startUsersAutoRefresh() {
+    if (STATE.usersTimer) return;
+    STATE.usersTimer = setInterval(function () {
+      var pane = $('[data-pane="users"]');
+      if (pane && pane.hidden) return;                 // تب کاربران باز نیست
+      if (D.hidden) return;                            // پنجره پنهان است
+      loadUsers();
+    }, 25000);
+    W.addEventListener("focus", function () {
+      var pane = $('[data-pane="users"]');
+      if (pane && !pane.hidden) loadUsers();
+    });
   }
 
   function paintUsers(r) {
@@ -289,6 +324,7 @@
         "<td>" + fa(u.lessonsRead) + "</td><td>" + fa(u.exams) + "</td><td>" + fa(u.studyMinutes) + "</td>" +
         "<td>" + (u.lastLogin ? jdate(u.lastLogin) : "—") + "</td>" +
         '<td><div class="adm-row-actions">' +
+          '<button data-act="view" data-id="' + u.id + '">جزئیات</button>' +
           (canEdit ? '<button data-act="edit" data-id="' + u.id + '">ویرایش</button>' : "") +
           (isOwnerMe ? '<button data-act="tick" data-id="' + u.id + '">' + (u.verified ? "برداشتن تیک" : "تیک آبی") + "</button>" : "") +
           (canEdit ? '<button data-act="pass" data-id="' + u.id + '">رمز</button>' : "") +
@@ -309,10 +345,62 @@
     $("#admPager").innerHTML = pager;
   }
 
+  /* -------------------------------------------------- جزئیات کامل کاربر */
+  function renderUserDetail(u) {
+    var G = { "7": "هفتم", "8": "هشتم", "9": "نهم" };
+    var rows = [
+      ["نام و نام خانوادگی", u.name || "—"],
+      ["ایمیل", u.email || "—"],
+      ["شمارهٔ تماس", u.phone || "ثبت نشده"],
+      ["نقش", u.roleFa || u.role || "—"],
+      ["پایه", G[u.grade] || "—"],
+      ["مدرسه", u.school || "—"],
+      ["شهر", u.city || "—"],
+      ["تاریخ عضویت", u.createdAt ? jdate(u.createdAt) : "—"],
+      ["آخرین ورود", (u.lastSeen || u.lastAt) ? jdate(u.lastSeen || u.lastAt) : "—"],
+      ["درس‌های خوانده‌شده", fa(u.lessonsRead || 0)],
+      ["آزمون‌های داده", fa(u.exams || 0)],
+      ["یادداشت‌ها", fa(u.notes || 0)],
+      ["دقیقهٔ مطالعه", fa(u.studyMinutes || 0)],
+      ["درصد پیشرفت", fa(u.progress || 0) + "٪"],
+      ["وضعیت", (u.banned ? "مسدود" : "فعال") +
+        (u.verified ? " · تأییدشده (تیک آبی)" : "") +
+        (u.isOwner ? " · مالک سایت" : "")]
+    ];
+    return '<div class="um-detail-h">جزئیات کامل</div><dl class="rt-kv">' +
+      rows.map(function (r) {
+        return "<dt>" + esc(r[0]) + "</dt><dd>" + esc(String(r[1] == null ? "—" : r[1])) + "</dd>";
+      }).join("") + "</dl>";
+  }
+
+  /* حالت فقط‌خواندنی: پنجره با جزئیات کامل باز می‌شود و فیلدهای ویرایش پنهان‌اند */
+  function openUserDetail(id) {
+    var u = STATE.users.filter(function (x) { return x.id === id; })[0];
+    if (!u) return;
+    $("#umTitle").textContent = "جزئیات " + (u.name || "کاربر");
+    $("#umId").value = u.id;
+    $("#umInfo").innerHTML = '<span class="chip">' + esc(u.roleFa || u.role) + "</span>" +
+      '<span class="chip">' + esc(u.email || "") + "</span>";
+    var d = $("#umDetail");
+    if (d) { d.innerHTML = renderUserDetail(u); d.hidden = false; }
+    var ef = $("#umEditFields");
+    if (ef) ef.hidden = true;
+    $$("#admModal .adm-actions .btn").forEach(function (b) {
+      if (b.hasAttribute("data-modal-close")) return;
+      b.hidden = true;
+    });
+    $("#admModal").classList.add("open");
+  }
+
   function openUser(id) {
     var u = STATE.users.filter(function (x) { return x.id === id; })[0];
     if (!u) return;
+    var d0 = $("#umDetail"), ef0 = $("#umEditFields");
+    if (d0) { d0.innerHTML = renderUserDetail(u); d0.hidden = false; }
+    if (ef0) ef0.hidden = false;
+    $$("#admModal .adm-actions .btn").forEach(function (b) { b.hidden = false; });
     $("#umTitle").textContent = "ویرایش " + u.name;
+    if ($("#umPhone")) $("#umPhone").value = u.phone || "";
     $("#umId").value = u.id;
     $("#umName").value = u.name || "";
     $("#umEmail").value = u.email || "";
@@ -423,6 +511,7 @@
       var b = e.target.closest("[data-act]");
       if (!b) return;
       var id = b.getAttribute("data-id"), act = b.getAttribute("data-act");
+      if (act === "view") { openUserDetail(id); return; }
       if (act === "edit") openUser(id);
       if (act === "tick") {
         var row = STATE.users.filter(function (x) { return x.id === id; })[0];
@@ -472,6 +561,7 @@
         role: $("#umRole").value,
         banned: $("#umBan").checked
       };
+      if ($("#umPhone")) payload.phone = $("#umPhone").value.trim();
       // تیک آبی فقط وقتی نمایش داده می‌شود که خودت مالک باشی
       if ($("#umTick") && !$("#umTickWrap").hidden) payload.verified = $("#umTick").checked;
       api("POST", "/api/admin/user", payload).then(function () {
@@ -558,9 +648,15 @@
       var h = (location.hash || "").replace("#", "");
       show(["overview", "users", "announce", "settings", "events", "audit", "tools", "school", "quick", "flags", "content", "exams", "broadcast", "bulk", "reports", "security", "data"].indexOf(h) > -1 ? h : "overview");
       loadStats();
+      startUsersAutoRefresh();
       setInterval(function () {
+        if (D.hidden) return;
         var pane = $$("[data-pane]").filter(function (p) { return !p.hidden; })[0];
-        if (pane && pane.getAttribute("data-pane") === "overview") loadStats();
+        var name = pane && pane.getAttribute("data-pane");
+        /* پیش‌تر آمار فقط در «نمای کلی» تازه می‌شد؛ برای همین وقتی تب
+           کاربران باز بود، بج‌ها تازه نمی‌شدند و کاربر تازه‌ثبت‌نام‌شده
+           هم دیده نمی‌شد. حالا در تب کاربران هم تازه می‌شود. */
+        if (name === "overview" || name === "users") loadStats();
       }, 30000);
     });
   }

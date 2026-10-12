@@ -197,10 +197,61 @@
     }, 4000);
   }
 
+  /* ── پاک‌سازی ناوبری تکراری ─────────────────────────────────────────────
+     مشکل گزارش‌شده: «وقتی ثبت‌نام می‌کنم دو پروفایل و دو پنل مدیریت می‌آید».
+     علتش این بود که یک مقصد از چند مسیر جداگانه به نوار اضافه می‌شد:
+       • چیپ حساب (آواتار → profile.html) و لینک «پنل من»/«حساب من»
+       • چیپ «⚙ مدیریت» در کنار لینک «پنل مالک» که هر دو به admin.html می‌روند
+       • و لینک‌های ثابت صفحه در کنار لینک‌هایی که جاوااسکریپت اضافه می‌کند
+     حالا هر مقصد فقط یک بار در نوار می‌ماند و چیپ مدیریتِ تکراری حذف می‌شود. */
+  function normHref(h) {
+    if (!h) return "";
+    var s = String(h).split("#")[0].split("?")[0];
+    s = s.replace(/^(?:\.\.\/|\.\/)+/, "");           // حذف ../ و ./
+    s = s.replace(/^\/+/, "");                        // حذف اسلش ابتدای مسیر
+    var parts = s.split("/").filter(Boolean);
+    var last = parts.length ? parts[parts.length - 1] : "";
+    last = last.replace(/\.html$/, "");               // exam.html و exam یکی‌اند
+    if (last === "" || last === "index") return "__home";
+    return last;
+  }
+  function dedupeNav() {
+    $$(".header-nav, .r7-tabbar").forEach(function (nav) {
+      var seen = {};
+      $$("a[href]", nav).forEach(function (a) {
+        var key = normHref(a.getAttribute("href"));
+        if (!key || key.charAt(0) === "#") return;
+        if (seen[key]) {
+          // تکراری: برچسبِ کوتاه‌تر/بدون‌متن حذف می‌شود، وگرنه دومی
+          var prev = seen[key];
+          var keepPrev = (prev.textContent || "").trim().length >= (a.textContent || "").trim().length;
+          if (keepPrev) a.remove(); else { prev.remove(); seen[key] = a; }
+          return;
+        }
+        seen[key] = a;
+      });
+    });
+    /* اگر لینک پنل در نوار هست، چیپ «⚙ مدیریت» اضافه است */
+    if ($(".header-nav a[hkOwnerLink], .header-nav a[hkMgLink], .header-nav a[hkTcLink]")) {
+      $$(".header-nav a.hk-admin-link").forEach(function (x) { x.remove(); });
+    }
+    /* اگر «پنل من» هست، چیپ تکراریِ حساب با همان مقصد هم لازم نیست */
+    var panel = $(".header-nav a[hkPanelLink]");
+    if (panel) {
+      $$(".header-nav a.hk-account").forEach(function (a) {
+        if (normHref(a.getAttribute("href")) === normHref(panel.getAttribute("href"))) a.remove();
+      });
+    }
+  }
+
   function run() {
-    [progressBar, lazyImages, shortcuts, ttsButton, safetyNet].forEach(function (fn) {
+    [progressBar, lazyImages, shortcuts, ttsButton, safetyNet, dedupeNav].forEach(function (fn) {
       try { fn(); } catch (e) { }
     });
+    /* نوار بعد از بارگذاری کامل هم یک بار دوباره پاک‌سازی می‌شود،
+       چون بعضی لینک‌ها (پنل نقش) با تأخیر اضافه می‌شوند. */
+    W.addEventListener("load", function () { try { dedupeNav(); } catch (e) { } });
+    setTimeout(function () { try { dedupeNav(); } catch (e) { } }, 1200);
   }
   if (D.readyState === "loading") D.addEventListener("DOMContentLoaded", run);
   else run();
