@@ -325,3 +325,47 @@ body.r8-lite .r12-fab { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .header-nav a.zt-top-link.is-active {
   background-image: linear-gradient(135deg, var(--brand,#6d5efc), #8b7cff); color: #fff;
 }
+
+/* ═══════════ گیت نقش کلاس + زیباسازی پنل‌ها (نسخهٔ ۹.۴) ═══════════ */
+.cls-gate-grid {
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+.cls-gate-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 20px 14px; cursor: pointer; font: inherit; text-align: center;
+  border: 1px solid var(--r8-glass-brd); border-radius: 20px;
+  background-image: linear-gradient(160deg, var(--r8-glass-bg), transparent 70%);
+  box-shadow: var(--r8-depth-2), inset 0 1px 0 var(--r8-hair);
+  transition: transform .26s cubic-bezier(.2,.7,.3,1), box-shadow .26s ease;
+}
+.cls-gate-btn:hover { transform: translateY(-4px); box-shadow: var(--r8-depth-3); }
+.cls-gate-btn .ic { font-size: 2rem; line-height: 1; }
+.cls-gate-btn b { font-size: 1.02rem; }
+.cls-gate-btn small { font-size: .76rem; color: var(--muted); line-height: 1.7; }
+.cls-rolechg {
+  margin-top: 10px; padding: 7px 12px; border-radius: 999px; cursor: pointer;
+  font: inherit; font-size: .76rem; font-weight: 700;
+  border: 1px dashed var(--border); background: transparent; color: var(--muted);
+}
+.cls-rolechg:hover { color: var(--text); border-color: var(--brand, #6d5efc); }
+.cls-warn { display: block; font-size: .82rem; color: #d9484d; line-height: 1.8; }
+.cls-ok {
+  display: block; font-size: .82rem; line-height: 1.9; color: var(--text);
+  padding: 10px 12px; border-radius: 13px;
+  background: color-mix(in srgb, #22c55e 10%, var(--surface));
+  border: 1px solid color-mix(in srgb, #22c55e 34%, transparent);
+}
+
+/* یکدستی پنل‌ها: عنوان کارت‌ها و فاصله‌ها یکسان */
+.card > h4 { letter-spacing: 0; }
+.hk-field > label { font-size: .8rem; color: var(--muted); margin-block-end: 4px; display: block; }
+.hk-field input, .hk-field select { font-size: .92rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cls-gate-btn:hover { transform: none; }
+}
+@media (max-width: 520px) {
+  .cls-gate-btn { padding: 16px 12px; }
+  .cls-gate-btn .ic { font-size: 1.7rem; }
+}

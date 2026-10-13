@@ -35,7 +35,7 @@
   }
 
   var C = {
-    me: null, mine: [], taught: [], sessions: [], isStaff: false,
+    me: null, mine: [], taught: [], sessions: [], isStaff: false, teacherOk: false,
     cls: null, session: null, room: null, rev: 0, tab: "chat",
     rev0: 0, boardDirty: false, boardTimer: 0, loopTimer: 0, hbTimer: 0,
     pendingCode: "", alive: true, tick: 0,
@@ -63,9 +63,56 @@
       "</div></article>";
   }
 
+  /* ═══════════ گیت نقش: اول بپرس «معلمی یا دانش‌آموز؟» ═══════════ */
+  function rolePick() {
+    try { return localStorage.getItem("cls:role") || ""; } catch (e) { return ""; }
+  }
+  function setRole(r) {
+    try { localStorage.setItem("cls:role", r); } catch (e) { }
+  }
+
+  function gateHTML() {
+    return '<section class="wrap" style="padding-top:24px;padding-bottom:34px">' +
+      '<div class="card cls-gate">' +
+      '<h4><span class="card-icon">◆</span> کلاس مجازی رهنما</h4>' +
+      '<p style="margin:0 0 14px">اول بگو با چه نقشی وارد می‌شوی — بعد گزینه‌های مخصوص خودت را می‌بینی.</p>' +
+      '<div class="cls-gate-grid">' +
+      '<button type="button" class="cls-gate-btn" data-act="pickRole" data-role="student">' +
+      '<span class="ic">🎓</span><b>دانش‌آموز</b><small>با کد کلاس وارد شو و در درس شرکت کن</small></button>' +
+      '<button type="button" class="cls-gate-btn" data-act="pickRole" data-role="teacher">' +
+      '<span class="ic">👨‍🏫</span><b>معلم</b><small>برای ساخت کلاس و تدریس، کد معلمی لازم است</small></button>' +
+      "</div></div></section>";
+  }
+
+  function codeHTML() {
+    return '<section class="wrap" style="padding-top:24px;padding-bottom:34px">' +
+      '<div class="card">' +
+      '<h4><span class="card-icon">🔑</span> کد معلمی</h4>' +
+      '<p style="margin:0 0 12px">برای فعال‌شدن گزینه‌های معلمی، کدی را که مدیر سایت به تو داده وارد کن. ' +
+      "تا تأیید نشود، امکان ساخت کلاس و صدور کد ورود وجود ندارد.</p>" +
+      '<div class="hk-field"><input id="clsTeachCode" type="text" autocomplete="off" ' +
+      'placeholder="کد معلمی" style="letter-spacing:3px;text-align:center;direction:ltr"></div>' +
+      '<div class="flex" style="gap:8px;margin-top:10px;flex-wrap:wrap">' +
+      '<button class="btn btn-primary" data-act="teachcode">تأیید کد و ورود</button>' +
+      '<button class="btn" data-act="reqcode">کد ندارم — درخواست می‌دهم</button>' +
+      '<button class="btn" data-act="pickRole" data-role="student">من دانش‌آموزم</button>' +
+      "</div>" +
+      '<div id="clsReqBox" style="margin-top:12px"></div>' +
+      "</div></section>";
+  }
+
   function renderLobby() {
     var host = $("#clsLobby");
     if (!host) return;
+
+    /* اگر حساب اختیار معلمی دارد یا مدیر است، دیگر نمی‌پرسیم */
+    var hasTeach = !!(C.isStaff || C.teacherOk);
+    var pick = rolePick();
+    if (!hasTeach && pick !== "student") {
+      host.innerHTML = pick === "teacher" ? codeHTML() : gateHTML();
+      return;
+    }
+
     var liveSessions = C.sessions.filter(function (s) { return s.status === "live"; });
 
     host.innerHTML =
@@ -73,6 +120,7 @@
       '<div class="card">' +
       "<h4><span class=\"card-icon\">◆</span> کلاس مجازی رهنما</h4>" +
       "<p>با کد کلاس وارد شو، یا اگر دبیری کلاس بساز. داخل کلاس مجازی: تختهٔ اشتراکی، گفت‌وگوی زنده، فهرست حاضرین و حضور و غیاب خودکار.</p>" +
+      '<button type="button" class="cls-rolechg" data-act="pickRole" data-role="student">تغییر نقش (من دانش‌آموزم)</button>' +
       '<div class="grid-2" style="align-items:start;gap:14px">' +
       '<div class="card" style="margin:0"><h4>ورود با کد کلاس</h4>' +
       '<div class="hk-field"><input id="clsCode" type="text" inputmode="latin" autocomplete="off" placeholder="مثلاً A7K2QP" style="letter-spacing:4px;text-align:center;font-family:var(--font-mono);direction:ltr;font-size:1.05rem"></div>' +
@@ -213,6 +261,7 @@
       C.taught = r.taught || [];
       C.sessions = r.sessions || [];
       C.isStaff = !!r.isStaff;
+      C.teacherOk = !!(r.me && r.me.teacherOk) || !!r.isStaff;
       paint();
       return r;
     });
@@ -448,6 +497,34 @@
       if (!t) return;
       var act = t.getAttribute("data-act");
       var id = t.getAttribute("data-id");
+      /* ── گیت نقش و کد معلمی ── */
+      if (act === "pickRole") {
+        var r = t.getAttribute("data-role") || "student";
+        setRole(r);
+        paint();
+        return;
+      }
+      if (act === "teachcode") {
+        var cd = (($("#clsTeachCode") || {}).value || "").trim();
+        if (!cd) { toast("کد معلمی را وارد کن."); return; }
+        api("POST", "/api/class/teachcode", { code: cd }).then(function (x) {
+          if (!x || x.error) { toast((x && x.error) || "کد تأیید نشد."); return; }
+          C.teacherOk = true; C.isStaff = true;
+          toast("کد معلمی تأیید شد ✅ گزینه‌های معلمی باز شد.");
+          return loadList();
+        });
+        return;
+      }
+      if (act === "reqcode") {
+        api("POST", "/api/class/reqcode", {}).then(function (x) {
+          var box = $("#clsReqBox");
+          if (!box) return;
+          if (!x || x.error) { box.innerHTML = '<span class="cls-warn">' + esc((x && x.error) || "درخواست ثبت نشد.") + "</span>"; return; }
+          box.innerHTML = '<div class="cls-ok">✅ درخواست کد معلمی ثبت شد و در پنل مدیر سایت دیده می‌شود. ' +
+            "به‌محض صدور کد، همین‌جا واردش کن.</div>";
+        });
+        return;
+      }
       if (act === "join") { joinByCode(($("#clsCode") || {}).value || ""); return; }
       if (act === "create") { createClass(); return; }
       if (act === "start") { startClass(id); return; }

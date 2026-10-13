@@ -562,13 +562,88 @@ export function createEngine(LS, CFG) {
 
   function classHandler(sub, method, body, q) {
     var d = db(), u = me();
+    /* ── فهرست کلاس‌ها ──────────────────────────────────────────────────
+       ▼ رفع باگ مهم: کلاینت انتظار mine / taught / isStaff داشت ولی سرور
+       فقط classes می‌فرستاد؛ نتیجه این بود که فهرست کلاس‌ها همیشه خالی
+       دیده می‌شد و بخش کلاس مجازی «خراب» به‌نظر می‌رسید. حالا هر سه
+       فرستاده می‌شود و classes هم برای سازگاری می‌ماند. */
     if (sub === "list") {
-      var mine = d.classes.filter(function (c) { return u && (c.ownerId === u.id || (c.members || []).indexOf(u.id) > -1); });
-      var pubList = u && (u.role === "teacher" || u.role === "admin" || u.role === "owner") ? d.classes : mine;
-      return J({ classes: pubList, sessions: (d.sessions || []).filter(function (s) { return s.status === "live"; }) });
+      var boss = isBoss(u);
+      var staff = !!(boss || (u && (u.teacherOk || u.role === "teacher")));
+      var all = d.classes || [];
+      var mine = u ? all.filter(function (c) {
+        return c.ownerId !== u.id && (c.members || []).indexOf(u.id) > -1;
+      }) : [];
+      var taught = u ? all.filter(function (c) { return c.ownerId === u.id; }) : [];
+      return J({
+        mine: mine,
+        taught: taught,
+        isStaff: staff,
+        classes: staff ? all : mine.concat(taught),
+        sessions: (d.sessions || []).filter(function (s) { return s.status === "live"; }),
+        me: u ? {
+          id: u.id, name: u.name, role: u.role,
+          teacherOk: (staff ? true : !!u.teacherOk),
+          isBoss: boss
+        } : null
+      });
+    }
+
+    /* ── بررسی «کد معلمی» ───────────────────────────────────────────────
+       کاربر در صفحهٔ کلاس اول انتخاب می‌کند معلم است یا دانش‌آموز. اگر
+       معلم را بزند، باید کد معلمی (همان کد همکاران که در پنل مالک تعیین
+       می‌شود) را وارد کند. تا وقتی تأیید نشود، گزینه‌های معلمی باز
+       نمی‌شوند — پس همه چیز تحت کنترل مدیر سایت می‌ماند. */
+    if (sub === "teachcode") {
+      if (!u) return bad("ابتدا وارد شوید.", 401);
+      var want = String((d.settings && d.settings.staffCode) || "").trim();
+      var given = String(body.code || "").trim();
+      if (!want) return bad("کد معلمی روی سایت تنظیم نشده است؛ از مدیر سایت بخواه کد را بگذارد.", 400);
+      if (given !== want) {
+        logEvent("class_teachcode_fail", { email: u.email || "" });
+        return bad("کد معلمی درست نیست.", 403);
+      }
+      u.teacherOk = true;
+      if (u.role === "student") { u.role = "teacher"; u.roleFa = ROLE_FA.teacher || "دبیر"; }
+      save(); audit("class.teachcode", u.email || u.id);
+      return J({ ok: true, me: { id: u.id, name: u.name, role: u.role, teacherOk: true, isBoss: isBoss(u) } });
+    }
+
+    /* ── درخواست کد معلمی ──────────────────────────────────────────────
+       اگر کد را نداری، همین‌جا درخواست بده. درخواست مستقیم در پنل مالک
+       می‌نشیند و مالک از همان‌جا کد را صادر می‌کند. */
+    if (sub === "reqcode") {
+      if (!u) return bad("برای درخواست کد ابتدا وارد شوید.", 401);
+      if (u.teacherOk) return bad("اختیار معلمی برای حساب تو از قبل فعال است.", 400);
+      d.support = d.support || { reqs: [], keys: [] };
+      d.support.reqs = d.support.reqs || [];
+      var open = d.support.reqs.filter(function (x) {
+        return x.by === u.id && x.kind === "teacher" && x.status !== "rejected";
+      })[0];
+      if (open) return J({ ok: true, already: true, req: open });
+      var rq = {
+        id: uid("rq"), kind: "teacher", by: u.id, name: u.name, email: u.email || "",
+        grade: u.grade || "", school: u.school || "", note: String(body.note || "").slice(0, 300),
+        status: "pending", t: now()
+      };
+      d.support.reqs.unshift(rq);
+      d.support.reqs = d.support.reqs.slice(0, 200);
+      save(); logEvent("class_reqcode", { email: u.email || "" });
+      return J({ ok: true, req: rq });
+    }
+
+    /* وضعیت درخواست خودم */
+    if (sub === "mreq") {
+      if (!u) return J({ ok: true, req: null });
+      var r2 = (d.support.reqs || []).filter(function (x) { return x.by === u.id && x.kind === "teacher"; })[0] || null;
+      return J({ ok: true, req: r2 });
     }
     if (sub === "create") {
       if (!u) return bad("ابتدا وارد شوید.", 401);
+      /* فقط کسی که کد معلمی را وارد کرده (یا مدیر/مالک است) می‌تواند
+         کلاس بسازد و برای دیگران کد ورود صادر کند. */
+      var mayTeach = !!(u.teacherOk || isBoss(u) || u.role === "teacher");
+      if (!mayTeach) return bad("برای ساخت کلاس باید اول کد معلمی را وارد کنی.", 403);
       var nc = { id: uid("c"), name: String(body.name || "کلاس تازه").slice(0, 80), grade: body.grade || (u.grade || "8"), subject: body.subject || "ریاضی", code: code(6), ownerId: u.id, members: [], createdAt: now() };
       if (body.autoMembers) d.users.forEach(function (x) { if (x.role === "student" && x.grade === nc.grade) nc.members.push(x.id); });
       d.classes.unshift(nc); save(); logEvent("class_create", { code: nc.code, name: nc.name });
