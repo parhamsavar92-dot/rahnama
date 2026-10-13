@@ -415,3 +415,32 @@ body.r8-lite .r12-fab { -webkit-backdrop-filter: none; backdrop-filter: none; }
 [data-theme="dark"] .cls-role.r-teacher { color: #7dd3fc; }
 [data-theme="dark"] .cls-role.r-student { color: #86efac; }
 @media (max-width: 520px) { .cls-av { inline-size: 29px; block-size: 29px; font-size: .8rem; } }
+
+/* ═══════ پشتیبانی آنلاین در منوی بالا (نسخهٔ ۹.۶) ═══════ */
+.header-nav a.r12-menu-link {
+  display: inline-flex; align-items: center; gap: 5px; position: relative;
+  font-weight: 800; white-space: nowrap; border-radius: 999px; padding-inline: 10px;
+  background-image: linear-gradient(135deg, color-mix(in srgb, #22c55e 16%, transparent), transparent);
+}
+.header-nav a.r12-menu-link.has-unread {
+  background-image: linear-gradient(135deg, color-mix(in srgb, #e5484d 18%, transparent), transparent);
+}
+.r12-mbadge {
+  font-style: normal; font-size: .62rem; font-weight: 800; line-height: 1;
+  min-inline-size: 16px; padding: 3px 5px; border-radius: 999px;
+  background: #e5484d; color: #fff; text-align: center;
+}
+/* دکمهٔ شناور دیگر ساخته نمی‌شود؛ اگر نسخهٔ کهنه در مرورگر بود، پنهان بماند */
+.r12-fab { display: none !important; }
+
+/* پنل: روی موبایل مثل کشوی پایین، روی دسکتاپ گوشهٔ پایین */
+.r12-panel { inset-block-end: 84px; }
+@media (max-width: 560px) {
+  .r12-panel {
+    inset-inline: 10px; inset-block-end: 74px;
+    inline-size: auto; max-block-size: 72vh; border-radius: 20px;
+  }
+  .r12-head { padding: 11px 13px 9px; }
+  .r12-msgs { padding: 10px; }
+}
+@media (min-width: 561px) { .r12-panel { inset-inline-start: 18px; } }
