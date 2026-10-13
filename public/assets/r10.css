@@ -239,3 +239,89 @@
   background: var(--r8-glass-bg-2, rgba(255,255,255,.44));
 }
 .r11-live-h { font-size: .76rem; color: var(--muted); margin-block-end: 6px; line-height: 1.8; }
+
+/* ═══════════ پشتیبانی آنلاین (r12-support.js) ═══════════ */
+#r12Sup { font-family: inherit; }
+.r12-fab {
+  position: fixed; inset-block-end: 86px; inset-inline-start: 16px; z-index: 70;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 11px 15px; border: 1px solid var(--r8-glass-brd); border-radius: 999px;
+  background: var(--r8-glass-bg); color: var(--text); font: inherit; font-weight: 800;
+  font-size: .86rem; cursor: pointer; box-shadow: var(--r8-depth-2);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  transition: transform .2s cubic-bezier(.2,.7,.3,1);
+}
+.r12-fab:hover { transform: translateY(-2px); }
+.r12-fab-t { font-size: 1.1rem; }
+.r12-dot {
+  position: absolute; inset-block-start: -2px; inset-inline-end: -2px;
+  inline-size: 11px; block-size: 11px; border-radius: 50%;
+  background: #e5484d; box-shadow: 0 0 0 2px var(--surface);
+}
+.r12-panel {
+  position: fixed; inset-block-end: 150px; inset-inline-start: 16px; z-index: 71;
+  inline-size: min(390px, calc(100vw - 32px)); max-block-size: min(62vh, 560px);
+  display: flex; flex-direction: column; overflow: hidden;
+  border: 1px solid var(--r8-glass-brd); border-radius: 18px;
+  background: var(--surface); box-shadow: var(--r8-depth-3);
+}
+.r12-head {
+  display: flex; flex-direction: column; gap: 2px; padding: 12px 14px 10px;
+  border-block-end: 1px solid var(--r8-glass-brd);
+  background-image: linear-gradient(135deg, color-mix(in srgb, var(--brand,#6d5efc) 12%, transparent), transparent);
+}
+.r12-head b { font-size: .95rem; }
+.r12-sub { font-size: .74rem; color: var(--muted); }
+.r12-x {
+  position: absolute; inset-block-start: 8px; inset-inline-end: 10px;
+  border: 0; background: transparent; color: var(--muted); font-size: 1rem; cursor: pointer;
+}
+.r12-threads { max-block-size: 150px; overflow: auto; border-block-end: 1px solid var(--r8-glass-brd); }
+.r12-th {
+  display: flex; flex-direction: column; gap: 1px; inline-size: 100%; text-align: start;
+  padding: 8px 12px; border: 0; background: transparent; font: inherit; cursor: pointer;
+  border-block-end: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
+}
+.r12-th.is-on { background: color-mix(in srgb, var(--brand,#6d5efc) 10%, transparent); }
+.r12-th b { font-size: .84rem; display: flex; align-items: center; gap: 6px; }
+.r12-th small { font-size: .72rem; color: var(--muted); }
+.r12-badge {
+  font-style: normal; font-size: .66rem; padding: 1px 6px; border-radius: 999px;
+  background: #e5484d; color: #fff;
+}
+.r12-msgs { flex: 1; overflow: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.r12-b { max-inline-size: 86%; display: flex; flex-direction: column; gap: 2px; }
+.r12-b.me { align-self: flex-end; align-items: flex-end; }
+.r12-who { font-size: .68rem; color: var(--muted); }
+.r12-txt {
+  padding: 8px 11px; border-radius: 13px; font-size: .85rem; line-height: 1.75;
+  background: color-mix(in srgb, var(--brand,#6d5efc) 9%, var(--surface));
+  border: 1px solid var(--r8-glass-brd);
+}
+.r12-b.me .r12-txt { background-image: linear-gradient(135deg, var(--brand,#6d5efc), #8b7cff); color: #fff; }
+.r12-time { font-size: .66rem; color: var(--muted); }
+.r12-empty, .r12-sys { font-size: .8rem; color: var(--muted); text-align: center; padding: 10px; }
+.r12-form { display: flex; gap: 7px; padding: 9px; border-block-start: 1px solid var(--r8-glass-brd); }
+.r12-form input {
+  flex: 1; padding: 9px 12px; border-radius: 12px; font: inherit; font-size: .86rem;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+}
+.r12-send {
+  padding: 9px 14px; border: 0; border-radius: 12px; font: inherit; font-weight: 800;
+  font-size: .84rem; cursor: pointer; color: #fff;
+  background-image: linear-gradient(135deg, var(--brand,#6d5efc), #8b7cff);
+}
+body.r8-lite .r12-fab { -webkit-backdrop-filter: none; backdrop-filter: none; }
+@media (max-width: 520px) {
+  .r12-fab-l { display: none; }
+  .r12-panel { inset-block-end: 138px; }
+}
+
+.header-nav a.zt-top-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-weight: 800; white-space: nowrap; border-radius: 999px; padding-inline: 10px;
+  background-image: linear-gradient(135deg, color-mix(in srgb, var(--brand,#6d5efc) 16%, transparent), transparent);
+}
+.header-nav a.zt-top-link.is-active {
+  background-image: linear-gradient(135deg, var(--brand,#6d5efc), #8b7cff); color: #fff;
+}

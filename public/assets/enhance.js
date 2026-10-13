@@ -493,6 +493,21 @@
     var nav = document.querySelector(".header-nav");
     if (nav) nav.insertBefore(cbtn, nav.firstChild);
 
+    /* «زنگ تفریح» در ردیف اول منوی بالای سایت — همیشه دیده شود
+       (پیش‌تر فقط داخل منوی «بیشتر»/مگامنو بود و به‌راحتی پیدا نمی‌شد). */
+    var zone = document.querySelector(".header-nav");
+    if (zone && !zone.querySelector("[data-zt-link]")) {
+      var z = document.createElement("a");
+      z.href = url("community.html");
+      z.setAttribute("data-zt-link", "");
+      z.className = "zt-top-link";
+      z.innerHTML = "🎉 <span>زنگ تفریح</span>";
+      var zOn = /community\.html$/.test(location.pathname);
+      if (zOn) z.className += " is-active";
+      var first = zone.querySelector("a");
+      if (first) zone.insertBefore(z, first); else zone.appendChild(z);
+    }
+
     document.addEventListener("click", function (e) { if (e.target.closest("[data-open-cmdk]")) { e.preventDefault(); open(); } });
     document.addEventListener("keydown", function (e) {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); open(); }

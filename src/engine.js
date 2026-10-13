@@ -368,6 +368,100 @@ export function createEngine(LS, CFG) {
   function bump(r) { r.rev = (r.rev || 0) + 1; }
 
   /* ==========================================================================
+     پشتیبانی آنلاین  (/api/helpdesk/*)
+     --------------------------------------------------------------------------
+     کاربر پیام می‌فرستد و همان پیام مستقیم در پنل مالک می‌نشیند؛ مالک هم
+     از همان‌جا جواب می‌دهد. هر رشتهٔ گفت‌وگو = یکی از کاربران (th = شناسهٔ
+     کاربر). پیام‌ها در d.messages با kind="support" نگه داشته می‌شوند تا از
+     همان مسیر ذخیره‌سازی مطمئنِ موجود استفاده کنند.
+     ========================================================================== */
+  function helpMsgs() {
+    return (db().messages || []).filter(function (x) { return x.kind === "support"; });
+  }
+  function isBoss(u) { return !!(u && (u.isOwner || u.role === "owner" || u.role === "admin")); }
+
+  function helpdeskHandler(sub, method, body, q) {
+    var d = db(), u = me();
+    if (!u) return bad("برای استفاده از پشتیبانی ابتدا وارد شوید.", 401);
+
+    /* پیام‌های گفت‌وگوی خودم */
+    if (sub === "thread") {
+      var mine = helpMsgs().filter(function (x) { return x.th === u.id; })
+        .sort(function (a, b) { return (a.t || 0) - (b.t || 0); })
+        .slice(-200)
+        .map(function (x) { return { id: x.id, t: x.t, from: x.from, name: x.name, text: x.text }; });
+      var unread = helpMsgs().filter(function (x) { return x.th === u.id && x.from === "owner" && !x.seenUser; }).length;
+      return J({ ok: true, msgs: mine, unread: unread, me: { id: u.id, name: u.name, isBoss: isBoss(u) } });
+    }
+
+    /* فهرست گفت‌وگوها — مخصوص مالک/مدیر */
+    if (sub === "threads") {
+      if (!isBoss(u)) return bad("دسترسی ندارید.", 403);
+      var all = helpMsgs(), map = {};
+      all.forEach(function (x) {
+        var k = x.th || "?";
+        if (!map[k]) map[k] = { th: k, name: x.name || "کاربر", last: "", t: 0, unread: 0, count: 0 };
+        map[k].count++;
+        if ((x.t || 0) >= map[k].t) { map[k].t = x.t; map[k].last = x.text; map[k].name = x.name || map[k].name; }
+        if (x.from === "user" && !x.seenOwner) map[k].unread++;
+      });
+      var list = Object.keys(map).map(function (k) { return map[k]; })
+        .sort(function (a, b) { return (b.t || 0) - (a.t || 0); });
+      var total = list.reduce(function (a, x) { return a + x.unread; }, 0);
+      return J({ ok: true, threads: list, unread: total });
+    }
+
+    if (sub === "send") {
+      var txt = String(body.text || "").trim().slice(0, 900);
+      if (!txt) return bad("متن پیام خالی است.");
+      var asOwner = isBoss(u) && body.to;
+      var th = asOwner ? String(body.to).slice(0, 40) : u.id;
+      var to = d.users.filter(function (x) { return x.id === th; })[0];
+      d.messages.unshift({
+        id: uid("h"), kind: "support", t: now(), th: th,
+        from: asOwner ? "owner" : "user",
+        name: asOwner ? (u.name || "پشتیبانی") : (u.name || "کاربر"),
+        userId: u.id, text: txt,
+        seenOwner: asOwner ? true : false, seenUser: asOwner ? false : true
+      });
+      d.messages = d.messages.slice(0, 400);
+      save(); logEvent("helpdesk_send", { th: th, owner: !!asOwner });
+      return J({ ok: true, th: th });
+    }
+
+    /* خواندن گفت‌وگوی یک کاربر (مالک) */
+    if (sub === "read") {
+      if (!isBoss(u)) return bad("دسترسی ندارید.", 403);
+      var th2 = String(q.th || body.th || "").slice(0, 40);
+      if (!th2) return bad("کاربر مشخص نیست.");
+      var msgs = helpMsgs().filter(function (x) { return x.th === th2; })
+        .sort(function (a, b) { return (a.t || 0) - (b.t || 0); })
+        .map(function (x) { return { id: x.id, t: x.t, from: x.from, name: x.name, text: x.text }; });
+      var who = d.users.filter(function (x) { return x.id === th2; })[0];
+      return J({
+        ok: true, msgs: msgs,
+        who: who ? { id: who.id, name: who.name, email: who.email, grade: who.grade, phone: who.ph || "" } : null
+      });
+    }
+
+    /* علامت خوانده‌شده */
+    if (sub === "seen") {
+      var th3 = String(body.th || "").slice(0, 40);
+      if (!th3) return bad("کاربر مشخص نیست.");
+      var n = 0;
+      helpMsgs().forEach(function (x) {
+        if (x.th !== th3) return;
+        if (isBoss(u) && x.from === "user" && !x.seenOwner) { x.seenOwner = true; n++; }
+        if (!isBoss(u) && x.th === u.id && x.from === "owner" && !x.seenUser) { x.seenUser = true; n++; }
+      });
+      if (n) save();
+      return J({ ok: true, marked: n });
+    }
+
+    return bad("مسیر نامعتبر است.", 404);
+  }
+
+  /* ==========================================================================
      بخش هم‌زمان «زنگ تفریح» (شبیه توییتر)
      --------------------------------------------------------------------------
      نوشته‌ها در d.messages با نشانهٔ kind="feed" نگه داشته می‌شوند؛ همین
@@ -846,6 +940,16 @@ export function createEngine(LS, CFG) {
       if (body.verified != null && (me().isOwner || me().role === "owner")) u.verified = !!body.verified;
       /* شمارهٔ تماس را هم مالک/مدیر می‌تواند در پنل ویرایش کند */
       if (body.phone != null) u.ph = String(body.phone).replace(/[^\d+]/g, "").slice(0, 16);
+      /* حذف کاربر — فقط مالک. حساب مالک خودش را نمی‌توان حذف کرد. */
+      if (body.del) {
+        if (!me().isOwner) return bad("فقط مالک سایت می‌تواند کاربر را حذف کند.", 403);
+        if (u.isOwner) return bad("حساب مالک سایت قابل حذف نیست.", 400);
+        d.users = d.users.filter(function (x) { return x.id !== u.id; });
+        if (d.sessions) d.sessions = d.sessions.filter(function (x) { return x.userId !== u.id; });
+        if (d.messages) d.messages = d.messages.filter(function (x) { return x.userId !== u.id && x.th !== u.id; });
+        save(); audit("user.del", u.email || u.id);
+        return J({ ok: true, id: u.id });
+      }
       u.roleFa = ROLE_FA[u.role] || u.role;
       if (u.isOwner) { u.role = "owner"; u.roleFa = ROLE_FA.owner; u.banned = false; u.verified = true; }
       save(); audit("user.update", u.email, { role: u.role, banned: u.banned });
@@ -1209,6 +1313,7 @@ export function createEngine(LS, CFG) {
     if (seg[0] === "admin") return adminHandler(seg.slice(1).join("/"), m, body, q);
     if (seg[0] === "class") return classHandler(seg.slice(1).join("/"), m, body, q);
     if (seg[0] === "feed") return feedHandler(seg.slice(1).join("/"), m, body, q);
+    if (seg[0] === "helpdesk") return helpdeskHandler(seg.slice(1).join("/"), m, body, q);
 
     if (seg[0] === "ai-local") return J({ error: "دستیار آنلاین در این نسخه به سرور وصل نیست؛ حالت محلی فعال است.", offline: true }, 503);
     if (seg[0] === "__status" || path === "/__status") return J({ ok: true, online: true });

@@ -162,6 +162,9 @@ const KV_SETS = {
 function planOf(seg) {
   if (seg[0] === "admin") return { kv: "heavy", all: true };
   if (seg[0] === "feed") return { kv: "social", all: false };
+  /* پشتیبانی آنلاین: هم پیام‌ها لازم است، هم فهرست کاربران (all) تا مالک
+     ببیند چه کسی پیام داده و جزئیاتش را داشته باشد. */
+  if (seg[0] === "helpdesk") return { kv: "social", all: true };
   if (seg[0] === "class") {
     const sub = seg.slice(1).join("/");
     return { kv: "cls", all: sub === "create" || sub === "overview" || sub === "attendance" };
