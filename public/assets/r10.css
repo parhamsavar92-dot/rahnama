@@ -444,3 +444,81 @@ body.r8-lite .r12-fab { -webkit-backdrop-filter: none; backdrop-filter: none; }
   .r12-msgs { padding: 10px; }
 }
 @media (min-width: 561px) { .r12-panel { inset-inline-start: 18px; } }
+
+/* ═══════════════ انیمیشن بیشتر کارت‌ها (نسخهٔ ۹.۷) ═══════════════
+   همه چیز فقط روی transform / opacity / translate است تا سرعت حفظ شود.
+   برای ورود کارت‌ها از خاصیت مستقل translate استفاده می‌کنیم، نه transform،
+   چون انیمیشن‌ها بر هاور غلبه می‌کنند و بالا آمدن کارت را از کار می‌اندازند.
+   روی حالت سبک (r8-lite) و «کاهش حرکت» خودکار خاموش می‌شود. */
+
+@keyframes r10-card-in {
+  from { opacity: 0; translate: 0 16px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+@keyframes r10-pop {
+  0%   { translate: 0 0; }
+  55%  { translate: 0 -3px; }
+  100% { translate: 0 0; }
+}
+
+/* ورود پله‌ای کارت‌ها در شبکه‌ها */
+.grid-2 > *, .grid-3 > *, .tool-grid > *, .rt-grid > * {
+  animation: r10-card-in .52s cubic-bezier(.2, .7, .3, 1) both;
+}
+.grid-2 > *:nth-child(2), .grid-3 > *:nth-child(2), .tool-grid > *:nth-child(2), .rt-grid > *:nth-child(2) { animation-delay: .05s; }
+.grid-2 > *:nth-child(3), .grid-3 > *:nth-child(3), .tool-grid > *:nth-child(3), .rt-grid > *:nth-child(3) { animation-delay: .1s; }
+.grid-2 > *:nth-child(4), .grid-3 > *:nth-child(4), .tool-grid > *:nth-child(4), .rt-grid > *:nth-child(4) { animation-delay: .15s; }
+.grid-2 > *:nth-child(5), .grid-3 > *:nth-child(5), .tool-grid > *:nth-child(5), .rt-grid > *:nth-child(5) { animation-delay: .2s; }
+.grid-2 > *:nth-child(n+6), .grid-3 > *:nth-child(n+6), .tool-grid > *:nth-child(n+6), .rt-grid > *:nth-child(n+6) { animation-delay: .25s; }
+
+/* هاور زنده‌تر: بالاتر، کمی بزرگ‌تر، هالهٔ رنگی */
+@media (hover: hover), (any-pointer: fine) {
+  .card, .subject-card, .tool-card, .rt-card, .cls-card, .hk-card, .kpi {
+    transition: transform .34s cubic-bezier(.2, .7, .3, 1),
+                box-shadow .34s ease, border-color .34s ease,
+                background-position .7s ease;
+    background-size: 100% 100%, 220% 100%;
+    background-position: 0 0, 120% 0;
+  }
+  .card:hover, .subject-card:hover, .tool-card:hover, .rt-card:hover,
+  .cls-card:hover, .hk-card:hover, .kpi:hover {
+    transform: translate3d(0, -8px, 0) scale(1.014);
+    background-position: 0 0, -40% 0;
+  }
+  /* آیکون کارت هنگام هاور زنده می‌شود */
+  .card:hover .card-icon, .tool-card:hover .ti, .subject-card:hover .si,
+  .rt-card:hover .ic, .kpi:hover .ic {
+    transform: scale(1.14) rotate(-5deg);
+  }
+  .card-icon, .tool-card .ti, .subject-card .si, .rt-card .ic, .kpi .ic {
+    display: inline-block;
+    transition: transform .38s cubic-bezier(.2, 1.5, .5, 1);
+  }
+  /* دکمهٔ کارت هم کمی جلو می‌آید */
+  .tool-card:hover h4, .rt-card:hover h4 { transform: translate3d(0, -1px, 0); }
+  .tool-card h4, .rt-card h4 { transition: transform .3s cubic-bezier(.2, .7, .3, 1); }
+}
+
+/* بازخورد لمس/کلیک — حس فشردن */
+.card:active, .subject-card:active, .tool-card:active, .rt-card:active,
+.cls-card:active, .hk-card:active, .kpi:active {
+  transform: translate3d(0, -2px, 0) scale(.994);
+  transition-duration: .08s;
+}
+
+/* پرش کوتاه وقتی کارتی «تازه» مشخص می‌شود */
+.is-new, .r8-in.is-new { animation: r10-pop .42s cubic-bezier(.2, .7, .3, 1); }
+
+/* محافظ‌ها: حالت سبک و کاهش حرکت */
+body.r8-lite .grid-2 > *, body.r8-lite .grid-3 > *,
+body.r8-lite .tool-grid > *, body.r8-lite .rt-grid > * { animation: none; }
+body.r8-lite .card-icon, body.r8-lite .tool-card .ti, body.r8-lite .subject-card .si,
+body.r8-lite .rt-card .ic, body.r8-lite .kpi .ic { transition: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .grid-2 > *, .grid-3 > *, .tool-grid > *, .rt-grid > * { animation: none; }
+  .card:hover, .subject-card:hover, .tool-card:hover, .rt-card:hover,
+  .cls-card:hover, .hk-card:hover, .kpi:hover { transform: none; }
+  .card:hover .card-icon, .tool-card:hover .ti, .subject-card:hover .si,
+  .rt-card:hover .ic, .kpi:hover .ic { transform: none; }
+}
