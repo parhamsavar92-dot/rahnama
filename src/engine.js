@@ -694,8 +694,44 @@ export function createEngine(LS, CFG) {
     if (sub === "stream") {
       var sess2 = (d.sessions || []).filter(function (x) { return x.id === q.session; })[0];
       if (!sess2) return bad("جلسه پیدا نشد.", 404);
-      var r2 = getRoom(sess2.id);
-      return J({ session: sess2, room: r2, rev: r2 ? r2.rev : 0 });
+      var r2 = getRoom(sess2.id) || { rev: 0 };
+      var want = +q.rev || 0;
+      var cur = r2.rev || 0;
+
+      /* ▼ رفع باگ اصلی «هم‌زمان نبودن کلاس» ─────────────────────────────
+         کلاینت منتظر فیلد changed بود ولی سرور آن را نمی‌فرستاد؛ نتیجه:
+         هیچ تغییری (پیام، تخته، دست‌بلند، حاضرین) روی صفحهٔ بقیه اعمال
+         نمی‌شد. حالا changed درست محاسبه و فرستاده می‌شود.
+
+         ▼ و رفع باگ دوم: پیش‌تر کل اتاق — از جمله «دادهٔ صوتی» همهٔ
+         ویس‌ها — در هر درخواست فرستاده می‌شد؛ یعنی چند صد کیلوبایت در
+         ثانیه برای هر نفر. حالا فهرست ویس‌ها بدون دادهٔ صوتی می‌آید و
+         صدا فقط وقتی پخش شود، جداگانه گرفته می‌شود. */
+      var voices = (r2.voices || []).map(function (v) {
+        return { id: v.id, t: v.t, from: v.from, userId: v.userId, role: v.role, secs: v.secs };
+      });
+      var roomOut = {
+        rev: cur, board: r2.board || "", msgs: r2.msgs || [], voices: voices,
+        canTeach: r2.canTeach !== false, hands: r2.hands || [], poll: r2.poll || null,
+        picks: r2.picks || [], reactions: r2.reactions || {}, timer: r2.timer || null,
+        announce: r2.announce || null, attendance: r2.attendance || [],
+        live: !!(r2.live && u && r2.live[u.id]),
+        subject: r2.subject, grade: r2.grade
+      };
+      return J({
+        session: sess2, room: roomOut, rev: cur,
+        changed: !want || cur > want,
+        serverTime: now()
+      });
+    }
+
+    /* دادهٔ صوتی یک ویس، فقط هنگام پخش (تا هر ثانیه صدها کیلوبایت رد و بدل نشود) */
+    if (sub === "voiceget") {
+      var rv2 = getRoom(body.sessionId || q.session);
+      if (!rv2) return bad("جلسه پیدا نشد.", 404);
+      var vv = (rv2.voices || []).filter(function (x) { return x.id === (body.id || q.id); })[0];
+      if (!vv) return bad("پیام صوتی پیدا نشد.", 404);
+      return J({ ok: true, data: vv.data, secs: vv.secs, from: vv.from });
     }
     if (sub === "ping") return ok();
     if (sub === "chat") {

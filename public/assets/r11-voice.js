@@ -287,7 +287,11 @@
   function voiceBubble(v, mine) {
     return '<div class="hk-msg' + (mine ? " from-me" : "") + '"><div><div class="hk-msg-body">' +
       (!mine ? '<b style="font-size:.72rem;opacity:.8;display:block">' + esc(v.from) + "</b>" : "") +
-      '<audio controls preload="none" src="' + v.data + '" style="max-width:210px;height:34px"></audio>' +
+      /* ▼ دادهٔ صوتی دیگر در هر درخواست فرستاده نمی‌شود (چون هر ثانیه
+         صدها کیلوبایت رد و بدل می‌شد). صدا هنگام اولین کلیک گرفته
+         می‌شود. */
+      '<audio controls preload="none" data-vid="' + esc(v.id) +
+      '" style="max-width:210px;height:34px"></audio>' +
       '<div style="font-size:.68rem;opacity:.75;margin-top:2px">' + fa(v.secs) + " ثانیه" +
       ((v.canDel) ? ' · <button type="button" class="r11-del" data-vdel="' + esc(v.id) + '" style="background:none;border:0;color:inherit;cursor:pointer;text-decoration:underline">حذف</button>' : "") +
       "</div></div></div></div>";
@@ -314,6 +318,28 @@
         d.setAttribute("data-v", v.id);
         d.innerHTML = voiceBubble(v, me && v.userId === me.id);
         host.appendChild(d);
+        /* صدا هنگام اولین کلیک/پخش گرفته می‌شود */
+        (function (au, vid) {
+          if (!au) return;
+          var loading = false;
+          function grab() {
+            if (au.getAttribute("src") || loading) return;
+            loading = true;
+            au.setAttribute("data-loading", "1");
+            api("POST", "/api/class/voiceget", { sessionId: SID(), id: vid }).then(function (x) {
+              loading = false;
+              au.removeAttribute("data-loading");
+              if (x && x.data) {
+                au.src = x.data;
+                try { au.play(); } catch (e) { }
+              } else {
+                toast("صدای این پیام در دسترس نیست.");
+              }
+            });
+          }
+          au.addEventListener("click", grab);
+          au.addEventListener("play", grab);
+        })(d.querySelector("audio"), v.id);
       });
       host.scrollTop = host.scrollHeight;
       if (force) toast("صداها تازه شد");

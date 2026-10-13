@@ -337,7 +337,11 @@
     if (!C.session || !C.alive) return;
     api("GET", "/api/class/stream?session=" + encodeURIComponent(C.session.id) + "&rev=" + C.rev + "&timeout=25000")
       .then(function (r) {
-        if (r.changed) {
+        /* ▼ رفع باگ: پیش‌تر فقط به r.changed تکیه می‌کرد و سرور هم آن را
+           نمی‌فرستاد، پس تغییرات هیچ‌وقت اعمال نمی‌شد. حالا اگر changed
+           هم نبود، با مقایسهٔ rev تغییر را تشخیص می‌دهیم. */
+        var needApply = !C.room || !!r.changed || (r.rev !== C.rev);
+        if (needApply) {
           var newChat = (r.room.msgs || []).length !== ((C.room && C.room.msgs) || []).length;
           applyRoom(r);
           if (newChat) {
@@ -354,7 +358,10 @@
         } else {
           C.session = r.session || C.session;
         }
-        C.loopTimer = setTimeout(roomLoop, 200);
+        /* فاصلهٔ پولینگ: پیش‌تر ۲۰۰ میلی‌ثانیه بود و مرورگر چند بار در
+           ثانیه به سرور می‌زد (هم کندی، هم مصرف بی‌دلیل). ۱۲۰۰ میلی‌ثانیه
+           یعنی حس هم‌زمانی، با ترافیک بسیار کمتر. */
+        C.loopTimer = setTimeout(roomLoop, document.hidden ? 5000 : 1200);
       })
       .catch(function (e) {
         if (e && (e.status === 401 || e.status === 403 || e.status === 404)) {
