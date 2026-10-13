@@ -737,7 +737,14 @@ export function createEngine(LS, CFG) {
     if (sub === "chat") {
       var r3 = getRoom(body.sessionId); if (!r3) return bad("جلسه پیدا نشد.", 404);
       r3.msgs.push({
-        id: uid("m"), t: now(), from: u ? u.name : "مهمان", role: u ? u.role : "student",
+        id: uid("m"), t: now(),
+        from: u ? u.name : "مهمان",
+        /* نام و رنگ پروفایل هم می‌رود تا در گفت‌وگوی کلاس کنار هر پیام،
+           نام کامل + نشان پروفایل + نقش فرستنده دیده شود. */
+        name: u ? u.name : "مهمان",
+        color: (u && u.color) || "",
+        role: u ? u.role : "student",
+        roleFa: u ? (ROLE_FA[u.role] || u.role) : "مهمان",
         userId: u ? u.id : "", text: String(body.text || "").slice(0, 500)
       });
       r3.msgs = r3.msgs.slice(-200); bump(r3); save(); return ok();

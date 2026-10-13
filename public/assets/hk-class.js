@@ -197,10 +197,30 @@
       '<div class="cls-panel"' + (C.tab === "chat" ? "" : " hidden") + ">" +
       '<div class="hk-thread" id="clsChat" style="min-height:300px">' +
       ((r.msgs || []).length ? r.msgs.map(function (m) {
-        var mine = C.me && m.from === C.me.id;
-        return '<div class="hk-msg' + (mine ? " from-me" : "") + '"><div><div class="hk-msg-body">' +
-          (!mine ? '<b style="font-size:.72rem;opacity:.8;display:block">' + esc(m.name) + "</b>" : "") +
-          esc(m.text) + "</div></div></div>";
+        /* ▼ رفع باگ: پیش‌تر m.name خوانده می‌شد که در پیام وجود ندارد (سرور
+           فیلد from را می‌فرستد) — پس نام فرستنده هیچ‌وقت دیده نمی‌شد.
+           هم‌چنین پیام خودِ کاربر با مقایسهٔ نام و شناسه اشتباه تشخیص داده
+           می‌شد. حالا نام کامل، نقش، ساعت و نشان پروفایل نمایش می‌یابد. */
+        var nm = String(m.name || m.from || "کاربر").trim();
+        var mine = !!(C.me && m.userId && m.userId === C.me.id);
+        var ROLE = { owner: "مالک سایت", admin: "مدیر", deputy: "ناظم", teacher: "دبیر", student: "دانش‌آموز" };
+        var roleLbl = ROLE[m.role] || "کاربر";
+        /* رنگ پروفایل: از رنگ خودِ کاربر، وگرنه از نامش ساخته می‌شود */
+        var hh = 0, i2;
+        for (i2 = 0; i2 < nm.length; i2++) hh = (hh * 31 + nm.charCodeAt(i2)) % 360;
+        var col = m.color || ("hsl(" + hh + ",62%,52%)");
+        var tm = "";
+        try { tm = new Date(m.t).toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" }); } catch (e) { }
+        return '<div class="hk-msg cls-msg' + (mine ? " from-me" : "") + '">' +
+          '<span class="cls-av" style="background:' + esc(col) + '" aria-hidden="true">' +
+          esc(nm.slice(0, 1)) + "</span>" +
+          '<div class="cls-mwrap">' +
+          '<div class="cls-mh"><b class="cls-mn">' + esc(nm) + "</b>" +
+          '<i class="cls-role r-' + esc(m.role || "user") + '">' + esc(roleLbl) + "</i>" +
+          (tm ? "<time>" + esc(tm) + "</time>" : "") +
+          "</div>" +
+          '<div class="hk-msg-body">' + esc(m.text) + "</div>" +
+          "</div></div>";
       }).join("") : '<div class="hk-empty"><b>گفت‌وگوی کلاس</b>اولین پیام را بنویس؛ دبیر و همهٔ هم‌کلاسی‌ها می‌بینند.</div>') +
       "</div>" +
       '<div class="hk-chat-compose"><textarea rows="1" id="clsMsg" data-act="msg" placeholder="پیام به کلاس… (Enter برای ارسال)"' + (ended ? " disabled" : "") + "></textarea>" +
