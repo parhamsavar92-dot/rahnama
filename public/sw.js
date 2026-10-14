@@ -2,13 +2,21 @@
    پایهٔ هشتم — Service Worker  |  sw.js
    مطالعهٔ آفلاین کامل: پیش‌بارگذاری همهٔ صفحه‌ها، تصاویر و دادهٔ مطالعه
    ========================================================================== */
-const VERSION = "g8-v48";
+const VERSION = "g8-v50";
 const CORE = VERSION + "-core";
 const PAGES = VERSION + "-pages";
 const RUNTIME = VERSION + "-runtime";
 const WARM_MARK = VERSION + "-warm-done";
 
 const CORE_ASSETS = [
+  "exam-maker.html",
+  "assets/exam-maker.css",
+  "assets/exam-maker.js",
+  "assets/picker.css",
+  "assets/picker.js",
+  "assets/reader.css",
+  "assets/reader.js",
+  "assets/jozve-chapters.json",
   "terms.html",
   "faq.html",
   "toolbox.html",

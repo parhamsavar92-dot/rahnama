@@ -1,0 +1,189 @@
+/* ==========================================================================
+   رهنما — خوانندهٔ جزوه (reader.css)
+   --------------------------------------------------------------------------
+   نوار خواندن، کشوی فهرست درس‌ها، حالت «یک درس در یک صفحه»، حلقهٔ پیشرفت،
+   و بازگشت به جایی که رها کرده بودی.
+   پیشوند همهٔ کلاس‌ها rd- است تا با ابزارهای موجود سایت (hk-*) تضاد نکند.
+   ========================================================================== */
+
+/* ═══════════ نوار خواندن ═══════════ */
+.rd-bar {
+  position: sticky; top: 0; z-index: 58;
+  margin: 0 0 14px;
+  border-radius: 18px;
+  border: 1px solid var(--r13-hair, var(--border));
+  background: color-mix(in srgb, var(--surface) 93%, transparent);
+  box-shadow: var(--r13-sh-2, 0 10px 30px -14px rgba(16, 18, 40, .22));
+  backdrop-filter: blur(18px) saturate(170%);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  overflow: hidden;
+}
+.rd-in {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 10px 13px;
+}
+.rd-book {
+  display: flex; align-items: center; gap: 9px; min-inline-size: 0;
+  padding-inline-end: 11px; border-inline-end: 1px solid var(--r13-hair, var(--border));
+}
+.rd-book i {
+  inline-size: 34px; block-size: 34px; flex: 0 0 auto; border-radius: 11px;
+  display: grid; place-items: center; font-size: 1.05rem;
+  background: var(--surface-2); border: 1px solid var(--r13-hair, var(--border));
+}
+.rd-book b { display: block; font-size: .84rem; font-weight: 800; line-height: 1.5; }
+.rd-book span { display: block; font-size: .71rem; color: var(--muted); }
+
+.rd-now { flex: 1 1 190px; min-inline-size: 0; }
+.rd-now b {
+  display: block; font-size: .85rem; font-weight: 700; line-height: 1.6;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rd-now span { display: block; font-size: .71rem; color: var(--muted); }
+
+.rd-nav { display: flex; align-items: center; gap: 6px; }
+.rd-b {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  min-inline-size: 38px; block-size: 38px; padding: 0 11px;
+  border-radius: 12px; cursor: pointer; font-family: inherit;
+  font-size: .78rem; font-weight: 700; color: var(--text-soft);
+  background: var(--surface-2); border: 1px solid var(--r13-hair, var(--border));
+  transition: transform .26s var(--r13-ease-back, ease), color .2s linear, border-color .22s ease, opacity .2s linear;
+}
+.rd-b:hover { transform: translateY(-2px); color: var(--brand); border-color: color-mix(in srgb, var(--brand) 40%, var(--border)); }
+.rd-b:active { transform: scale(.94); }
+.rd-b[disabled] { opacity: .35; pointer-events: none; }
+.rd-b svg { inline-size: 17px; block-size: 17px; }
+.rd-b.rd-on { color: #fff; border-color: transparent; background: linear-gradient(135deg, var(--brand), var(--brand-2)); }
+.rd-b.rd-read { color: #16a34a; border-color: color-mix(in srgb, #16a34a 40%, var(--border)); background: color-mix(in srgb, #16a34a 10%, var(--surface-2)); }
+
+/* حلقهٔ پیشرفت */
+.rd-ring { inline-size: 40px; block-size: 40px; flex: 0 0 auto; position: relative; }
+.rd-ring svg { transform: rotate(-90deg); inline-size: 40px; block-size: 40px; }
+.rd-ring circle { fill: none; stroke-width: 4; }
+.rd-ring .rd-tr { stroke: var(--surface-3); }
+.rd-ring .rd-pr { stroke: url(#rdGrad); stroke-linecap: round; transition: stroke-dashoffset .6s var(--r13-ease, ease); }
+.rd-ring b {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-size: .62rem; font-weight: 800; color: var(--text-soft);
+}
+
+/* ═══════════ کشوی فهرست درس‌ها ═══════════ */
+.rd-drawer {
+  position: fixed; inset-block: 0; inset-inline-start: 0; z-index: 560;
+  inline-size: min(360px, 88vw); display: flex; flex-direction: column;
+  background: var(--surface); border-inline-end: 1px solid var(--r13-hair, var(--border));
+  box-shadow: -20px 0 60px -30px rgba(8, 10, 24, .5);
+  transform: translate3d(105%, 0, 0); transition: transform .4s var(--r13-ease, ease);
+}
+[dir="rtl"] .rd-drawer { transform: translate3d(105%, 0, 0); }
+.rd-drawer.rd-open { transform: none; }
+.rd-dw-h {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; border-bottom: 1px solid var(--r13-hair, var(--border));
+}
+.rd-dw-h b { flex: 1 1 auto; font-size: .9rem; }
+.rd-dw-h button {
+  inline-size: 34px; block-size: 34px; border-radius: 11px; cursor: pointer;
+  border: 1px solid var(--r13-hair, var(--border)); background: var(--surface-2); color: var(--text-soft);
+  transition: transform .26s var(--r13-ease-back, ease), color .2s linear;
+}
+.rd-dw-h button:hover { color: var(--err, #dc2626); transform: rotate(90deg); }
+.rd-dw-s { padding: 11px 14px; border-bottom: 1px solid var(--r13-hair, var(--border)); }
+.rd-dw-s input {
+  inline-size: 100%; padding: 10px 13px; border-radius: 12px; font-family: inherit;
+  font-size: .84rem; color: var(--text); background: var(--surface-2); border: 1px solid var(--border);
+}
+.rd-dw-l { flex: 1 1 auto; overflow-y: auto; padding: 9px; margin: 0; list-style: none; }
+.rd-dw-l li { margin-bottom: 3px; }
+.rd-dw-l a, .rd-dw-l button {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: start;
+  padding: 10px 11px; border-radius: 12px; cursor: pointer; text-decoration: none;
+  border: none; background: none; color: var(--text); font-family: inherit; font-size: .83rem;
+  transition: background-color .16s linear, transform .2s var(--r13-ease, ease);
+}
+.rd-dw-l a:hover, .rd-dw-l button:hover { background: color-mix(in srgb, var(--brand) 10%, transparent); }
+.rd-dw-l .rd-cur { background: color-mix(in srgb, var(--brand) 13%, transparent); font-weight: 700; }
+.rd-num {
+  inline-size: 26px; block-size: 26px; flex: 0 0 auto; border-radius: 9px;
+  display: grid; place-items: center; font-size: .72rem; font-weight: 800;
+  color: var(--muted); background: var(--surface-2); border: 1px solid var(--r13-hair, var(--border));
+}
+.rd-dw-l .rd-done .rd-num { color: #fff; background: linear-gradient(140deg, #16a34a, #22c55e); border-color: transparent; }
+.rd-q { margin-inline-start: auto; font-size: .68rem; color: var(--muted); white-space: nowrap; }
+.rd-dw-f {
+  padding: 11px 14px; border-top: 1px solid var(--r13-hair, var(--border));
+  font-size: .74rem; color: var(--muted); background: var(--surface-2);
+}
+.rd-back {
+  position: fixed; inset: 0; z-index: 555; background: rgba(10, 12, 26, .45);
+  backdrop-filter: blur(3px); animation: rd-fade .22s linear both;
+}
+@keyframes rd-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ═══════════ حالت «یک درس در یک صفحه» ═══════════ */
+body.rd-one .rd-one-hide { display: none !important; }
+body.rd-one article.lesson:not(.rd-cur) { display: none !important; }
+body.rd-one .toc { display: none !important; }
+body.rd-one .lesson-layout { display: block !important; }
+
+/* دکمهٔ پایان درس: تا وقتی خوانده نشده، برجسته */
+.rd-end {
+  margin-top: 18px; padding: 15px 17px; border-radius: 16px;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  background: color-mix(in srgb, var(--brand) 7%, var(--surface-2));
+  border: 1px solid color-mix(in srgb, var(--brand) 20%, transparent);
+}
+.rd-end p { margin: 0; flex: 1 1 170px; font-size: .82rem; color: var(--text-soft); line-height: 1.95; }
+.rd-end .rd-b { min-inline-size: auto; height: 40px; }
+
+/* ═══════════ کارت «ادامه بده» ═══════════ */
+.rd-resume {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin: 0 0 14px; padding: 13px 16px; border-radius: 16px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--brand) 12%, var(--surface)), var(--surface));
+  border: 1px solid color-mix(in srgb, var(--brand) 26%, transparent);
+  animation: rd-drop .45s var(--r13-ease-back, ease) both;
+}
+@keyframes rd-drop { from { opacity: 0; transform: translate3d(0, -10px, 0); } to { opacity: 1; transform: none; } }
+.rd-resume i { font-style: normal; font-size: 1.3rem; }
+.rd-resume div { flex: 1 1 180px; min-inline-size: 0; }
+.rd-resume b { display: block; font-size: .85rem; }
+.rd-resume span { font-size: .75rem; color: var(--muted); }
+
+/* ═══════════ نشانهٔ «خوانده شد» روی درس ═══════════ */
+article.lesson.rd-done { position: relative; }
+article.lesson.rd-done::before {
+  content: "✓ خوانده شد"; position: absolute; inset-block-start: 10px; inset-inline-end: 10px;
+  padding: 3px 10px; border-radius: 8px; font-size: .68rem; font-weight: 700;
+  color: #15803d; background: color-mix(in srgb, #16a34a 14%, transparent);
+  pointer-events: none;
+}
+[data-theme="dark"] article.lesson.rd-done::before { color: #86efac; }
+
+/* هنگام چاپ: فقط درس جاری چاپ شود */
+@media print {
+  .rd-bar, .rd-drawer, .rd-back, .rd-resume, .rd-end { display: none !important; }
+  body.rd-one article.lesson:not(.rd-cur) { display: none !important; }
+}
+
+/* ═══════════ موبایل ═══════════ */
+@media (max-width: 720px) {
+  .rd-in { padding: 9px 11px; gap: 8px; }
+  .rd-book { border: none; padding-inline-end: 0; }
+  .rd-book div { display: none; }
+  .rd-now { flex: 1 1 100%; order: 3; }
+  .rd-nav { margin-inline-start: auto; }
+  .rd-b span { display: none; }
+  .rd-b { min-inline-size: 36px; padding: 0 8px; }
+}
+
+/* ═══════════ محافظ‌ها ═══════════ */
+@media (prefers-reduced-motion: reduce) {
+  .rd-drawer { transition: none; }
+  .rd-resume, .rd-back { animation: none; }
+  .rd-b:hover { transform: none; }
+}
+body.r8-lite .rd-resume, body.r8-lite .rd-back { animation: none; }
+body.r8-lite .rd-drawer { transition: none; }
+body.r8-lite .rd-b:hover { transform: none; }
