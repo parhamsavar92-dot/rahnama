@@ -2,12 +2,17 @@
    پایهٔ هشتم — Service Worker  |  sw.js
    مطالعهٔ آفلاین کامل: پیش‌بارگذاری همهٔ صفحه‌ها، تصاویر و دادهٔ مطالعه
    ========================================================================== */
-const VERSION = "g8-v45";
+const VERSION = "g8-v46";
 const CORE = VERSION + "-core";
 const PAGES = VERSION + "-pages";
 const RUNTIME = VERSION + "-runtime";
 
 const CORE_ASSETS = [
+  "jozve-share.html",
+  "assets/r13.css",
+  "assets/r13.js",
+  "assets/jozve-share.css",
+  "assets/jozve-share.js",
   "index.html",
   "ai.html",
   "about.html",

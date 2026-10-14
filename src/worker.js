@@ -22,7 +22,16 @@ const SCHEMA = [
   "CREATE TABLE IF NOT EXISTS sessions (th TEXT PRIMARY KEY, uid TEXT NOT NULL, exp INTEGER NOT NULL)",
   "CREATE INDEX IF NOT EXISTS sessions_uid ON sessions(uid)",
   "CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v TEXT NOT NULL)",
-  "CREATE TABLE IF NOT EXISTS rate (k TEXT PRIMARY KEY, n INTEGER NOT NULL, reset INTEGER NOT NULL)"
+  "CREATE TABLE IF NOT EXISTS rate (k TEXT PRIMARY KEY, n INTEGER NOT NULL, reset INTEGER NOT NULL)",
+  /* ── جزوهٔ همکلاسی‌ها ─────────────────────────────────────────────────────────
+     هر جزوه یک ردیف مستقل است (نه داخل بلوبِ بزرگ وضعیت) تا:
+       ۱) حجم دادهٔ وضعیت سایت بالا نرود و پنل/کلاس کند نشود،
+       ۲) تصویرها جدا ذخیره شوند و فهرست جزوه‌ها سبک بماند.
+     ستون img فهرست JSON شناسهٔ تصویرها و ستون likes فهرست شناسهٔ کاربران است. */
+  "CREATE TABLE IF NOT EXISTS jozve (id TEXT PRIMARY KEY, t INTEGER NOT NULL, uid TEXT, name TEXT, grade TEXT, subject TEXT, title TEXT, body TEXT, img TEXT, likes TEXT)",
+  "CREATE INDEX IF NOT EXISTS jozve_t ON jozve(t)",
+  "CREATE INDEX IF NOT EXISTS jozve_uid ON jozve(uid)",
+  "CREATE TABLE IF NOT EXISTS jozve_img (id TEXT PRIMARY KEY, mime TEXT NOT NULL, b64 TEXT NOT NULL)"
 ];
 
 const enc = new TextEncoder();
@@ -688,6 +697,151 @@ async function handleAI(env, req, body, uid) {
   return err("سرویس دستیار پاسخ نداد؛ کمی بعد دوباره امتحان کن.", 502);
 }
 
+/* ============================================================================
+   جزوهٔ همکلاسی‌ها — پنل اشتراک جزوه (متن + عکس)
+   ----------------------------------------------------------------------------
+   این بخش عمداً مستقیم روی D1 کار می‌کند و از «موتور مشترک» رد نمی‌شود:
+   موتور کل وضعیت سایت را به‌صورت یک بلوب JSON می‌خواند و می‌نویسد؛ اگر جزوه‌ها
+   (که تصویر دارند و می‌توانند بزرگ شوند) داخل همان بلوب بروند، هر بازدید
+   سایت سنگین می‌شود. اینجا هر جزوه/تصویر ردیف مستقل خودش را دارد.
+   همهٔ تصویرها سمت مرورگر فشرده می‌شوند تا حجم کم بماند.
+   ========================================================================== */
+const JZ_GRADES = ["7", "8", "9"];
+const JZ_MAX_IMGS = 3;                        // حداکثر تصویر برای هر جزوه
+const JZ_IMG_BYTES = 400 * 1024;              // سقف حجم هر تصویر (پس از فشردگی)
+const JZ_TITLE_MAX = 120, JZ_BODY_MAX = 4000;
+
+/* کاربر جاری از روی کوکی نشست — بدون بارگذاری کل وضعیت سایت */
+async function whoAmI(env, req) {
+  const token = cookieOf(req);
+  if (!token) return null;
+  const row = await env.DB.prepare(
+    "SELECT s.uid AS uid, u.json AS json FROM sessions s JOIN users u ON u.id = s.uid WHERE s.th = ? AND s.exp > ?"
+  ).bind(await sha256hex(token), Date.now()).first();
+  if (!row) return null;
+  let u = null; try { u = JSON.parse(row.json); } catch (e) { return null; }
+  if (!u || (u.banned && !u.isOwner)) return null;
+  return u;
+}
+const jzAdmin = (u) => !!(u && (u.isOwner || u.role === "owner" || u.role === "admin"));
+const jzClean = (s, n) => String(s == null ? "" : s)
+  .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "")
+  .replace(/[ \t]{3,}/g, "  ")
+  .trim().slice(0, n);
+const jzParse = (s) => { try { const a = JSON.parse(s || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; } };
+
+function jzPub(r, u) {
+  const likes = jzParse(r.likes), imgs = jzParse(r.img);
+  return {
+    id: r.id, t: r.t || 0,
+    name: r.name || "کاربر رهنما", grade: r.grade || "", subject: r.subject || "",
+    title: r.title || "", body: r.body || "",
+    imgs: imgs.map((x) => "/api/jozve/img/" + x),
+    likes: likes.length,
+    liked: !!(u && likes.indexOf(u.id) > -1),
+    mine: !!(u && r.uid === u.id),
+    canDel: !!(u && (r.uid === u.id || jzAdmin(u)))
+  };
+}
+
+async function handleJozve(req, env, url, sub, method, body) {
+  const db = env.DB;
+  const seg = String(sub || "").split("/").filter(Boolean);
+  const action = seg[0] || "list";
+
+  /* تصویر عمومی است (بدون ورود) تا در رابط کاربری و حافظهٔ نهان مرورگر بنشیند */
+  if (action === "img" && seg[1]) {
+    const id = jzClean(seg[1], 64);
+    const row = await db.prepare("SELECT mime, b64 FROM jozve_img WHERE id = ?").bind(id).first();
+    if (!row) return new Response("Not found", { status: 404, headers: SEC_HEADERS });
+    const bin = unb64(row.b64);
+    const h = new Headers(SEC_HEADERS);
+    h.set("Content-Type", row.mime || "image/jpeg");
+    h.set("Content-Length", String(bin.byteLength));
+    h.set("Cache-Control", "public, max-age=31536000, immutable");
+    return new Response(bin, { status: 200, headers: h });
+  }
+
+  const u = await whoAmI(env, req);
+
+  if (action === "list") {
+    const [rows, cnt] = await db.batch([
+      db.prepare("SELECT * FROM jozve ORDER BY t DESC LIMIT 60"),
+      db.prepare("SELECT COUNT(*) AS n FROM jozve")
+    ]);
+    const notes = (rows.results || []).map((x) => jzPub(x, u));
+    const total = ((cnt.results || [])[0] || {}).n || notes.length;
+    return json({
+      notes: notes, total: total, now: Date.now(),
+      me: u ? { id: u.id, name: u.name || "کاربر", grade: u.grade || "" } : null
+    });
+  }
+
+  if (action === "post" && method === "POST") {
+    if (!u) return err("برای گذاشتن جزوه، اول وارد حساب شو.", 401);
+    if (!(await hit(db, "jz:post:" + u.id, 15, 36e5))) return err("امروز زیاد جزوه گذاشتی؛ کمی بعد دوباره تلاش کن.", 429);
+    const title = jzClean(body.title, JZ_TITLE_MAX);
+    const text = jzClean(body.body, JZ_BODY_MAX);
+    if (title.length < 3) return err("عنوان جزوه را کامل‌تر بنویس.");
+    if (text.length < 10) return err("متن جزوه خیلی کوتاه است.");
+    const gIn = String(body.grade || "").trim();
+    const grade = JZ_GRADES.indexOf(gIn) > -1 ? gIn
+      : (JZ_GRADES.indexOf(String(u.grade || "")) > -1 ? String(u.grade) : "");
+    const subject = jzClean(body.subject, 40) || "عمومی";
+
+    /* تصویرها: فقط dataURL تصویری، با سقف حجم. هر تصویر ردیف مستقل می‌گیرد. */
+    const raw = Array.isArray(body.images) ? body.images.slice(0, JZ_MAX_IMGS) : [];
+    const ids = [], st = [], log = [];
+    for (const d of raw) {
+      const m = /^data:image\/(png|jpe?g|webp|gif);base64,([A-Za-z0-9+/=]+)$/.exec(String(d || ""));
+      if (!m) { log.push("قالب تصویر پشتیبانی نمی‌شود."); continue; }
+      const mime = m[1].toLowerCase() === "jpg" ? "jpeg" : m[1].toLowerCase();
+      const bytes = Math.floor(m[2].length * 3 / 4);
+      if (bytes > JZ_IMG_BYTES) { log.push("یک تصویر بزرگ‌تر از حد بود و نادیده گرفته شد."); continue; }
+      const id = newId("jzimg");
+      st.push(db.prepare("INSERT OR REPLACE INTO jozve_img(id,mime,b64) VALUES(?,?,?)").bind(id, "image/" + mime, m[2]));
+      ids.push(id);
+    }
+
+    const note = {
+      id: newId("jz"), t: Date.now(),
+      uid: u.id, name: u.name || "کاربر رهنما", grade: grade, subject: subject,
+      title: title, body: text, img: JSON.stringify(ids), likes: JSON.stringify([])
+    };
+    st.push(db.prepare("INSERT INTO jozve(id,t,uid,name,grade,subject,title,body,img,likes) VALUES(?,?,?,?,?,?,?,?,?,?)")
+      .bind(note.id, note.t, note.uid, note.name, note.grade, note.subject, note.title, note.body, note.img, note.likes));
+    await db.batch(st);
+    return json({ ok: true, note: jzPub(note, u), warn: log.length ? log.join(" ") : "" });
+  }
+
+  if (action === "like" && method === "POST") {
+    if (!u) return err("برای پسندیدن، اول وارد حساب شو.", 401);
+    const id = jzClean(body.id, 64);
+    const r = await db.prepare("SELECT likes FROM jozve WHERE id = ?").bind(id).first();
+    if (!r) return err("جزوه پیدا نشد.", 404);
+    const likes = jzParse(r.likes);
+    const i = likes.indexOf(u.id);
+    if (i > -1) likes.splice(i, 1); else likes.push(u.id);
+    await db.prepare("UPDATE jozve SET likes = ? WHERE id = ?").bind(JSON.stringify(likes.slice(0, 500)), id).run();
+    return json({ ok: true, id: id, likes: likes.length, liked: i < 0 });
+  }
+
+  if (action === "del" && method === "POST") {
+    if (!u) return err("اول وارد حساب شو.", 401);
+    const id = jzClean(body.id, 64);
+    const r = await db.prepare("SELECT uid, img FROM jozve WHERE id = ?").bind(id).first();
+    if (!r) return err("جزوه پیدا نشد.", 404);
+    if (!(r.uid === u.id || jzAdmin(u))) return err("اجازهٔ حذف این جزوه را نداری.", 403);
+    const st = [db.prepare("DELETE FROM jozve WHERE id = ?").bind(id)];
+    /* با حذف جزوه، تصویرهایش هم پاک می‌شوند تا فضا اشغال نشود */
+    for (const g of jzParse(r.img)) st.push(db.prepare("DELETE FROM jozve_img WHERE id = ?").bind(g));
+    await db.batch(st);
+    return json({ ok: true, id: id });
+  }
+
+  return err("مسیر نامعتبر است.", 404);
+}
+
 /* ------------------------------------------------------------ مسیریاب اصلی */
 async function api(req, env, url) {
   const path = url.pathname;
@@ -718,6 +872,9 @@ async function api(req, env, url) {
   if (route === "auth/login" && method === "POST") return handleLogin(env, req, body);
   if (route === "auth/logout") return handleLogout(env, req);
   if (route === "site/status" && method === "GET") return handleSiteStatus(env);
+
+  /* جزوهٔ همکلاسی‌ها: پیش از بارگذاری وضعیت سایت رسیدگی می‌شود تا سبک بماند */
+  if (seg[0] === "jozve") return handleJozve(req, env, url, seg.slice(1).join("/"), method, body);
 
   const token = cookieOf(req);
   const tokenHash = token ? await sha256hex(token) : "";

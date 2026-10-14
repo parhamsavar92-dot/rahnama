@@ -253,6 +253,12 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://www.hamkardarsi.ir/jozve-share.html</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.hamkardarsi.ir/jozve/7/arabic.html</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
