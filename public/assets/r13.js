@@ -95,32 +95,35 @@
     }, 2600);
   }
 
-  /* ── ۳. سربرگ، نوار پیشرفت و دکمهٔ بالا ──────────────────────────────── */
+  /* ── ۳. سربرگ + دکمهٔ بالا ───────────────────────────────────────────────
+     نکته: «نوار پیشرفت» (#readbar) و «دکمهٔ بازگشت به بالا» (#toTop) از قبل
+     در سایت وجود دارند و app.js آن‌ها را می‌گرداند. اینجا عنصر تازه‌ای ساخته
+     نمی‌شود (وگرنه دو دکمهٔ روی‌هم می‌افتاد)؛ فقط اگر صفحه‌ای این دکمه را
+     نداشت، یکی با همان شناسهٔ #toTop اضافه می‌شود تا قیافه و رفتارش یکدست بماند. */
   function chrome() {
     var html = D.documentElement;
-    var bar = D.createElement("div");
-    bar.className = "r13-progress";
-    bar.setAttribute("aria-hidden", "true");
-    D.body.appendChild(bar);
+    var top = D.getElementById("toTop");
+    var mine = false;
 
-    var top = D.createElement("button");
-    top.className = "r13-top";
-    top.type = "button";
-    top.setAttribute("aria-label", "بازگشت به بالای صفحه");
-    top.setAttribute("title", "بازگشت به بالا");
-    top.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V6M5 12l7-7 7 7"/></svg>';
-    top.addEventListener("click", function () { W.scrollTo({ top: 0, behavior: REDUCED ? "auto" : "smooth" }); });
-    D.body.appendChild(top);
+    if (!top && D.body) {
+      top = D.createElement("button");
+      top.id = "toTop";
+      top.type = "button";
+      top.setAttribute("aria-label", "بازگشت به بالای صفحه");
+      top.setAttribute("title", "بازگشت به بالا");
+      top.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V6M5 12l7-7 7 7"/></svg>';
+      top.addEventListener("click", function () { W.scrollTo({ top: 0, behavior: REDUCED ? "auto" : "smooth" }); });
+      D.body.appendChild(top);
+      mine = true;
+    }
 
     var ticking = false;
     function update() {
       ticking = false;
       var y = W.pageYOffset || html.scrollTop || 0;
-      var doc = D.documentElement;
-      var max = Math.max(1, (doc.scrollHeight || 0) - (W.innerHeight || 0));
-      bar.style.transform = "scaleX(" + Math.min(1, y / max).toFixed(4) + ")";
       if (y > 6) html.classList.add("r13-scrolled"); else html.classList.remove("r13-scrolled");
-      if (y > 620) top.classList.add("r13-show"); else top.classList.remove("r13-show");
+      /* فقط دکمه‌ای که خودمان ساخته‌ایم را می‌گردانیم؛ بقیه را app.js اداره می‌کند */
+      if (mine) { if (y > 520) top.classList.add("show"); else top.classList.remove("show"); }
     }
     function onScroll() { if (ticking) return; ticking = true; raf(update); }
     W.addEventListener("scroll", onScroll, { passive: true });

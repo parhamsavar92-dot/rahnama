@@ -230,30 +230,33 @@ input:focus, select:focus, textarea:focus { box-shadow: var(--ring); border-colo
 /* عمداً از will-change استفاده نمی‌کنیم: روی نیاکان، کادر مرجع می‌سازد و
    می‌تواند نوارهای چسبان (sticky) صفحه را از کار بیندازد. */
 
-/* نوار پیشرفت اسکرول — باریک، در بالای صفحه */
-.r13-progress {
-  position: fixed; inset-inline: 0; top: 0; height: 2.5px; z-index: 300;
-  transform-origin: right center; transform: scaleX(0);
-  background: linear-gradient(90deg, var(--brand), var(--brand-2), var(--brand-3));
-  pointer-events: none; transition: opacity .3s linear;
+/* نوار پیشرفت مطالعه — همان #readbar که app.js پرمی‌کند (نسخهٔ تازه ساخته نمی‌شود) */
+#readbar {
+  height: 3px;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--brand) 58%, transparent),
+              0 1px 0 rgba(255, 255, 255, .28) inset;
+  transition: width .14s linear;
 }
-[dir="rtl"] .r13-progress { transform-origin: right center; }
 
-/* دکمهٔ بازگشت به بالا — نرم و بی‌مزاحم */
-.r13-top {
-  position: fixed; inset-inline-end: 18px; bottom: 20px; z-index: 240;
-  width: 46px; height: 46px; border-radius: 15px;
-  display: grid; place-items: center; cursor: pointer;
-  color: #fff; border: none;
+/* دکمهٔ بازگشت به بالا — همان #toTop؛ فقط زنده‌تر و نرم‌تر */
+#toTop {
+  border-radius: 15px;
+  border-color: transparent;
   background: linear-gradient(140deg, var(--brand), var(--brand-2));
-  box-shadow: 0 14px 30px -10px color-mix(in srgb, var(--brand) 70%, transparent);
-  opacity: 0; transform: translate3d(0, 16px, 0) scale(.9); pointer-events: none;
-  transition: opacity .34s var(--r13-ease), transform .44s var(--r13-ease-back);
+  color: #fff;
+  box-shadow: 0 14px 30px -12px color-mix(in srgb, var(--brand) 72%, transparent);
+  transform: translate3d(0, 14px, 0) scale(.92);
+  transition: opacity .34s var(--r13-ease), transform .46s var(--r13-ease-back),
+              background-color .24s var(--r13-ease), box-shadow .3s var(--r13-ease);
 }
-.r13-top.r13-show { opacity: 1; transform: none; pointer-events: auto; }
-.r13-top:hover { transform: translateY(-3px) scale(1.05); }
-.r13-top:active { transform: scale(.93); }
-.r13-top svg { width: 21px; height: 21px; }
+#toTop.show { transform: none; }
+#toTop:hover {
+  background: linear-gradient(140deg, var(--brand-2), var(--brand));
+  color: #fff; transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 18px 36px -12px color-mix(in srgb, var(--brand) 84%, transparent);
+}
+#toTop:active { transform: scale(.93); }
 
 /* شمارندهٔ اعداد: بدون لرزش چیدمان */
 .r13-count { display: inline-block; font-variant-numeric: tabular-nums; }
@@ -279,7 +282,7 @@ input:focus, select:focus, textarea:focus { box-shadow: var(--ring); border-colo
   .btn::after { display: none; }
   .header-nav.open, .header-nav.open a { animation: none; }
   .r13-sk { animation: none; }
-  .r13-top { transition: opacity .2s linear; }
+  #toTop { transform: none; transition: opacity .2s linear, visibility .2s linear; }
 }
 body.r8-lite .grad-text { animation: none; }
 body.r8-lite .r13-on .r13-reveal { opacity: 1; transform: none; transition: none; }
@@ -290,6 +293,6 @@ body.r8-lite .header-nav.open a { animation: none; }
 
 /* چاپ: هیچ‌کدام از عناصر تزئینی چاپ نشوند */
 @media print {
-  .r13-progress, .r13-top { display: none !important; }
+  #readbar, #toTop { display: none !important; }
   .r13-on .r13-reveal { opacity: 1 !important; transform: none !important; }
 }
