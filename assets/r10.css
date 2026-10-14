@@ -1,0 +1,524 @@
+/* ==========================================================================
+   رهنما — لایهٔ ۱۰: «زنگ تفریح» (بخش هم‌زمان سایت)  |  r10.css
+   --------------------------------------------------------------------------
+   ظاهری تمیز و آشنا مثل توییتر، هم‌خوان با لایهٔ «یخ و شیشه».
+   همهٔ انیمیشن‌ها سبک (transform/opacity) تا سایت روان بماند.
+   ========================================================================== */
+
+.zt-wrap { max-inline-size: 720px; margin-inline: auto; }
+
+/* ---------------------------------------------------------- نوار وضعیت زنده */
+.zt-live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-block: 12px;
+  font-size: .82rem;
+  color: var(--text-soft);
+}
+.zt-dot {
+  inline-size: 9px; block-size: 9px; border-radius: 50%;
+  background: var(--ok, #16a34a);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok, #16a34a) 60%, transparent);
+  animation: zt-pulse 2.4s ease-out infinite;
+}
+.zt-dot.off { background: var(--muted); animation: none; box-shadow: none; }
+@keyframes zt-pulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok, #16a34a) 55%, transparent); }
+  70%  { box-shadow: 0 0 0 9px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.zt-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--r8-glass-brd);
+  background: var(--r8-glass-bg-2);
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------- کادر نوشتن */
+.zt-compose {
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid var(--r8-glass-brd);
+  background-image: linear-gradient(160deg, var(--r8-glass-bg-2), transparent 55%), var(--surface, #fff);
+  box-shadow: var(--r8-depth-2);
+}
+.zt-compose .zt-ava { flex: 0 0 auto; }
+.zt-compose .zt-body { flex: 1 1 auto; min-inline-size: 0; }
+.zt-ta {
+  inline-size: 100%;
+  min-block-size: 62px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: .95rem;
+  line-height: 1.9;
+  resize: vertical;
+  outline: none;
+}
+.zt-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-block-start: 6px;
+  padding-block-start: 8px;
+  border-block-start: 1px solid var(--r8-glass-brd);
+}
+.zt-count { font-size: .76rem; color: var(--muted); margin-inline-start: auto; }
+.zt-count.bad { color: var(--err); font-weight: 800; }
+.zt-btn {
+  padding: 8px 15px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background-image: linear-gradient(135deg, var(--brand, #6d5efc),
+      color-mix(in srgb, var(--r8-ice-1, #7ee7ff) 40%, var(--brand, #6d5efc)));
+  color: #fff;
+  font: inherit;
+  font-size: .86rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.zt-btn:disabled { opacity: .5; cursor: default; }
+.zt-btn.ghost {
+  background-image: none; background: transparent;
+  border-color: var(--r8-glass-brd); color: var(--text);
+}
+
+/* ---------------------------------------------------------------- آواتار */
+.zt-ava {
+  inline-size: 42px; block-size: 42px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 800; font-size: .95rem;
+  flex: 0 0 auto;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35);
+}
+
+/* ------------------------------------------------------------- نوشته‌ها */
+.zt-feed { display: grid; gap: 10px; margin-block-start: 14px; }
+.zt-post {
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid var(--r8-glass-brd);
+  background-image: linear-gradient(160deg, var(--r8-glass-bg-2), transparent 60%), var(--surface, #fff);
+  box-shadow: var(--r8-depth-1);
+  animation: zt-in .34s cubic-bezier(.2, .7, .3, 1) both;
+}
+@keyframes zt-in {
+  from { opacity: 0; translate: 0 10px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+.zt-post.is-new { border-color: color-mix(in srgb, var(--brand, #6d5efc) 45%, var(--r8-glass-brd)); }
+.zt-main { flex: 1 1 auto; min-inline-size: 0; }
+.zt-head {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  font-size: .84rem;
+}
+.zt-head b { font-weight: 800; }
+.zt-head .zt-meta { color: var(--muted); font-size: .76rem; }
+.zt-grade {
+  font-size: .7rem; padding: 2px 8px; border-radius: 999px;
+  background: color-mix(in srgb, var(--brand, #6d5efc) 14%, transparent);
+  color: var(--brand, #6d5efc); font-weight: 700;
+}
+.zt-text {
+  margin: 7px 0 0;
+  font-size: .94rem;
+  line-height: 2;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.zt-acts {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  margin-block-start: 9px;
+}
+.zt-act {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px; border-radius: 999px;
+  border: 1px solid var(--r8-glass-brd);
+  background: transparent; color: var(--text-soft);
+  font: inherit; font-size: .8rem; font-weight: 700; cursor: pointer;
+  transition: transform .14s ease, color .16s ease, border-color .16s ease;
+}
+.zt-act:hover { transform: translate3d(0, -1px, 0); color: var(--text); }
+.zt-act.on {
+  color: var(--brand, #6d5efc);
+  border-color: color-mix(in srgb, var(--brand, #6d5efc) 45%, var(--r8-glass-brd));
+  background: color-mix(in srgb, var(--brand, #6d5efc) 10%, transparent);
+}
+.zt-act.danger:hover { color: var(--err); border-color: color-mix(in srgb, var(--err) 45%, var(--r8-glass-brd)); }
+
+/* ------------------------------------------------------------- پاسخ‌ها */
+.zt-comments { margin-block-start: 10px; display: grid; gap: 7px; }
+.zt-cm {
+  display: flex; gap: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--r8-glass-bg-2);
+  border: 1px solid var(--r8-glass-brd);
+  font-size: .85rem;
+}
+.zt-cm .zt-cm-t { flex: 1; }
+.zt-cm b { font-weight: 800; }
+.zt-cm small { color: var(--muted); font-size: .72rem; display: block; }
+.zt-cmform { display: flex; gap: 7px; margin-block-start: 7px; }
+.zt-cmin {
+  flex: 1; padding: 8px 11px; border-radius: 999px;
+  border: 1px solid var(--r8-glass-brd);
+  background: var(--r8-glass-bg-2); color: var(--text); font: inherit; font-size: .85rem;
+}
+.zt-cmin:focus { outline: none; border-color: color-mix(in srgb, var(--brand, #6d5efc) 55%, var(--r8-glass-brd)); }
+
+.zt-empty {
+  padding: 30px 18px; text-align: center; color: var(--muted);
+  border: 1px dashed var(--r8-glass-brd); border-radius: 18px;
+}
+.zt-more { display: block; margin: 12px auto 0; }
+
+@media (max-width: 560px) {
+  .zt-ava { inline-size: 36px; block-size: 36px; font-size: .84rem; }
+  .zt-post { padding: 12px; border-radius: 15px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zt-dot { animation: none; }
+  .zt-post { animation: none; }
+  .zt-act { transition: none; }
+}
+
+/* ═══════════════════ صدا و تماس زندهٔ کلاس (r11-voice.js) ═══════════════════ */
+.r11-bar {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  margin-block-start: 8px; padding-block-start: 8px;
+  border-block-start: 1px dashed var(--r8-glass-brd, #d8d8e6);
+}
+.r11-btn {
+  padding: 7px 13px; border-radius: 999px;
+  border: 1px solid var(--r8-glass-brd, #d8d8e6);
+  background-image: linear-gradient(160deg, var(--r8-glass-bg, rgba(255,255,255,.6)), transparent);
+  color: var(--text); font: inherit; font-size: .82rem; font-weight: 800; cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease;
+}
+.r11-btn:hover { transform: translate3d(0, -1px, 0); }
+.r11-btn.is-rec {
+  color: #fff; border-color: transparent;
+  background-image: linear-gradient(135deg, #dc2626, #f87171);
+  animation: r11-pulse 1.4s ease-in-out infinite;
+}
+.r11-btn.is-on {
+  color: #fff; border-color: transparent;
+  background-image: linear-gradient(135deg, var(--ok, #16a34a), #4ade80);
+}
+@keyframes r11-pulse { 0%,100% { opacity: 1 } 50% { opacity: .68 } }
+.r11-status { font-size: .76rem; color: var(--muted); font-weight: 700; }
+.r11-peers { display: flex; gap: 6px; flex-wrap: wrap; }
+.r11-chip {
+  font-size: .72rem; padding: 4px 9px; border-radius: 999px;
+  border: 1px solid var(--r8-glass-brd, #d8d8e6);
+  background: var(--r8-glass-bg-2, rgba(255,255,255,.44));
+  color: var(--text-soft);
+}
+.r11-chip.is-me { color: var(--brand, #6d5efc); font-weight: 800; }
+.r11-voice { margin-block: 4px; }
+.r11-voice audio { vertical-align: middle; }
+@media (prefers-reduced-motion: reduce) { .r11-btn.is-rec { animation: none; } }
+
+.r11-live {
+  flex: 1 1 100%;
+  margin-block-start: 8px; padding: 9px 12px;
+  border-radius: 12px;
+  border: 1px dashed var(--r8-glass-brd, #d8d8e6);
+  background: var(--r8-glass-bg-2, rgba(255,255,255,.44));
+}
+.r11-live-h { font-size: .76rem; color: var(--muted); margin-block-end: 6px; line-height: 1.8; }
+
+/* ═══════════ پشتیبانی آنلاین (r12-support.js) ═══════════ */
+#r12Sup { font-family: inherit; }
+.r12-fab {
+  position: fixed; inset-block-end: 86px; inset-inline-start: 16px; z-index: 70;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 11px 15px; border: 1px solid var(--r8-glass-brd); border-radius: 999px;
+  background: var(--r8-glass-bg); color: var(--text); font: inherit; font-weight: 800;
+  font-size: .86rem; cursor: pointer; box-shadow: var(--r8-depth-2);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  transition: transform .2s cubic-bezier(.2,.7,.3,1);
+}
+.r12-fab:hover { transform: translateY(-2px); }
+.r12-fab-t { font-size: 1.1rem; }
+.r12-dot {
+  position: absolute; inset-block-start: -2px; inset-inline-end: -2px;
+  inline-size: 11px; block-size: 11px; border-radius: 50%;
+  background: #e5484d; box-shadow: 0 0 0 2px var(--surface);
+}
+.r12-panel {
+  position: fixed; inset-block-end: 150px; inset-inline-start: 16px; z-index: 71;
+  inline-size: min(390px, calc(100vw - 32px)); max-block-size: min(62vh, 560px);
+  display: flex; flex-direction: column; overflow: hidden;
+  border: 1px solid var(--r8-glass-brd); border-radius: 18px;
+  background: var(--surface); box-shadow: var(--r8-depth-3);
+}
+.r12-head {
+  display: flex; flex-direction: column; gap: 2px; padding: 12px 14px 10px;
+  border-block-end: 1px solid var(--r8-glass-brd);
+  background-image: linear-gradient(135deg, color-mix(in srgb, var(--brand,#6d5efc) 12%, transparent), transparent);
+}
+.r12-head b { font-size: .95rem; }
+.r12-sub { font-size: .74rem; color: var(--muted); }
+.r12-x {
+  position: absolute; inset-block-start: 8px; inset-inline-end: 10px;
+  border: 0; background: transparent; color: var(--muted); font-size: 1rem; cursor: pointer;
+}
+.r12-threads { max-block-size: 150px; overflow: auto; border-block-end: 1px solid var(--r8-glass-brd); }
+.r12-th {
+  display: flex; flex-direction: column; gap: 1px; inline-size: 100%; text-align: start;
+  padding: 8px 12px; border: 0; background: transparent; font: inherit; cursor: pointer;
+  border-block-end: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
+}
+.r12-th.is-on { background: color-mix(in srgb, var(--brand,#6d5efc) 10%, transparent); }
+.r12-th b { font-size: .84rem; display: flex; align-items: center; gap: 6px; }
+.r12-th small { font-size: .72rem; color: var(--muted); }
+.r12-badge {
+  font-style: normal; font-size: .66rem; padding: 1px 6px; border-radius: 999px;
+  background: #e5484d; color: #fff;
+}
+.r12-msgs { flex: 1; overflow: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.r12-b { max-inline-size: 86%; display: flex; flex-direction: column; gap: 2px; }
+.r12-b.me { align-self: flex-end; align-items: flex-end; }
+.r12-who { font-size: .68rem; color: var(--muted); }
+.r12-txt {
+  padding: 8px 11px; border-radius: 13px; font-size: .85rem; line-height: 1.75;
+  background: color-mix(in srgb, var(--brand,#6d5efc) 9%, var(--surface));
+  border: 1px solid var(--r8-glass-brd);
+}
+.r12-b.me .r12-txt { background-image: linear-gradient(135deg, var(--brand,#6d5efc), #8b7cff); color: #fff; }
+.r12-time { font-size: .66rem; color: var(--muted); }
+.r12-empty, .r12-sys { font-size: .8rem; color: var(--muted); text-align: center; padding: 10px; }
+.r12-form { display: flex; gap: 7px; padding: 9px; border-block-start: 1px solid var(--r8-glass-brd); }
+.r12-form input {
+  flex: 1; padding: 9px 12px; border-radius: 12px; font: inherit; font-size: .86rem;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+}
+.r12-send {
+  padding: 9px 14px; border: 0; border-radius: 12px; font: inherit; font-weight: 800;
+  font-size: .84rem; cursor: pointer; color: #fff;
+  background-image: linear-gradient(135deg, var(--brand,#6d5efc), #8b7cff);
+}
+body.r8-lite .r12-fab { -webkit-backdrop-filter: none; backdrop-filter: none; }
+@media (max-width: 520px) {
+  .r12-fab-l { display: none; }
+  .r12-panel { inset-block-end: 138px; }
+}
+
+.header-nav a.zt-top-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-weight: 800; white-space: nowrap; border-radius: 999px; padding-inline: 10px;
+  background-image: linear-gradient(135deg, color-mix(in srgb, var(--brand,#6d5efc) 16%, transparent), transparent);
+}
+.header-nav a.zt-top-link.is-active {
+  background-image: linear-gradient(135deg, var(--brand,#6d5efc), #8b7cff); color: #fff;
+}
+
+/* ═══════════ گیت نقش کلاس + زیباسازی پنل‌ها (نسخهٔ ۹.۴) ═══════════ */
+.cls-gate-grid {
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+.cls-gate-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 20px 14px; cursor: pointer; font: inherit; text-align: center;
+  border: 1px solid var(--r8-glass-brd); border-radius: 20px;
+  background-image: linear-gradient(160deg, var(--r8-glass-bg), transparent 70%);
+  box-shadow: var(--r8-depth-2), inset 0 1px 0 var(--r8-hair);
+  transition: transform .26s cubic-bezier(.2,.7,.3,1), box-shadow .26s ease;
+}
+.cls-gate-btn:hover { transform: translateY(-4px); box-shadow: var(--r8-depth-3); }
+.cls-gate-btn .ic { font-size: 2rem; line-height: 1; }
+.cls-gate-btn b { font-size: 1.02rem; }
+.cls-gate-btn small { font-size: .76rem; color: var(--muted); line-height: 1.7; }
+.cls-rolechg {
+  margin-top: 10px; padding: 7px 12px; border-radius: 999px; cursor: pointer;
+  font: inherit; font-size: .76rem; font-weight: 700;
+  border: 1px dashed var(--border); background: transparent; color: var(--muted);
+}
+.cls-rolechg:hover { color: var(--text); border-color: var(--brand, #6d5efc); }
+.cls-warn { display: block; font-size: .82rem; color: #d9484d; line-height: 1.8; }
+.cls-ok {
+  display: block; font-size: .82rem; line-height: 1.9; color: var(--text);
+  padding: 10px 12px; border-radius: 13px;
+  background: color-mix(in srgb, #22c55e 10%, var(--surface));
+  border: 1px solid color-mix(in srgb, #22c55e 34%, transparent);
+}
+
+/* یکدستی پنل‌ها: عنوان کارت‌ها و فاصله‌ها یکسان */
+.card > h4 { letter-spacing: 0; }
+.hk-field > label { font-size: .8rem; color: var(--muted); margin-block-end: 4px; display: block; }
+.hk-field input, .hk-field select { font-size: .92rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cls-gate-btn:hover { transform: none; }
+}
+@media (max-width: 520px) {
+  .cls-gate-btn { padding: 16px 12px; }
+  .cls-gate-btn .ic { font-size: 1.7rem; }
+}
+
+/* ═══════ پیام کلاس با نام کامل + پروفایل + نقش (نسخهٔ ۹.۵) ═══════ */
+.hk-msg.cls-msg {
+  display: flex; align-items: flex-start; gap: 9px;
+  padding: 9px 10px; border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+}
+.hk-msg.cls-msg.from-me {
+  flex-direction: row-reverse;
+  background-image: linear-gradient(135deg,
+      color-mix(in srgb, var(--brand, #6d5efc) 13%, transparent), transparent);
+  border-color: color-mix(in srgb, var(--brand, #6d5efc) 34%, transparent);
+}
+.cls-av {
+  flex: 0 0 auto; inline-size: 34px; block-size: 34px; border-radius: 50%;
+  display: grid; place-items: center; color: #fff; font-weight: 800; font-size: .9rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35);
+  user-select: none;
+}
+.cls-mwrap { flex: 1; min-inline-size: 0; }
+.hk-msg.cls-msg.from-me .cls-mwrap { text-align: end; }
+.cls-mh {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  margin-block-end: 3px; font-size: .76rem;
+}
+.hk-msg.cls-msg.from-me .cls-mh { justify-content: flex-end; }
+.cls-mn { font-size: .8rem; font-weight: 800; color: var(--text); }
+.cls-mh time { font-size: .68rem; color: var(--muted); }
+.cls-role {
+  font-style: normal; font-size: .66rem; font-weight: 700;
+  padding: 2px 7px; border-radius: 999px; line-height: 1.7;
+  background: color-mix(in srgb, var(--muted) 16%, transparent); color: var(--muted);
+}
+.cls-role.r-owner { background: color-mix(in srgb, #f59e0b 20%, transparent); color: #b45309; }
+.cls-role.r-admin { background: color-mix(in srgb, #ef4444 18%, transparent); color: #b91c1c; }
+.cls-role.r-deputy { background: color-mix(in srgb, #8b5cf6 18%, transparent); color: #6d28d9; }
+.cls-role.r-teacher { background: color-mix(in srgb, #0ea5e9 20%, transparent); color: #0369a1; }
+.cls-role.r-student { background: color-mix(in srgb, #22c55e 18%, transparent); color: #15803d; }
+.hk-msg.cls-msg .hk-msg-body { font-size: .88rem; line-height: 1.85; }
+[data-theme="dark"] .cls-role.r-owner { color: #fbbf24; }
+[data-theme="dark"] .cls-role.r-admin { color: #fca5a5; }
+[data-theme="dark"] .cls-role.r-deputy { color: #c4b5fd; }
+[data-theme="dark"] .cls-role.r-teacher { color: #7dd3fc; }
+[data-theme="dark"] .cls-role.r-student { color: #86efac; }
+@media (max-width: 520px) { .cls-av { inline-size: 29px; block-size: 29px; font-size: .8rem; } }
+
+/* ═══════ پشتیبانی آنلاین در منوی بالا (نسخهٔ ۹.۶) ═══════ */
+.header-nav a.r12-menu-link {
+  display: inline-flex; align-items: center; gap: 5px; position: relative;
+  font-weight: 800; white-space: nowrap; border-radius: 999px; padding-inline: 10px;
+  background-image: linear-gradient(135deg, color-mix(in srgb, #22c55e 16%, transparent), transparent);
+}
+.header-nav a.r12-menu-link.has-unread {
+  background-image: linear-gradient(135deg, color-mix(in srgb, #e5484d 18%, transparent), transparent);
+}
+.r12-mbadge {
+  font-style: normal; font-size: .62rem; font-weight: 800; line-height: 1;
+  min-inline-size: 16px; padding: 3px 5px; border-radius: 999px;
+  background: #e5484d; color: #fff; text-align: center;
+}
+/* دکمهٔ شناور دیگر ساخته نمی‌شود؛ اگر نسخهٔ کهنه در مرورگر بود، پنهان بماند */
+.r12-fab { display: none !important; }
+
+/* پنل: روی موبایل مثل کشوی پایین، روی دسکتاپ گوشهٔ پایین */
+.r12-panel { inset-block-end: 84px; }
+@media (max-width: 560px) {
+  .r12-panel {
+    inset-inline: 10px; inset-block-end: 74px;
+    inline-size: auto; max-block-size: 72vh; border-radius: 20px;
+  }
+  .r12-head { padding: 11px 13px 9px; }
+  .r12-msgs { padding: 10px; }
+}
+@media (min-width: 561px) { .r12-panel { inset-inline-start: 18px; } }
+
+/* ═══════════════ انیمیشن بیشتر کارت‌ها (نسخهٔ ۹.۷) ═══════════════
+   همه چیز فقط روی transform / opacity / translate است تا سرعت حفظ شود.
+   برای ورود کارت‌ها از خاصیت مستقل translate استفاده می‌کنیم، نه transform،
+   چون انیمیشن‌ها بر هاور غلبه می‌کنند و بالا آمدن کارت را از کار می‌اندازند.
+   روی حالت سبک (r8-lite) و «کاهش حرکت» خودکار خاموش می‌شود. */
+
+@keyframes r10-card-in {
+  from { opacity: 0; translate: 0 16px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+@keyframes r10-pop {
+  0%   { translate: 0 0; }
+  55%  { translate: 0 -3px; }
+  100% { translate: 0 0; }
+}
+
+/* ورود پله‌ای کارت‌ها در شبکه‌ها */
+.grid-2 > *, .grid-3 > *, .tool-grid > *, .rt-grid > * {
+  animation: r10-card-in .52s cubic-bezier(.2, .7, .3, 1) both;
+}
+.grid-2 > *:nth-child(2), .grid-3 > *:nth-child(2), .tool-grid > *:nth-child(2), .rt-grid > *:nth-child(2) { animation-delay: .05s; }
+.grid-2 > *:nth-child(3), .grid-3 > *:nth-child(3), .tool-grid > *:nth-child(3), .rt-grid > *:nth-child(3) { animation-delay: .1s; }
+.grid-2 > *:nth-child(4), .grid-3 > *:nth-child(4), .tool-grid > *:nth-child(4), .rt-grid > *:nth-child(4) { animation-delay: .15s; }
+.grid-2 > *:nth-child(5), .grid-3 > *:nth-child(5), .tool-grid > *:nth-child(5), .rt-grid > *:nth-child(5) { animation-delay: .2s; }
+.grid-2 > *:nth-child(n+6), .grid-3 > *:nth-child(n+6), .tool-grid > *:nth-child(n+6), .rt-grid > *:nth-child(n+6) { animation-delay: .25s; }
+
+/* هاور زنده‌تر: بالاتر، کمی بزرگ‌تر، هالهٔ رنگی */
+@media (hover: hover), (any-pointer: fine) {
+  .card, .subject-card, .tool-card, .rt-card, .cls-card, .hk-card, .kpi {
+    transition: transform .34s cubic-bezier(.2, .7, .3, 1),
+                box-shadow .34s ease, border-color .34s ease,
+                background-position .7s ease;
+    background-size: 100% 100%, 220% 100%;
+    background-position: 0 0, 120% 0;
+  }
+  .card:hover, .subject-card:hover, .tool-card:hover, .rt-card:hover,
+  .cls-card:hover, .hk-card:hover, .kpi:hover {
+    transform: translate3d(0, -8px, 0) scale(1.014);
+    background-position: 0 0, -40% 0;
+  }
+  /* آیکون کارت هنگام هاور زنده می‌شود */
+  .card:hover .card-icon, .tool-card:hover .ti, .subject-card:hover .si,
+  .rt-card:hover .ic, .kpi:hover .ic {
+    transform: scale(1.14) rotate(-5deg);
+  }
+  .card-icon, .tool-card .ti, .subject-card .si, .rt-card .ic, .kpi .ic {
+    display: inline-block;
+    transition: transform .38s cubic-bezier(.2, 1.5, .5, 1);
+  }
+  /* دکمهٔ کارت هم کمی جلو می‌آید */
+  .tool-card:hover h4, .rt-card:hover h4 { transform: translate3d(0, -1px, 0); }
+  .tool-card h4, .rt-card h4 { transition: transform .3s cubic-bezier(.2, .7, .3, 1); }
+}
+
+/* بازخورد لمس/کلیک — حس فشردن */
+.card:active, .subject-card:active, .tool-card:active, .rt-card:active,
+.cls-card:active, .hk-card:active, .kpi:active {
+  transform: translate3d(0, -2px, 0) scale(.994);
+  transition-duration: .08s;
+}
+
+/* پرش کوتاه وقتی کارتی «تازه» مشخص می‌شود */
+.is-new, .r8-in.is-new { animation: r10-pop .42s cubic-bezier(.2, .7, .3, 1); }
+
+/* محافظ‌ها: حالت سبک و کاهش حرکت */
+body.r8-lite .grid-2 > *, body.r8-lite .grid-3 > *,
+body.r8-lite .tool-grid > *, body.r8-lite .rt-grid > * { animation: none; }
+body.r8-lite .card-icon, body.r8-lite .tool-card .ti, body.r8-lite .subject-card .si,
+body.r8-lite .rt-card .ic, body.r8-lite .kpi .ic { transition: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .grid-2 > *, .grid-3 > *, .tool-grid > *, .rt-grid > * { animation: none; }
+  .card:hover, .subject-card:hover, .tool-card:hover, .rt-card:hover,
+  .cls-card:hover, .hk-card:hover, .kpi:hover { transform: none; }
+  .card:hover .card-icon, .tool-card:hover .ti, .subject-card:hover .si,
+  .rt-card:hover .ic, .kpi:hover .ic { transform: none; }
+}

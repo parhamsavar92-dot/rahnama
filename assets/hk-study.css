@@ -1,0 +1,149 @@
+/* ==========================================================================
+   رهنما — استایل بستهٔ مطالعهٔ جزوه  |  assets/hk-study.css
+   نوار مطالعهٔ چسبان + کشوی فهرست مطالب (بدون بلور و بدون افکت سنگین،
+   تا روی گوشی هم اسکرول روان بماند).
+   ========================================================================== */
+
+.hk-stbar {
+  position: sticky;
+  /* باید زیر سربرگ چسبان (ارتفاع ۶۸ پیکسل) بنشیند، وگرنه پشت آن پنهان می‌شد */
+  top: calc(var(--header-h, 68px) + 4px);
+  z-index: 54;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 auto 12px;
+  max-width: 1180px;
+  padding: 7px 11px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: .8rem;
+  color: var(--text);
+  box-shadow: 0 4px 14px rgba(18, 22, 52, .05);
+}
+
+.hk-stb-btn {
+  flex: 0 0 auto;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 5px 10px;
+  font: inherit;
+  cursor: pointer;
+  transition: transform .12s, border-color .12s;
+}
+.hk-stb-btn:hover { transform: translateY(-1px); border-color: var(--brand); }
+.hk-stb-btn[hidden] { display: none; }
+
+.hk-stb-cur {
+  flex: 1 1 190px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--muted);
+}
+
+.hk-stb-meter {
+  flex: 1 1 70px;
+  height: 6px;
+  min-width: 60px;
+  background: var(--surface-2);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.hk-stb-meter i {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--brand), var(--brand-3, #22c1dc));
+  transition: width .18s linear;
+}
+
+.hk-stb-pct { flex: 0 0 auto; font-weight: 700; color: var(--brand); }
+.hk-stb-time { flex: 0 0 auto; color: var(--muted); }
+
+/* ------------------------------------------------ کشوی فهرست مطالب */
+.hk-stdrawer {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: min(370px, 90vw);
+  z-index: 640;
+  background: var(--surface);
+  border-inline-end: 1px solid var(--border);
+  box-shadow: 0 0 40px rgba(10, 14, 40, .18);
+  overflow-y: auto;
+  padding: 12px 12px 26px;
+}
+.hk-stdrawer[hidden] { display: none; }
+
+.hk-std-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-block-end: 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+.hk-std-head b { flex: 1 1 auto; font-size: .95rem; }
+.hk-std-count { font-size: .72rem; color: var(--muted); }
+.hk-std-search input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  font-size: .84rem;
+  margin-bottom: 8px;
+}
+.hk-std-list { list-style: none; margin: 0; padding: 0; }
+.hk-std-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  text-align: start;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: .84rem;
+  line-height: 1.7;
+  padding: 7px 8px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+.hk-std-item:hover { background: var(--surface-2); }
+.hk-std-item.is-cur { background: color-mix(in srgb, var(--brand) 12%, transparent); }
+.hk-std-item.is-done .hk-std-t { color: var(--muted); }
+.hk-std-num {
+  flex: 0 0 26px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  background: var(--surface-2);
+  border-radius: 7px;
+  font-size: .72rem;
+  color: var(--muted);
+}
+.hk-std-t { flex: 1 1 auto; }
+.hk-std-ok { flex: 0 0 auto; color: var(--ok, #16a34a); font-size: .78rem; }
+.hk-std-empty { color: var(--muted); font-size: .82rem; padding: 10px; }
+
+/* ------------------------------------------------ موبایل */
+@media (max-width: 900px), (pointer: coarse) {
+  .hk-stbar { top: var(--header-h, 56px); margin-block-end: 8px; font-size: .76rem; gap: 6px; }
+  .hk-stb-cur { flex: 1 1 130px; }
+  .hk-stb-time { display: none; }
+  .hk-stdrawer { width: min(330px, 92vw); }
+}
+@media print {
+  .hk-stbar, .hk-stdrawer { display: none !important; }
+}

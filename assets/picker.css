@@ -1,0 +1,214 @@
+/* ==========================================================================
+   رهنما — انتخابگر کتاب و درس (picker.css)
+   --------------------------------------------------------------------------
+   گام یک: کتابت را انتخاب کن.  گام دو: کدام درس را می‌خواهی بخوانی.
+   همهٔ کلاس‌ها با pk- شروع می‌شوند تا با بقیهٔ لایه‌ها تضاد نکنند.
+   ========================================================================== */
+
+.pk-hero {
+  position: relative; overflow: hidden;
+  padding: clamp(22px, 3.4vw, 40px);
+  border-radius: clamp(20px, 2.6vw, 30px);
+  border: 1px solid color-mix(in srgb, var(--brand) 16%, var(--border));
+  background:
+    radial-gradient(110% 140% at 90% -25%, color-mix(in srgb, var(--brand-3) 18%, transparent), transparent 60%),
+    radial-gradient(120% 130% at 4% 120%, color-mix(in srgb, var(--brand-2) 16%, transparent), transparent 58%),
+    var(--surface);
+  box-shadow: var(--r13-sh-2, 0 10px 30px -14px rgba(16, 18, 40, .22));
+}
+.pk-eyebrow {
+  display: inline-block; padding: 6px 14px; border-radius: 99px;
+  font-size: .78rem; font-weight: 700; color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--brand) 24%, transparent);
+}
+.pk-hero h1 { margin: 12px 0 8px; font-size: clamp(1.4rem, 3.3vw, 2.05rem); }
+.pk-hero p { margin: 0; max-inline-size: 66ch; color: var(--text-soft); font-size: .92rem; line-height: 2.05; }
+
+/* ── کارت «ادامهٔ مطالعه» ── */
+.pk-resume {
+  display: flex; align-items: center; gap: 13px; flex-wrap: wrap;
+  margin-top: 16px; padding: 14px 17px; border-radius: 18px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--brand) 13%, var(--surface)), var(--surface));
+  border: 1px solid color-mix(in srgb, var(--brand) 28%, transparent);
+}
+.pk-resume i { font-style: normal; font-size: 1.5rem; }
+.pk-resume div { flex: 1 1 190px; min-inline-size: 0; }
+.pk-resume b { display: block; font-size: .88rem; }
+.pk-resume span { font-size: .76rem; color: var(--muted); }
+
+/* ── نوار گام‌ها ── */
+.pk-steps {
+  display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
+  margin: 18px 0 12px;
+}
+.pk-step {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 15px; border-radius: 13px; font-size: .8rem; font-weight: 700;
+  color: var(--muted); background: var(--surface-2); border: 1px solid var(--r13-hair, var(--border));
+}
+.pk-step b {
+  inline-size: 22px; block-size: 22px; border-radius: 8px; display: grid; place-items: center;
+  font-size: .72rem; color: #fff; background: linear-gradient(140deg, var(--brand), var(--brand-2));
+}
+.pk-step.pk-on {
+  color: var(--text); border-color: color-mix(in srgb, var(--brand) 42%, var(--border));
+  background: color-mix(in srgb, var(--brand) 10%, var(--surface));
+}
+.pk-step.pk-off b { background: var(--surface-3); color: var(--muted); }
+.pk-sep { color: var(--muted); font-size: .9rem; }
+
+/* ── نوار جست‌وجو و پایه ── */
+.pk-tools {
+  position: sticky; top: calc(var(--header-h, 60px) + 8px); z-index: 58;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin: 14px 0; padding: 12px;
+  border-radius: 20px; border: 1px solid var(--r13-hair, var(--border));
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: var(--r13-sh-1, none);
+  backdrop-filter: blur(18px) saturate(170%);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+}
+.pk-search { position: relative; flex: 1 1 240px; min-inline-size: 200px; }
+.pk-search input {
+  inline-size: 100%; padding: 11px 40px 11px 14px; border-radius: 14px; font-family: inherit;
+  font-size: .87rem; color: var(--text); background: var(--surface-2); border: 1px solid var(--border);
+}
+.pk-search svg { position: absolute; inset-inline-end: 12px; top: 50%; transform: translateY(-50%); inline-size: 17px; block-size: 17px; color: var(--muted); }
+.pk-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.pk-chip {
+  padding: 9px 15px; border-radius: 12px; cursor: pointer; font-family: inherit;
+  font-size: .82rem; font-weight: 600; color: var(--text-soft);
+  background: var(--surface-2); border: 1px solid var(--r13-hair, var(--border));
+  transition: transform .26s var(--r13-ease-back, ease), color .2s linear, border-color .22s ease, background-color .22s ease;
+}
+.pk-chip:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--brand) 38%, var(--border)); }
+.pk-chip[aria-pressed="true"] {
+  color: #fff; border-color: transparent;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  box-shadow: 0 8px 20px -10px color-mix(in srgb, var(--brand) 84%, transparent);
+}
+
+/* ── گام یک: شبکهٔ کتاب‌ها ── */
+.pk-books { display: grid; grid-template-columns: repeat(auto-fill, minmax(212px, 1fr)); gap: 14px; }
+@media (max-width: 620px) { .pk-books { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 11px; } }
+
+.pk-book {
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 9px;
+  padding: 16px 15px; border-radius: 19px; cursor: pointer; text-align: start;
+  font-family: inherit; color: var(--text);
+  border: 1px solid var(--r13-hair, var(--border)); background: var(--surface);
+  box-shadow: var(--r13-sh-1, 0 1px 3px rgba(16, 18, 40, .05));
+  transition: transform .34s var(--r13-ease, ease), box-shadow .34s ease, border-color .28s ease;
+  animation: pk-in .5s var(--r13-ease, ease) both;
+}
+@keyframes pk-in { from { opacity: 0; transform: translate3d(0, 16px, 0); } to { opacity: 1; transform: none; } }
+.pk-book:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--r13-sh-3, 0 30px 70px -28px rgba(16, 18, 40, .34));
+  border-color: color-mix(in srgb, var(--pk-c, var(--brand)) 42%, var(--border));
+}
+.pk-book:active { transform: translateY(-2px) scale(.99); }
+/* نوار رنگی هر درس، از رنگ همان درس */
+.pk-book::before {
+  content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: 4px;
+  background: var(--pk-c, var(--brand)); opacity: .85;
+}
+.pk-book-ico {
+  inline-size: 44px; block-size: 44px; border-radius: 14px; display: grid; place-items: center;
+  font-size: 1.35rem; background: color-mix(in srgb, var(--pk-c, var(--brand)) 13%, var(--surface-2));
+  border: 1px solid color-mix(in srgb, var(--pk-c, var(--brand)) 22%, transparent);
+}
+.pk-book b { font-size: .95rem; font-weight: 800; line-height: 1.6; }
+.pk-book small { font-size: .74rem; color: var(--muted); }
+.pk-book-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
+.pk-book-meta span {
+  font-size: .71rem; padding: 3px 9px; border-radius: 8px;
+  color: var(--muted); background: var(--surface-2); border: 1px solid var(--r13-hair, var(--border));
+}
+.pk-book-bar { block-size: 5px; border-radius: 4px; background: var(--surface-3); overflow: hidden; }
+.pk-book-bar i { display: block; block-size: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--pk-c, var(--brand)), color-mix(in srgb, var(--pk-c, var(--brand)) 55%, #fff)); transition: inline-size .5s var(--r13-ease, ease); }
+.pk-book .pk-badge {
+  position: absolute; inset-block-start: 11px; inset-inline-end: 11px;
+  padding: 3px 9px; border-radius: 8px; font-size: .66rem; font-weight: 800;
+  color: #15803d; background: color-mix(in srgb, #16a34a 15%, transparent);
+}
+[data-theme="dark"] .pk-book .pk-badge { color: #86efac; }
+
+/* ── گام دو: سرصفحهٔ کتاب انتخاب‌شده و دکمه‌های درس ── */
+.pk-bookhead {
+  display: flex; align-items: center; gap: 13px; flex-wrap: wrap;
+  padding: 16px 18px; border-radius: 20px; margin: 4px 0 14px;
+  border: 1px solid color-mix(in srgb, var(--pk-c, var(--brand)) 30%, var(--border));
+  background: linear-gradient(120deg, color-mix(in srgb, var(--pk-c, var(--brand)) 10%, var(--surface)), var(--surface));
+}
+.pk-bookhead i {
+  inline-size: 52px; block-size: 52px; flex: 0 0 auto; border-radius: 16px;
+  display: grid; place-items: center; font-size: 1.6rem;
+  background: color-mix(in srgb, var(--pk-c, var(--brand)) 15%, var(--surface-2));
+  border: 1px solid color-mix(in srgb, var(--pk-c, var(--brand)) 26%, transparent);
+}
+.pk-bookhead div { flex: 1 1 200px; min-inline-size: 0; }
+.pk-bookhead b { display: block; font-size: 1.05rem; font-weight: 800; }
+.pk-bookhead span { font-size: .78rem; color: var(--muted); }
+
+.pk-chapters { display: grid; grid-template-columns: repeat(auto-fill, minmax(268px, 1fr)); gap: 11px; }
+@media (max-width: 620px) { .pk-chapters { grid-template-columns: 1fr; gap: 9px; } }
+
+.pk-ch {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 13px 15px; border-radius: 16px; cursor: pointer; text-align: start;
+  font-family: inherit; color: var(--text); text-decoration: none;
+  border: 1px solid var(--r13-hair, var(--border)); background: var(--surface);
+  box-shadow: var(--r13-sh-1, none);
+  transition: transform .3s var(--r13-ease-back, ease), box-shadow .3s ease, border-color .24s ease;
+  animation: pk-in .45s var(--r13-ease, ease) both;
+}
+.pk-ch:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--r13-sh-2, none);
+  border-color: color-mix(in srgb, var(--pk-c, var(--brand)) 40%, var(--border));
+}
+.pk-ch:active { transform: translateY(-1px) scale(.995); }
+.pk-ch-num {
+  inline-size: 38px; block-size: 38px; flex: 0 0 auto; border-radius: 13px;
+  display: grid; place-items: center; font-size: .9rem; font-weight: 800;
+  color: color-mix(in srgb, var(--pk-c, var(--brand)) 85%, var(--text));
+  background: color-mix(in srgb, var(--pk-c, var(--brand)) 12%, var(--surface-2));
+  border: 1px solid color-mix(in srgb, var(--pk-c, var(--brand)) 22%, transparent);
+}
+.pk-ch-tx { min-inline-size: 0; flex: 1 1 auto; }
+.pk-ch-tx b { display: block; font-size: .87rem; font-weight: 700; line-height: 1.65; }
+.pk-ch-tx small { font-size: .71rem; color: var(--muted); }
+.pk-ch.pk-done .pk-ch-num { color: #fff; background: linear-gradient(140deg, #16a34a, #22c55e); border-color: transparent; }
+.pk-ch.pk-done { border-color: color-mix(in srgb, #16a34a 28%, var(--border)); }
+.pk-ch.pk-extra { grid-column: 1 / -1; }
+.pk-ch.pk-extra .pk-ch-num { background: linear-gradient(140deg, #d97706, #f59e0b); color: #fff; border-color: transparent; }
+.pk-mark { font-size: .9rem; color: #16a34a; flex: 0 0 auto; }
+
+/* ── نتیجهٔ جست‌وجو ── */
+.pk-hits { display: grid; gap: 9px; }
+.pk-hit {
+  display: flex; align-items: center; gap: 11px; padding: 11px 14px;
+  border-radius: 14px; text-decoration: none; color: var(--text);
+  border: 1px solid var(--r13-hair, var(--border)); background: var(--surface);
+  transition: transform .26s var(--r13-ease-back, ease), border-color .22s ease;
+}
+.pk-hit:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--brand) 38%, var(--border)); }
+.pk-hit small { font-size: .72rem; color: var(--muted); display: block; }
+
+.pk-empty, .pk-load { padding: 34px 20px; text-align: center; color: var(--muted); font-size: .87rem; }
+.pk-empty i { display: block; font-size: 2rem; font-style: normal; margin-bottom: 8px; }
+.pk-note {
+  margin-top: 18px; padding: 14px 17px; border-radius: 15px; font-size: .82rem; line-height: 2;
+  color: var(--text-soft); background: var(--surface-2); border: 1px solid var(--r13-hair, var(--border));
+  border-inline-start: 4px solid var(--brand);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pk-book, .pk-ch { animation: none; }
+  .pk-book:hover, .pk-ch:hover, .pk-chip:hover { transform: none; }
+}
+body.r8-lite .pk-book, body.r8-lite .pk-ch { animation: none; }
+body.r8-lite .pk-book:hover, body.r8-lite .pk-ch:hover { transform: none; }

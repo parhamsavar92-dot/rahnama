@@ -1,0 +1,9 @@
+# robots.txt — www.hamkardarsi.ir
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://www.hamkardarsi.ir/sitemap.xml
+
+# خوراک تازه‌ها (Atom)
+# https://www.hamkardarsi.ir/feed.xml

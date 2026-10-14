@@ -1,0 +1,143 @@
+/* ==========================================================================
+   پایهٔ هشتم — ابزار یادداشت‌گذاری روی جزوه  |  annotate.css
+   هایلایت • مداد با سایز و رنگ • پاک‌کن جادویی • واگرد • ذخیرهٔ خودکار
+   ========================================================================== */
+
+#inkCanvas {
+  position: fixed;
+  top: 0;
+  inset-inline-start: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 55;
+  pointer-events: none;
+  touch-action: auto;
+}
+body.ink-on #inkCanvas { pointer-events: auto; touch-action: none; cursor: crosshair; }
+body.ink-on, body.ink-on * { user-select: none !important; -webkit-user-select: none !important; }
+body.ink-on textarea, body.ink-on input { user-select: text !important; -webkit-user-select: text !important; }
+body.ink-on.ink-erase #inkCanvas { cursor: cell; }
+
+/* نوار ابزار اصلی باید روی بوم بماند */
+.toolbar, #toTop, .ink-palette { z-index: 900 !important; }
+
+/* ---------- دکمهٔ حالت یادداشت در نوار ابزار ---------- */
+.tb.is-active { background: var(--accent); color: #fff; border-color: transparent; }
+.tb.is-active svg { stroke: #fff; }
+
+/* ---------- پالت پایین صفحه ---------- */
+.ink-palette {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 14px;
+  margin-inline: auto;
+  width: min(96vw, 720px);
+  display: none;
+  flex-direction: column;
+  gap: 9px;
+  padding: 12px 14px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  box-shadow: 0 18px 50px rgba(15, 17, 40, .22);
+}
+body.ink-on .ink-palette { display: flex; }
+
+.ink-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ink-row .lbl {
+  font-size: .72rem; font-weight: 800; color: var(--muted);
+  min-width: 46px;
+}
+
+.ink-tool {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px; border-radius: 11px; font-size: .8rem; font-weight: 800;
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--text-soft);
+  transition: var(--tr); white-space: nowrap;
+}
+.ink-tool svg { width: 16px; height: 16px; }
+.ink-tool:hover { border-color: var(--accent); color: var(--accent); }
+.ink-tool.on {
+  background: var(--accent); color: #fff; border-color: transparent;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.ink-tool.on svg { stroke: #fff; }
+
+.ink-swatches { display: flex; gap: 7px; }
+.ink-sw {
+  width: 28px; height: 28px; border-radius: 9px; border: 2px solid var(--border);
+  transition: var(--tr); position: relative;
+}
+.ink-sw:hover { transform: translateY(-2px); }
+.ink-sw.on { border-color: var(--text); transform: translateY(-2px) scale(1.06); }
+.ink-sw.on::after {
+  content: "✓"; position: absolute; inset: 0; display: grid; place-items: center;
+  font-size: .8rem; font-weight: 900; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.5);
+}
+
+.ink-sizes { display: flex; gap: 6px; align-items: center; }
+.ink-size {
+  width: 34px; height: 30px; border-radius: 9px; border: 1px solid var(--border);
+  background: var(--surface-2); display: grid; place-items: center; transition: var(--tr);
+}
+.ink-size i { display: block; border-radius: 99px; background: var(--text-soft); }
+.ink-size.on { border-color: var(--accent); background: var(--accent-soft); }
+.ink-size.on i { background: var(--accent); }
+
+.ink-actions { display: flex; gap: 7px; margin-inline-start: auto; }
+.ink-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px; border-radius: 11px; font-size: .78rem; font-weight: 800;
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--text-soft);
+  transition: var(--tr);
+}
+.ink-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ink-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+.ink-btn svg { width: 15px; height: 15px; }
+
+.ink-note {
+  font-size: .7rem; color: var(--muted); line-height: 1.7;
+  border-top: 1px dashed var(--border); padding-top: 8px;
+}
+.ink-note b { color: var(--accent); }
+
+/* حالت تمرکز و چاپ با یادداشت‌ها */
+@media print {
+  #inkCanvas, .ink-palette { display: none !important; }
+  #inkNotes { display: block; }
+}
+@media (max-width: 640px) {
+  .ink-palette { width: 94vw; padding: 10px 11px; border-radius: 16px; }
+  .ink-tool span, .ink-btn span { display: none; }
+  .ink-tool, .ink-btn { padding: 8px 10px; }
+  .ink-row .lbl { min-width: 38px; font-size: .68rem; }
+}
+
+/* ---------- یادداشت‌های متنی (ابزار «ویرایش») ---------- */
+#inkNotes {
+  position: absolute; top: 0; inset-inline-start: 0;
+  width: 0; height: 0; z-index: 56;
+}
+.ink-note-card {
+  position: absolute; width: 210px; min-height: 76px;
+  padding: 24px 9px 9px; border-radius: 13px;
+  border: 1px solid rgba(15, 17, 40, .14);
+  box-shadow: 0 10px 26px rgba(15, 17, 40, .16);
+  pointer-events: none;
+}
+body.ink-on .ink-note-card { pointer-events: auto; }
+.ink-note-card textarea {
+  width: 100%; border: 0; background: transparent; resize: vertical;
+  font: inherit; font-size: .82rem; line-height: 1.85; color: #1f2937; outline: none; min-height: 44px;
+}
+.ink-note-del {
+  position: absolute; top: 3px; inset-inline-end: 5px;
+  width: 20px; height: 20px; border-radius: 7px; display: none; place-items: center;
+  background: rgba(255, 255, 255, .7); color: #b91c1c; font-weight: 900; font-size: .9rem;
+  border: 1px solid rgba(0,0,0,.1);
+}
+body.ink-on .ink-note-del { display: grid; }
+.ink-magic-row { border-top: 1px dashed var(--border); padding-top: 9px; }
+body.ink-note-tool #inkCanvas { cursor: copy; }
+@media print { .ink-note-card { box-shadow: none; border: 1px solid #ccc; } }

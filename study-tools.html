@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مرکز ابزارها — رهنما</title>
+<meta name="description" content="بیست ابزار کاربردی برای درس خواندن: پومودورو، ماشین‌حساب علمی، جدول تناوبی، برنامه‌ریز هفتگی، واژه‌نامه، متن‌خوان فارسی و بیشتر — همه در مرورگر و بدون اینترنت.">
+<link rel="canonical" href="https://www.hamkardarsi.ir/study-tools.html">
+<meta name="theme-color" content="#6d5efc">
+<link rel="icon" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/fonts.css?v=10.0">
+<link rel="stylesheet" href="assets/style.css?v=10.0">
+<link rel="stylesheet" href="assets/enhance.css?v=10.0">
+<link rel="stylesheet" href="assets/annotate.css?v=10.0">
+<link rel="stylesheet" href="assets/ultra.css?v=10.0">
+<link rel="stylesheet" href="assets/ai2.css?v=10.0">
+<link rel="stylesheet" href="assets/print.css?v=10.0">
+<link rel="stylesheet" href="assets/hk.css?v=10.0">
+<link rel="stylesheet" href="assets/hk3d.css?v=10.0">
+<link rel="stylesheet" href="assets/hk-school.css?v=10.0">
+<link rel="stylesheet" href="assets/polish.css?v=10.0">
+<link rel="stylesheet" href="assets/cute.css?v=10.0">
+<link rel="stylesheet" href="assets/r6.css?v=10.0">
+<link rel="stylesheet" href="assets/r7.css?v=10.0">
+<link rel="stylesheet" href="assets/r8.css?v=10.0">
+<link rel="stylesheet" href="assets/r9.css?v=10.0">
+<link rel="stylesheet" href="assets/r10.css?v=10.0">
+<link rel="stylesheet" href="assets/r13.css?v=10.0">
+<link rel="stylesheet" href="assets/r14.css?v=10.0">
+</head>
+<body data-base="">
+
+<header class="site-header">
+  <div class="wrap header-in">
+    <a class="brand" href="index.html"><span class="brand-mark">ر</span><b>رهنما</b></a>
+    <nav class="header-nav">
+      <a href="index.html">خانه</a>
+      <a href="jozve.html">جزوه‌ها</a> <a href="jozve-share.html">جزوهٔ همکلاسی‌ها</a> <a href="exam-maker.html">آزمون‌ساز</a> <a href="toolbox.html">جعبهٔ ابزار</a>
+      <a href="study-tools.html" class="on">ابزارها</a>
+      <a href="pdf-tools.html">ابزار PDF</a>
+      <a href="exam.html">آزمون</a>
+      <a href="ai.html">دستیار</a>
+      <a href="dashboard.html">مطالعه</a>
+      <a href="profile.html">حساب من</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="wrap" style="padding-top:22px">
+    <div class="card rt-hero" style="padding:20px">
+      <h1 style="margin:0 0 6px;font-size:1.45rem">🧰 مرکز ابزارها</h1>
+      <p style="margin:0;font-size:.92rem;color:var(--text-soft);line-height:1.9">
+        بیست ابزار کاربردی برای درس خواندن — همه در مرورگر خودت اجرا می‌شوند،
+        <b>بدون اینترنت</b> و بدون فرستادن چیزی به سرور.
+      </p>
+      <div class="rt-bar">
+        <input class="rt-search" id="rtSearch" type="search" placeholder="جست‌وجوی ابزار… مثلاً: پومودورو، جدول تناوبی، درصد">
+      </div>
+      <div class="rt-bar" id="rtCats">
+        <button class="rt-chip on" type="button" data-cat="all">همه</button>
+        <button class="rt-chip" type="button" data-cat="time">⏱ زمان و تمرکز</button>
+        <button class="rt-chip" type="button" data-cat="math">🧮 ریاضی</button>
+        <button class="rt-chip" type="button" data-cat="sci">🔬 علوم</button>
+        <button class="rt-chip" type="button" data-cat="study">📚 مطالعه</button>
+        <button class="rt-chip" type="button" data-cat="help">🎯 کمک‌درسی</button>
+      </div>
+      <div style="font-size:.8rem;color:var(--muted)"><span id="rtCount">۲۰</span> ابزار آماده است.</div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="rt-grid" id="rtGrid">
+
+      <!-- ═════════════‌ ۱. پومودورو ═════════════ -->
+      <div class="card rt-tool" id="tool-pomodoro" data-cat="time" data-key="پومودورو تمرکز زمان تایمر مطالعه 25 دقیقه">
+        <h4><span class="card-icon">🍅</span> پومودورو</h4>
+        <p class="rt-hint">۲۵ دقیقه درس، ۵ دقیقه استراحت. جلسه‌های امروزت ذخیره می‌شود.</p>
+        <svg class="rt-ring" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
+          <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" stroke-opacity=".12" stroke-width="8"></circle>
+          <circle cx="60" cy="60" r="52" fill="none" stroke="#6d5efc" stroke-width="8" stroke-linecap="round"
+                  transform="rotate(-90 60 60)" stroke-dasharray="326.7" stroke-dashoffset="0"></circle>
+        </svg>
+        <div class="rt-clock" id="pmClock">۲۵:۰۰</div>
+        <div class="rt-pills">
+          <span class="rt-pill">حالت: <span id="pmMode">۲۵</span> دقیقه</span>
+          <button class="rt-pill" type="button" data-pm="25">۲۵</button>
+          <button class="rt-pill" type="button" data-pm="15">۱۵</button>
+          <button class="rt-pill" type="button" data-pm="50">۵۰</button>
+          <button class="rt-pill" type="button" data-pm="5">۵</button>
+        </div>
+        <div class="rt-btns">
+          <button class="rt-btn primary" type="button" id="pmStart">شروع</button>
+          <button class="rt-btn" type="button" id="pmStop">توقف</button>
+        </div>
+        <div class="rt-out" id="pmOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۲. کرنومتر و تایمر آزمون ═════════════ -->
+      <div class="card rt-tool" id="tool-stopwatch" data-cat="time" data-key="کرنومتر تایمر آزمون زمان دور شمارش">
+        <h4><span class="card-icon">⏱</span> کرنومتر و تایمر آزمون</h4>
+        <p class="rt-hint">برای زمان‌گیری حل تمرین یا شبیه‌سازی زمان آزمون.</p>
+        <div class="rt-clock" id="swClock">۰۰:۰۰٫۰</div>
+        <div class="rt-btns">
+          <button class="rt-btn primary" type="button" id="swStart">شروع</button>
+          <button class="rt-btn" type="button" id="swStop">توقف</button>
+          <button class="rt-btn" type="button" id="swLap">ثبت دور</button>
+          <button class="rt-btn ghost" type="button" id="swReset">صفر کن</button>
+        </div>
+        <div class="rt-row" style="margin-top:12px">
+          <div class="rt-f"><label for="swCdMin">تایمر معکوس (دقیقه)</label>
+            <input class="rt-in" id="swCdMin" type="number" min="1" value="20" dir="ltr"></div>
+          <button class="rt-btn" type="button" id="swCd">شروع تایمر</button>
+        </div>
+        <div class="rt-out" id="swOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۳. ماشین‌حساب علمی ═════════════ -->
+      <div class="card rt-tool" id="tool-calc" data-cat="math" data-key="ماشین حساب علمی رادیکال سینوس کسینوس لگاریتم توان">
+        <h4><span class="card-icon">🧮</span> ماشین‌حساب علمی</h4>
+        <p class="rt-hint">عبارت را بنویس — مثلاً <code dir="ltr">sqrt(2)*sin(pi/4)</code> یا <code dir="ltr">2^10</code></p>
+        <div class="rt-row">
+          <div class="rt-f" style="flex:1 1 100%">
+            <input class="rt-in" id="calcIn" type="text" dir="ltr" placeholder="مثلاً: (12+8)/4^2">
+          </div>
+        </div>
+        <div class="rt-btns" style="margin-top:8px">
+          <button class="rt-btn" type="button" data-calc="sqrt(">√</button>
+          <button class="rt-btn" type="button" data-calc="^">^</button>
+          <button class="rt-btn" type="button" data-calc="pi">π</button>
+          <button class="rt-btn" type="button" data-calc="sin(">sin</button>
+          <button class="rt-btn" type="button" data-calc="cos(">cos</button>
+          <button class="rt-btn" type="button" data-calc="log(">log</button>
+          <button class="rt-btn" type="button" data-calc="( )">( )</button>
+          <button class="rt-btn" type="button" data-calc="%">٪</button>
+          <button class="rt-btn" type="button" data-calc="←">←</button>
+          <button class="rt-btn" type="button" data-calc="C">پاک</button>
+        </div>
+        <div class="rt-out" id="calcOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۴. معادلهٔ درجهٔ دوم ═════════════ -->
+      <div class="card rt-tool" id="tool-quad" data-cat="math" data-key="معادله درجه دوم دلتا ریشه حل معادله فرمول">
+        <h4><span class="card-icon">📐</span> حل معادله با گام‌های کامل</h4>
+        <p class="rt-hint">ضرایب <span dir="ltr">ax² + bx + c = 0</span> را بده تا گام‌به‌گام حل شود.</p>
+        <div class="rt-row">
+          <div class="rt-f"><label for="qa">a</label><input class="rt-in" id="qa" type="number" step="any" dir="ltr" placeholder="1"></div>
+          <div class="rt-f"><label for="qb">b</label><input class="rt-in" id="qb" type="number" step="any" dir="ltr" placeholder="-5"></div>
+          <div class="rt-f"><label for="qc">c</label><input class="rt-in" id="qc" type="number" step="any" dir="ltr" placeholder="6"></div>
+        </div>
+        <div class="rt-btns"><button class="rt-btn primary" type="button" id="quadGo">حل کن</button></div>
+        <div class="rt-out" id="quadOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۵. ب.م.م و ک.م.م ═════════════ -->
+      <div class="card rt-tool" id="tool-gcd" data-cat="math" data-key="ب م م ک م م بزرگترین مقسوم علیه کوچکترین مضرب عوامل اول">
+        <h4><span class="card-icon">🔢</span> ب.م.م و ک.م.م</h4>
+        <p class="rt-hint">با تجزیه به عوامل اول — همان روشی که در کتاب هست.</p>
+        <div class="rt-row">
+          <div class="rt-f"><label for="gA">عدد اول</label><input class="rt-in" id="gA" type="number" min="1" dir="ltr" placeholder="24"></div>
+          <div class="rt-f"><label for="gB">عدد دوم</label><input class="rt-in" id="gB" type="number" min="1" dir="ltr" placeholder="36"></div>
+        </div>
+        <div class="rt-btns"><button class="rt-btn primary" type="button" id="gcdGo">حساب کن</button></div>
+        <div class="rt-out" id="gcdOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۶. کسر ↔ اعشار ↔ درصد ═════════════ -->
+      <div class="card rt-tool" id="tool-frac" data-cat="math" data-key="کسر اعشار درصد تبدیل ساده کردن مخلوط">
+        <h4><span class="card-icon">½</span> کسر، اعشار و درصد</h4>
+        <p class="rt-hint">هر کدام را داری بده، بقیه را می‌سازم.</p>
+        <div class="rt-row">
+          <div class="rt-f"><label for="frN">صورت</label><input class="rt-in" id="frN" type="number" dir="ltr" placeholder="3"></div>
+          <div class="rt-f"><label for="frD">مخرج</label><input class="rt-in" id="frD" type="number" dir="ltr" placeholder="8"></div>
+          <button class="rt-btn" type="button" id="fracGo">تبدیل کسر</button>
+        </div>
+        <div class="rt-row" style="margin-top:8px">
+          <div class="rt-f"><label for="frDec">یا عدد اعشاری</label><input class="rt-in" id="frDec" type="number" step="any" dir="ltr" placeholder="0.375"></div>
+          <button class="rt-btn" type="button" id="fracFromDec">تبدیل اعشار</button>
+        </div>
+        <div class="rt-out" id="fracOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۷. محاسبهٔ درصد ═════════════ -->
+      <div class="card rt-tool" id="tool-percent" data-cat="math" data-key="درصد تخفیف تغییر درصدی محاسبه درصد">
+        <h4><span class="card-icon">٪</span> محاسبهٔ درصد</h4>
+        <p class="rt-hint">سه حالت پرکاربرد با هم.</p>
+        <div class="rt-row">
+          <div class="rt-f"><label for="pcA">عدد اول</label><input class="rt-in" id="pcA" type="number" step="any" dir="ltr" placeholder="20"></div>
+          <div class="rt-f"><label for="pcB">عدد دوم</label><input class="rt-in" id="pcB" type="number" step="any" dir="ltr" placeholder="150"></div>
+        </div>
+        <div class="rt-btns"><button class="rt-btn primary" type="button" id="pcGo">حساب کن</button></div>
+        <div class="rt-out" id="pcOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۸. جدول تناوبی ═════════════ -->
+      <div class="card rt-tool" id="tool-periodic" data-cat="sci" data-key="جدول تناوبی عنصر شیمی عدد اتمی جرم اتمی">
+        <h4><span class="card-icon">⚛</span> جدول تناوبی عناصر</h4>
+        <p class="rt-hint">۱۱۸ عنصر — روی هر عنصر بزن تا جزئیاتش را ببینی. با جست‌وجو برجسته می‌شود.</p>
+        <div class="rt-row">
+          <div class="rt-f" style="flex:1 1 100%">
+            <input class="rt-in" id="ptSearch" type="search" placeholder="جست‌وجو: نام یا نماد یا عدد اتمی">
+          </div>
+        </div>
+        <div class="rt-ptable" id="ptGrid"></div>
+        <div class="rt-legend" id="ptLegend"></div>
+        <div class="rt-out" id="ptOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۹. مبدل واحدها ═════════════ -->
+      <div class="card rt-tool" id="tool-units" data-cat="sci" data-key="تبدیل واحد طول جرم حجم دما انرژی متر کیلوگرم لیتر">
+        <h4><span class="card-icon">📏</span> مبدل واحدها</h4>
+        <p class="rt-hint">طول، جرم، حجم، زمان، انرژی و دما.</p>
+        <div class="rt-row">
+          <div class="rt-f"><label for="unKind">نوع</label>
+            <select class="rt-sel" id="unKind">
+              <option>طول</option><option>جرم</option><option>حجم</option><option>زمان</option><option>انرژی</option>
+            </select></div>
+          <div class="rt-f"><label for="unVal">مقدار</label><input class="rt-in" id="unVal" type="number" step="any" dir="ltr" placeholder="1"></div>
+        </div>
+        <div class="rt-row" style="margin-top:8px">
+          <div class="rt-f"><label for="unFrom">از</label><select class="rt-sel" id="unFrom"></select></div>
+          <div class="rt-f"><label for="unTo">به</label><select class="rt-sel" id="unTo"></select></div>
+          <button class="rt-btn primary" type="button" id="unGo">تبدیل</button>
+        </div>
+        <div class="rt-row" style="margin-top:10px">
+          <div class="rt-f"><label for="unTv">دما</label><input class="rt-in" id="unTv" type="number" step="any" dir="ltr" placeholder="25"></div>
+          <div class="rt-f"><label for="unTf">یکا</label>
+            <select class="rt-sel" id="unTf"><option value="C">سلسیوس</option><option value="F">فارنهایت</option><option value="K">کلوین</option></select></div>
+          <button class="rt-btn" type="button" id="unTemp">تبدیل دما</button>
+        </div>
+        <div class="rt-out" id="unOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۱۰. محاسبه‌گر فیزیک ═════════════ -->
+      <div class="card rt-tool" id="tool-physics" data-cat="sci" data-key="فیزیک چگالی سرعت نیرو فشار کار فرمول محاسبه">
+        <h4><span class="card-icon">🧲</span> محاسبه‌گر فرمول‌های فیزیک</h4>
+        <p class="rt-hint">چگالی، سرعت، نیرو، فشار و کار — با فرمول‌های کتاب درسی.</p>
+        <div class="rt-row">
+          <div class="rt-f"><label for="phForm">فرمول</label>
+            <select class="rt-sel" id="phForm">
+              <option value="density">چگالی: m ÷ V</option>
+              <option value="speed">سرعت: d ÷ t</option>
+              <option value="force">نیرو: m × a</option>
+              <option value="pressure">فشار: F ÷ A</option>
+              <option value="work">کار: F × d</option>
+            </select></div>
+          <div class="rt-f"><label for="phA">مقدار اول</label><input class="rt-in" id="phA" type="number" step="any" dir="ltr"></div>
+          <div class="rt-f"><label for="phB">مقدار دوم</label><input class="rt-in" id="phB" type="number" step="any" dir="ltr"></div>
+        </div>
+        <div class="rt-btns"><button class="rt-btn primary" type="button" id="phGo">حساب کن</button></div>
+        <div class="rt-out" id="phOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۱۱. برنامه‌ریز هفتگی ═════════════ -->
+      <div class="card rt-tool" id="tool-planner" data-cat="study" data-key="برنامه ریزی هفتگی جدول مطالعه زمان بندی درس">
+        <h4><span class="card-icon">🗓</span> برنامه‌ریز هفتگی</h4>
+        <p class="rt-hint">درس‌هایت را بنویس تا برنامهٔ متعادل هفتگی بچیند.</p>
+        <div class="rt-row">
+          <div class="rt-f" style="flex:1 1 100%">
+            <label for="plSubs">درس‌ها (با ویرگول جدا کن)</label>
+            <input class="rt-in" id="plSubs" type="text" placeholder="ریاضی، علوم، فارسی، عربی، انگلیسی">
+          </div>
+        </div>
+        <div class="rt-row" style="margin-top:8px">
+          <div class="rt-f"><label for="plHours">روزی چند ساعت؟</label>
+            <input class="rt-in" id="plHours" type="number" step="0.5" min="0.5" value="2" dir="ltr"></div>
+          <button class="rt-btn primary" type="button" id="plGo">بساز</button>
+          <button class="rt-btn ghost" type="button" id="plClear">پاک کن</button>
+        </div>
+        <div class="rt-out" id="plOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۱۲. پیگیری عادت ═════════════ -->
+      <div class="card rt-tool" id="tool-habits" data-cat="study" data-key="عادت پیگیری هفتگی چک لیست نشان مطالعه روزانه">
+        <h4><span class="card-icon">✅</span> پیگیری عادت هفتگی</h4>
+        <p class="rt-hint">هر روزی که عادت را انجام دادی، بزن روی حرف آن روز.</p>
+        <div id="hbList"></div>
+        <div class="rt-row" style="margin-top:10px">
+          <div class="rt-f"><label for="hbNew">عادت تازه</label><input class="rt-in" id="hbNew" type="text" placeholder="مثلاً: حل ۱۰ تمرین"></div>
+          <button class="rt-btn" type="button" id="hbAdd">اضافه کن</button>
+          <button class="rt-btn ghost" type="button" id="hbReset">همه را صفر کن</button>
+        </div>
+      </div>
+
+      <!-- ═════════════‌ ۱۳. واژه‌نامهٔ شخصی ═════════════ -->
+      <div class="card rt-tool" id="tool-vocab" data-cat="study" data-key="واژه نامه لغت معنی دیکشنری شخصی آزمون مرور">
+        <h4><span class="card-icon">📖</span> واژه‌نامهٔ شخصی</h4>
+        <p class="rt-hint">واژه‌های عربی و انگلیسی را ذخیره کن و با آزمون مرور کن.</p>
+        <div class="rt-row">
+          <div class="rt-f"><label for="voW">واژه</label><input class="rt-in" id="voW" type="text" placeholder="کتاب"></div>
+          <div class="rt-f"><label for="voM">معنی</label><input class="rt-in" id="voM" type="text" placeholder="book"></div>
+        </div>
+        <div class="rt-btns">
+          <button class="rt-btn primary" type="button" id="voAdd">اضافه کن</button>
+          <button class="rt-btn" type="button" id="voQuiz">آزمون مرور</button>
+        </div>
+        <div id="voList"></div>
+        <div class="rt-out" id="voOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۱۴. فلش‌کارت‌ساز سریع ═════════════ -->
+      <div class="card rt-tool" id="tool-flashmake" data-cat="study" data-key="فلش کارت ساز ساخت کارت جواب سوال مرور">
+        <h4><span class="card-icon">🃏</span> فلش‌کارت‌ساز سریع</h4>
+        <p class="rt-hint">هر خط یکی: <code dir="ltr">سؤال | جواب</code> — بعد با فلش‌کارت‌های سایت تمرین کن.</p>
+        <textarea class="rt-ta" id="fmText" placeholder="پایتخت ایران | تهران&#10;۸ × ۷ | ۵۶"></textarea>
+        <div class="rt-btns">
+          <button class="rt-btn primary" type="button" id="fmGo">کارت‌ها را بساز</button>
+          <button class="rt-btn ghost" type="button" id="fmLoad">بارگذاری کارت‌های ذخیره‌شده</button>
+        </div>
+        <div class="rt-out" id="fmOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۱۵. یادداشت سریع ═════════════ -->
+      <div class="card rt-tool" id="tool-notes" data-cat="study" data-key="یادداشت دفترچه نوشتن ذخیره خودکار">
+        <h4><span class="card-icon">📝</span> یادداشت سریع</h4>
+        <p class="rt-hint">خودش ذخیره می‌شود. می‌توانی بیرون هم ببری.</p>
+        <textarea class="rt-ta" id="ntText" placeholder="هر چه می‌خواهی بنویس…"></textarea>
+        <div class="rt-btns">
+          <button class="rt-btn primary" type="button" id="ntSave">ذخیره</button>
+          <button class="rt-btn" type="button" id="ntDl">دانلود متن</button>
+          <button class="rt-btn" type="button" id="ntCopy">کپی</button>
+          <button class="rt-btn ghost" type="button" id="ntClear">پاک کن</button>
+        </div>
+        <div style="font-size:.76rem;color:var(--muted);margin-top:6px" id="ntStatus"></div>
+      </div>
+
+      <!-- ═════════════‌ ۱۶. محاسبهٔ معدل ═════════════ -->
+      <div class="card rt-tool" id="tool-average" data-cat="study" data-key="معدل نمره ضریب میانگین محاسبه کارنامه">
+        <h4><span class="card-icon">📊</span> محاسبهٔ معدل</h4>
+        <p class="rt-hint">با ضریب — برای وقتی که درس‌ها وزن متفاوت دارند.</p>
+        <div id="avRows"></div>
+        <div class="rt-btns">
+          <button class="rt-btn" type="button" id="avAdd">ردیف تازه</button>
+          <button class="rt-btn primary" type="button" id="avGo">حساب کن</button>
+        </div>
+        <div class="rt-out" id="avOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۱۷. شمارشگر متن ═════════════ -->
+      <div class="card rt-tool" id="tool-counter" data-cat="study" data-key="شمارش کلمه واژه نویسه جمله زمان مطالعه">
+        <h4><span class="card-icon">🔠</span> شمارشگر متن</h4>
+        <p class="rt-hint">می‌گوید متن چند واژه است و چند دقیقه طول می‌کشد.</p>
+        <textarea class="rt-ta" id="cnText" placeholder="متن را این‌جا بچسبان…"></textarea>
+        <div class="rt-out" id="cnOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۱۸. متن‌خوان فارسی ═════════════ -->
+      <div class="card rt-tool" id="tool-tts" data-cat="help" data-key="متن خوان بلندخوانی صدا خواندن تلفظ فارسی">
+        <h4><span class="card-icon">🔊</span> متن‌خوان فارسی</h4>
+        <p class="rt-hint">متن جزوه را بچسبان تا برایت بخواند — خوب است برای مرور گوش‌دادنی.</p>
+        <textarea class="rt-ta" id="ttText" placeholder="متن را این‌جا بگذار…"></textarea>
+        <div class="rt-row" style="margin-top:8px">
+          <div class="rt-f"><label for="ttRate">سرعت خواندن</label>
+            <input class="rt-in" id="ttRate" type="number" step="0.1" min="0.5" max="2" value="1" dir="ltr"></div>
+        </div>
+        <div class="rt-btns">
+          <button class="rt-btn primary" type="button" id="ttGo">بخوان</button>
+          <button class="rt-btn" type="button" id="ttStop">بس کن</button>
+        </div>
+        <div class="rt-out" id="ttOut"></div>
+      </div>
+
+      <!-- ═════════════‌ ۱۹. حالت تمرکز ═════════════ -->
+      <div class="card rt-tool" id="tool-focus" data-cat="help" data-key="تمرکز تمام صفحه صدا سفید آرام بی صدا">
+        <h4><span class="card-icon">🎯</span> حالت تمرکز</h4>
+        <p class="rt-hint">تمام صفحه می‌شود، شمارش معکوس می‌گیرد و می‌توانی صدای آرام پس‌زمینه روشن کنی.</p>
+        <div class="rt-row">
+          <div class="rt-f"><label for="foMin">چند دقیقه؟</label>
+            <input class="rt-in" id="foMin" type="number" min="1" value="25" dir="ltr"></div>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.84rem;font-weight:700;padding-bottom:10px">
+            <input id="foNoise" type="checkbox"> صدای آرام
+          </label>
+        </div>
+        <div class="rt-btns"><button class="rt-btn primary" type="button" id="foGo">شروع تمرکز</button></div>
+      </div>
+
+      <!-- ═════════════‌ ۲۰. تبدیل تاریخ ═════════════ -->
+      <div class="card rt-tool" id="tool-date" data-cat="help" data-key="تاریخ شمسی میلادی تبدیل تقویم امروز">
+        <h4><span class="card-icon">📅</span> تبدیل تاریخ شمسی و میلادی</h4>
+        <p class="rt-hint">برای تاریخ‌های علوم و تاریخ.</p>
+        <div class="rt-row">
+          <div class="rt-f"><label for="dtY">سال شمسی</label><input class="rt-in" id="dtY" type="number" dir="ltr" placeholder="1404"></div>
+          <div class="rt-f"><label for="dtM">ماه</label><input class="rt-in" id="dtM" type="number" dir="ltr" placeholder="1"></div>
+          <div class="rt-f"><label for="dtD">روز</label><input class="rt-in" id="dtD" type="number" dir="ltr" placeholder="1"></div>
+          <button class="rt-btn" type="button" id="dtJ2G">به میلادی</button>
+        </div>
+        <div class="rt-row" style="margin-top:8px">
+          <div class="rt-f"><label for="dtYg">سال میلادی</label><input class="rt-in" id="dtYg" type="number" dir="ltr" placeholder="2026"></div>
+          <div class="rt-f"><label for="dtMg">ماه</label><input class="rt-in" id="dtMg" type="number" dir="ltr" placeholder="1"></div>
+          <div class="rt-f"><label for="dtDg">روز</label><input class="rt-in" id="dtDg" type="number" dir="ltr" placeholder="1"></div>
+          <button class="rt-btn" type="button" id="dtG2J">به شمسی</button>
+        </div>
+        <div class="rt-btns"><button class="rt-btn ghost" type="button" id="dtToday">امروز چندم است؟</button></div>
+        <div class="rt-out" id="dtOut"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="wrap" id="rtEmpty" hidden>
+    <div class="card" style="text-align:center;padding:26px">
+      <div style="font-size:2rem">🔍</div>
+      <p style="margin:6px 0 0">ابزاری با این نام پیدا نشد.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>رهنما — دورهٔ اول متوسطه · <a href="index.html">خانه</a> · <a href="jozve.html">جزوه‌ها</a> · <a href="pdf-tools.html">ابزار PDF</a> · <a href="profile.html">حساب من</a></p>
+  </div>
+
+    <p class="r14-foot-links"><a href="faq.html">پرسش‌های پرتکرار</a> · <a href="terms.html">قوانین و شرایط</a> · <a href="report-abuse.html">گزارش تخلف</a> · <a href="feed.xml">خوراک تازه‌ها</a></p>
+</footer>
+
+<script src="assets/hk-server.js?v=10.0"></script>
+<script src="assets/app.js?v=10.0"></script>
+<script src="assets/enhance.js?v=10.0"></script>
+<script src="assets/grade.js?v=10.0"></script>
+<script src="assets/ultra.js?v=10.0"></script>
+<script src="assets/ai2.js?v=10.0"></script>
+<script src="assets/hk-agent.js?v=10.0"></script>
+<script src="assets/hk-panel.js?v=10.0"></script>
+<script src="assets/hk3d.js?v=10.0"></script>
+<script src="assets/hk-auth.js?v=10.0"></script>
+<script src="assets/polish.js?v=10.0" defer></script>
+<script src="assets/r6.js?v=10.0" defer></script>
+<script src="assets/r7.js?v=10.0" defer></script>
+<script src="assets/r8.js?v=10.0" defer></script>
+<script src="assets/r9.js?v=10.0" defer></script>
+<script src="assets/r9-owner.js?v=10.0" defer></script>
+<script src="assets/r10.js?v=10.0" defer></script>
+<script src="assets/r9-tools.js?v=10.0" defer></script>
+<script src="assets/r9-hub.js?v=10.0" defer></script>
+<script src="assets/r12-support.js?v=10.0" defer></script>
+<script src="assets/r13.js?v=10.0" defer></script>
+<script src="assets/r14.js?v=10.0" defer></script>
+</body>
+</html>

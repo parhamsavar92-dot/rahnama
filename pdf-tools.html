@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>جعبهٔ ابزار PDF — رهنما</title>
+<meta name="description" content="ادغام، جدا کردن، چرخش، شماره‌گذاری، واترمارک فارسی و عکس به PDF — همه در مرورگر خودت، بدون آپلود به هیچ سروری.">
+<link rel="canonical" href="https://www.hamkardarsi.ir/pdf-tools.html">
+<meta name="theme-color" content="#6d5efc">
+<link rel="icon" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/fonts.css?v=10.0">
+<link rel="stylesheet" href="assets/style.css?v=10.0">
+<link rel="stylesheet" href="assets/enhance.css?v=10.0">
+<link rel="stylesheet" href="assets/annotate.css?v=10.0">
+<link rel="stylesheet" href="assets/ultra.css?v=10.0">
+<link rel="stylesheet" href="assets/ai2.css?v=10.0">
+<link rel="stylesheet" href="assets/print.css?v=10.0">
+<link rel="stylesheet" href="assets/hk.css?v=10.0">
+<link rel="stylesheet" href="assets/hk3d.css?v=10.0">
+<link rel="stylesheet" href="assets/hk-school.css?v=10.0">
+<link rel="stylesheet" href="assets/polish.css?v=10.0">
+<link rel="stylesheet" href="assets/cute.css?v=10.0">
+<link rel="stylesheet" href="assets/r6.css?v=10.0">
+<link rel="stylesheet" href="assets/r7.css?v=10.0">
+<link rel="stylesheet" href="assets/r8.css?v=10.0">
+<link rel="stylesheet" href="assets/r9.css?v=10.0">
+<link rel="stylesheet" href="assets/r10.css?v=10.0">
+<style>
+  .pd-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+  .pd-field { margin: 10px 0; }
+  .pd-field label { display: block; font-weight: 800; font-size: .84rem; margin-bottom: 5px; }
+  .pd-in { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border-strong, #d8d8e6);
+           background: var(--surface, #fff); color: var(--text, #1b1b29); font: inherit; }
+  .pd-files { font-size: .78rem; color: var(--muted, #6b7280); margin-top: 5px; min-height: 1em; }
+  .pd-note { font-size: .8rem; color: var(--muted, #6b7280); margin: 8px 0 0; line-height: 1.7; }
+  .pd-hero { background: linear-gradient(135deg, rgba(109,94,252,.10), rgba(34,211,238,.10)); }
+</style>
+<link rel="stylesheet" href="assets/r13.css?v=10.0">
+<link rel="stylesheet" href="assets/r14.css?v=10.0">
+</head>
+<body data-base="">
+
+<header class="site-header">
+  <div class="wrap header-in">
+    <a class="brand" href="index.html"><span class="brand-mark">ر</span><b>رهنما</b></a>
+    <nav class="header-nav">
+      <a href="index.html">خانه</a>
+      <a href="jozve.html">جزوه‌ها</a> <a href="jozve-share.html">جزوهٔ همکلاسی‌ها</a> <a href="exam-maker.html">آزمون‌ساز</a> <a href="toolbox.html">جعبهٔ ابزار</a> <a href="study-tools.html">ابزارها</a> <a href="community.html">زنگ تفریح</a>
+      <a href="pdf-tools.html" class="on">ابزار PDF</a>
+      <a href="exam.html">آزمون</a>
+      <a href="ai.html">دستیار</a>
+      <a href="dashboard.html">مطالعه</a>
+      <a href="profile.html">حساب من</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="wrap" style="padding-top:22px">
+    <div class="card pd-hero" style="padding:20px">
+      <h1 style="margin:0 0 6px;font-size:1.45rem">🗂 جعبهٔ ابزار PDF</h1>
+      <p class="pd-note" style="font-size:.92rem">
+        فایل‌هایت <b>از دستگاه خودت بیرون نمی‌روند</b> — همهٔ کارها در همان مرورگر انجام می‌شود.
+        هیچ چیزی به هیچ سروری آپلود نمی‌شود.
+      </p>
+      <div class="flex mt-2" style="flex-wrap:wrap;gap:8px">
+        <span class="chip">ادغام</span><span class="chip">جدا کردن</span><span class="chip">چرخش</span>
+        <span class="chip">مرتب‌سازی</span><span class="chip">شماره‌گذاری</span><span class="chip">واترمارک فارسی</span>
+        <span class="chip">عکس → PDF</span><span class="chip">متادیتا</span>
+      </div>
+      <div id="pdStatus" class="hk-status" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="pd-grid">
+
+      <!-- ادغام -->
+      <div class="card">
+        <h4><span class="card-icon">➕</span> ادغام چند PDF</h4>
+        <div class="pd-field">
+          <label for="pdMergeFiles">فایل‌ها را به ترتیب دلخواه انتخاب کن</label>
+          <input class="pd-in" id="pdMergeFiles" type="file" accept="application/pdf" multiple>
+          <div class="pd-files"></div>
+        </div>
+        <button class="btn btn-primary btn-sm" data-pd="merge">ادغام کن و دانلود</button>
+        <p class="pd-note">ترتیب ادغام همان ترتیب انتخاب فایل‌هاست.</p>
+      </div>
+
+      <!-- استخراج / حذف -->
+      <div class="card">
+        <h4><span class="card-icon">✂️</span> استخراج یا حذف صفحه‌ها</h4>
+        <div class="pd-field">
+          <label for="pdPickFile">فایل PDF</label>
+          <input class="pd-in" id="pdPickFile" type="file" accept="application/pdf">
+          <div class="pd-files"></div>
+        </div>
+        <div class="pd-field">
+          <label for="pdPickRange">شمارهٔ صفحه‌ها</label>
+          <input class="pd-in" id="pdPickRange" type="text" placeholder="مثلاً 1-3,5,8-10" dir="ltr">
+        </div>
+        <div class="flex" style="gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" data-pd="extract">فقط این صفحه‌ها را بده</button>
+          <button class="btn btn-sm" data-pd="remove">این صفحه‌ها را حذف کن</button>
+        </div>
+      </div>
+
+      <!-- چرخش -->
+      <div class="card">
+        <h4><span class="card-icon">🔄</span> چرخش صفحه‌ها</h4>
+        <div class="pd-field">
+          <label for="pdRotFile">فایل PDF</label>
+          <input class="pd-in" id="pdRotFile" type="file" accept="application/pdf">
+          <div class="pd-files"></div>
+        </div>
+        <div class="pd-field">
+          <label for="pdRotDeg">میزان چرخش</label>
+          <select class="pd-in" id="pdRotDeg">
+            <option value="90">۹۰ درجه</option>
+            <option value="180">۱۸۰ درجه</option>
+            <option value="270">۲۷۰ درجه</option>
+          </select>
+        </div>
+        <div class="pd-field">
+          <label for="pdRotRange">فقط این صفحه‌ها (خالی = همه)</label>
+          <input class="pd-in" id="pdRotRange" type="text" placeholder="مثلاً 1,3-4" dir="ltr">
+        </div>
+        <button class="btn btn-primary btn-sm" data-pd="rotate">بچرخان و دانلود</button>
+      </div>
+
+      <!-- مرتب‌سازی -->
+      <div class="card">
+        <h4><span class="card-icon">🔀</span> مرتب‌سازی صفحه‌ها</h4>
+        <div class="pd-field">
+          <label for="pdOrdFile">فایل PDF</label>
+          <input class="pd-in" id="pdOrdFile" type="file" accept="application/pdf">
+          <div class="pd-files"></div>
+        </div>
+        <div class="pd-field">
+          <label for="pdOrdOrder">ترتیب تازه</label>
+          <input class="pd-in" id="pdOrdOrder" type="text" placeholder="مثلاً 3,1,2" dir="ltr">
+        </div>
+        <button class="btn btn-primary btn-sm" data-pd="reorder">اعمال ترتیب و دانلود</button>
+        <p class="pd-note">صفحه‌هایی که نام نبری، به همان ترتیب قبلی بعد از اینها می‌آیند.</p>
+      </div>
+
+      <!-- شماره‌گذاری -->
+      <div class="card">
+        <h4><span class="card-icon">🔢</span> شماره‌گذاری صفحه‌ها</h4>
+        <div class="pd-field">
+          <label for="pdNumFile">فایل PDF</label>
+          <input class="pd-in" id="pdNumFile" type="file" accept="application/pdf">
+          <div class="pd-files"></div>
+        </div>
+        <div class="pd-field">
+          <label for="pdNumPos">جای شماره</label>
+          <select class="pd-in" id="pdNumPos">
+            <option value="center">وسط پایین</option>
+            <option value="right">راست پایین</option>
+            <option value="left">چپ پایین</option>
+          </select>
+        </div>
+        <div class="pd-field">
+          <label for="pdNumStart">از چه شماره‌ای شروع شود</label>
+          <input class="pd-in" id="pdNumStart" type="number" value="1" min="0" dir="ltr">
+        </div>
+        <button class="btn btn-primary btn-sm" data-pd="number">شماره بزن و دانلود</button>
+        <p class="pd-note">شماره‌ها با ارقام فارسی (۱۲۳) و فونت وزیرمتن نوشته می‌شوند.</p>
+      </div>
+
+      <!-- واترمارک -->
+      <div class="card">
+        <h4><span class="card-icon">💧</span> واترمارک متنی (فارسی)</h4>
+        <div class="pd-field">
+          <label for="pdWmFile">فایل PDF</label>
+          <input class="pd-in" id="pdWmFile" type="file" accept="application/pdf">
+          <div class="pd-files"></div>
+        </div>
+        <div class="pd-field">
+          <label for="pdWmText">متن واترمارک</label>
+          <input class="pd-in" id="pdWmText" type="text" placeholder="مثلاً: مدرسهٔ رهنما — نمونه">
+        </div>
+        <div class="pd-field">
+          <label for="pdWmSize">اندازه (۱۶ تا ۹۰)</label>
+          <input class="pd-in" id="pdWmSize" type="number" value="44" min="16" max="90" dir="ltr">
+        </div>
+        <div class="pd-field">
+          <label for="pdWmOpacity">شفافیت (۰٫۰۵ تا ۰٫۶)</label>
+          <input class="pd-in" id="pdWmOpacity" type="number" value="0.16" min="0.05" max="0.6" step="0.01" dir="ltr">
+        </div>
+        <button class="btn btn-primary btn-sm" data-pd="watermark">واترمارک بزن و دانلود</button>
+        <p class="pd-note">حروف فارسی به‌درستی به هم می‌چسبند و از راست به چپ نوشته می‌شوند.</p>
+      </div>
+
+      <!-- عکس → PDF -->
+      <div class="card">
+        <h4><span class="card-icon">🖼</span> عکس → PDF</h4>
+        <div class="pd-field">
+          <label for="pdImgFiles">تصویرها (JPG یا PNG — چند تا هم می‌شود)</label>
+          <input class="pd-in" id="pdImgFiles" type="file" accept="image/png,image/jpeg" multiple>
+          <div class="pd-files"></div>
+        </div>
+        <button class="btn btn-primary btn-sm" data-pd="images">PDF بساز و دانلود</button>
+        <p class="pd-note">هر عکس یک صفحهٔ A4 می‌شود، وسط‌چین و بدون کشیدگی.</p>
+      </div>
+
+      <!-- اطلاعات و متادیتا -->
+      <div class="card">
+        <h4><span class="card-icon">🏷</span> اطلاعات و متادیتا</h4>
+        <div class="pd-field">
+          <label for="pdInfoFile">فایل PDF</label>
+          <input class="pd-in" id="pdInfoFile" type="file" accept="application/pdf">
+          <div class="pd-files"></div>
+        </div>
+        <div class="pd-field">
+          <label for="pdInfoTitle">عنوان (اختیاری)</label>
+          <input class="pd-in" id="pdInfoTitle" type="text" placeholder="مثلاً: جزوهٔ ریاضی پایهٔ هشتم">
+        </div>
+        <div class="pd-field">
+          <label for="pdInfoAuthor">نویسنده (اختیاری)</label>
+          <input class="pd-in" id="pdInfoAuthor" type="text" placeholder="مثلاً: دبیر ریاضی">
+        </div>
+        <div class="flex" style="gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" data-pd="info">خواندن اطلاعات</button>
+        </div>
+        <div id="pdInfoOut" class="card" style="margin-top:12px;padding:12px;font-size:.86rem;display:block"></div>
+        <p class="pd-note">اگر عنوان یا نویسنده را پر کنی، فایل تازه با همان متادیتا دانلود می‌شود.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="card" style="padding:16px">
+      <h4><span class="card-icon">💡</span> نکته‌های کاربردی</h4>
+      <ul class="ticks">
+        <li>برای جدا کردن یک فصل، اول «استخراج» را با بازهٔ همان فصل بزن.</li>
+        <li>اگر فایل چرخیده است، «چرخش ۱۸۰ درجه» را روی همهٔ صفحه‌ها اعمال کن.</li>
+        <li>واترمارک با شفافیت ۰٫۱۲ تا ۰٫۲ بهترین نتیجه را روی جزوه‌ها می‌دهد.</li>
+        <li>همه‌چیز در مرورگر انجام می‌شود؛ حتی بدون اینترنت هم کار می‌کند.</li>
+      </ul>
+      <p class="pd-note" style="margin-top:10px">
+        فایل‌ها هیچ‌وقت به سرور فرستاده نمی‌شوند، پس اطلاعاتت پیش خودت می‌ماند.
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>رهنما — دورهٔ اول متوسطه · <a href="index.html">خانه</a> · <a href="jozve.html">جزوه‌ها</a> · <a href="profile.html">حساب من</a></p>
+  </div>
+
+    <p class="r14-foot-links"><a href="faq.html">پرسش‌های پرتکرار</a> · <a href="terms.html">قوانین و شرایط</a> · <a href="report-abuse.html">گزارش تخلف</a> · <a href="feed.xml">خوراک تازه‌ها</a></p>
+</footer>
+
+<script src="assets/hk-server.js?v=10.0"></script>
+<script src="assets/app.js?v=10.0"></script>
+<script src="assets/enhance.js?v=10.0"></script>
+<script src="assets/grade.js?v=10.0"></script>
+<script src="assets/ultra.js?v=10.0"></script>
+<script src="assets/ai2.js?v=10.0"></script>
+<script src="assets/hk-agent.js?v=10.0"></script>
+<script src="assets/hk-panel.js?v=10.0"></script>
+<script src="assets/hk3d.js?v=10.0"></script>
+<script src="assets/hk-auth.js?v=10.0"></script>
+<script src="assets/polish.js?v=10.0" defer></script>
+<script src="assets/r6.js?v=10.0" defer></script>
+<script src="assets/r7.js?v=10.0" defer></script>
+<script src="assets/r8.js?v=10.0" defer></script>
+<script src="assets/r9.js?v=10.0" defer></script>
+<script src="assets/r9-owner.js?v=10.0" defer></script>
+<script src="assets/r10.js?v=10.0" defer></script>
+<script src="assets/r7-pdf.js?v=10.0" defer></script>
+<script src="assets/r12-support.js?v=10.0" defer></script>
+<script src="assets/r13.js?v=10.0" defer></script>
+<script src="assets/r14.js?v=10.0" defer></script>
+</body>
+</html>

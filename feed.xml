@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="fa-IR">
+  <title>رهنما — جزوه‌ها و ابزارهای درسی دورهٔ اول متوسطه</title>
+  <subtitle>جزوه‌های پایهٔ هفتم، هشتم و نهم، آزمون‌ها، فلش‌کارت‌ها و ابزارهای کاربردی مطالعه</subtitle>
+  <link href="https://www.hamkardarsi.ir/feed.xml" rel="self"/>
+  <link href="https://www.hamkardarsi.ir/"/>
+  <id>https://www.hamkardarsi.ir/</id>
+  <updated>2026-10-14T13:21:59.434Z</updated>
+  <author><name>رهنما</name><uri>https://www.hamkardarsi.ir/about.html</uri></author>
+  <rights>رهنما — استفادهٔ آموزشی آزاد با ذکر منبع</rights>
+  <entry>
+    <title>جزوهٔ همکلاسی‌ها</title>
+    <link href="https://www.hamkardarsi.ir/jozve-share.html"/>
+    <id>https://www.hamkardarsi.ir/jozve-share.html</id>
+    <updated>2026-10-14T13:21:59.434Z</updated>
+    <summary>جزوه‌ها و خلاصه‌های دانش‌آموزان رهنما با متن و عکس — خودت هم می‌توانی بگذاری.</summary>
+  </entry>
+  <entry>
+    <title>جعبهٔ ابزار رهنما</title>
+    <link href="https://www.hamkardarsi.ir/toolbox.html"/>
+    <id>https://www.hamkardarsi.ir/toolbox.html</id>
+    <updated>2026-10-14T13:21:59.434Z</updated>
+    <summary>ماشین‌حساب معدل، پومودورو، تایمر آزمون، تبدیل یکا و فهرست کار روزانه.</summary>
+  </entry>
+  <entry>
+    <title>پرسش‌های پرتکرار رهنما</title>
+    <link href="https://www.hamkardarsi.ir/faq.html"/>
+    <id>https://www.hamkardarsi.ir/faq.html</id>
+    <updated>2026-10-14T13:21:59.434Z</updated>
+    <summary>پاسخ پرسش‌های رایج دربارهٔ استفاده از سایت، گذاشتن جزوه و حساب کاربری.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ کار و فناوری — پایهٔ نهم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/9/tech.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/9/tech.html</id>
+    <updated>2026-10-14T13:10:55.189Z</updated>
+    <summary>جزوهٔ کامل کار و فناوری پایهٔ نهم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ مطالعات اجتماعی — پایهٔ نهم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/9/social.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/9/social.html</id>
+    <updated>2026-10-14T13:10:55.182Z</updated>
+    <summary>جزوهٔ کامل مطالعات اجتماعی پایهٔ نهم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ علوم تجربی — پایهٔ نهم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/9/science.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/9/science.html</id>
+    <updated>2026-10-14T13:10:55.175Z</updated>
+    <summary>جزوهٔ کامل علوم تجربی پایهٔ نهم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ پیام‌های آسمان — پایهٔ نهم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/9/religion.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/9/religion.html</id>
+    <updated>2026-10-14T13:10:55.168Z</updated>
+    <summary>جزوهٔ کامل پیام‌های آسمان پایهٔ نهم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ قرآن — پایهٔ نهم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/9/quran.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/9/quran.html</id>
+    <updated>2026-10-14T13:10:55.165Z</updated>
+    <summary>جزوهٔ کامل قرآن پایهٔ نهم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ نگارش و انشا — پایهٔ نهم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/9/negaresh.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/9/negaresh.html</id>
+    <updated>2026-10-14T13:10:55.162Z</updated>
+    <summary>جزوهٔ کامل نگارش و انشا پایهٔ نهم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ ریاضی — پایهٔ نهم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/9/math.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/9/math.html</id>
+    <updated>2026-10-14T13:10:55.160Z</updated>
+    <summary>جزوهٔ کامل ریاضی پایهٔ نهم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ فارسی — پایهٔ نهم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/9/farsi.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/9/farsi.html</id>
+    <updated>2026-10-14T13:10:55.150Z</updated>
+    <summary>جزوهٔ کامل فارسی پایهٔ نهم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ زبان انگلیسی — پایهٔ نهم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/9/english.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/9/english.html</id>
+    <updated>2026-10-14T13:10:55.146Z</updated>
+    <summary>جزوهٔ کامل زبان انگلیسی پایهٔ نهم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ آمادگی دفاعی — پایهٔ نهم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/9/defa.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/9/defa.html</id>
+    <updated>2026-10-14T13:10:55.144Z</updated>
+    <summary>جزوهٔ کامل آمادگی دفاعی پایهٔ نهم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ فرهنگ و هنر — پایهٔ نهم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/9/art.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/9/art.html</id>
+    <updated>2026-10-14T13:10:55.141Z</updated>
+    <summary>جزوهٔ کامل فرهنگ و هنر پایهٔ نهم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ عربی — پایهٔ نهم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/9/arabic.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/9/arabic.html</id>
+    <updated>2026-10-14T13:10:55.134Z</updated>
+    <summary>جزوهٔ کامل عربی پایهٔ نهم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ تفکر و سبک زندگی — پایهٔ هشتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/8/thinking.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/8/thinking.html</id>
+    <updated>2026-10-14T13:10:55.129Z</updated>
+    <summary>جزوهٔ کامل تفکر و سبک زندگی پایهٔ هشتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ کار و فناوری — پایهٔ هشتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/8/tech.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/8/tech.html</id>
+    <updated>2026-10-14T13:10:55.126Z</updated>
+    <summary>جزوهٔ کامل کار و فناوری پایهٔ هشتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ مطالعات اجتماعی — پایهٔ هشتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/8/social.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/8/social.html</id>
+    <updated>2026-10-14T13:10:55.118Z</updated>
+    <summary>جزوهٔ کامل مطالعات اجتماعی پایهٔ هشتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ علوم تجربی — پایهٔ هشتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/8/science.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/8/science.html</id>
+    <updated>2026-10-14T13:10:55.112Z</updated>
+    <summary>جزوهٔ کامل علوم تجربی پایهٔ هشتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ پیام‌های آسمان — پایهٔ هشتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/8/religion.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/8/religion.html</id>
+    <updated>2026-10-14T13:10:55.105Z</updated>
+    <summary>جزوهٔ کامل پیام‌های آسمان پایهٔ هشتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ قرآن — پایهٔ هشتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/8/quran.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/8/quran.html</id>
+    <updated>2026-10-14T13:10:55.098Z</updated>
+    <summary>جزوهٔ کامل قرآن پایهٔ هشتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ نگارش و انشا — پایهٔ هشتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/8/negaresh.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/8/negaresh.html</id>
+    <updated>2026-10-14T13:10:55.095Z</updated>
+    <summary>جزوهٔ کامل نگارش و انشا پایهٔ هشتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ ریاضی — پایهٔ هشتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/8/math.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/8/math.html</id>
+    <updated>2026-10-14T13:10:55.092Z</updated>
+    <summary>جزوهٔ کامل ریاضی پایهٔ هشتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ فارسی — پایهٔ هشتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/8/farsi.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/8/farsi.html</id>
+    <updated>2026-10-14T13:10:55.079Z</updated>
+    <summary>جزوهٔ کامل فارسی پایهٔ هشتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ زبان انگلیسی — پایهٔ هشتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/8/english.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/8/english.html</id>
+    <updated>2026-10-14T13:10:55.072Z</updated>
+    <summary>جزوهٔ کامل زبان انگلیسی پایهٔ هشتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ فرهنگ و هنر — پایهٔ هشتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/8/art.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/8/art.html</id>
+    <updated>2026-10-14T13:10:55.066Z</updated>
+    <summary>جزوهٔ کامل فرهنگ و هنر پایهٔ هشتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ عربی — پایهٔ هشتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/8/arabic.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/8/arabic.html</id>
+    <updated>2026-10-14T13:10:55.060Z</updated>
+    <summary>جزوهٔ کامل عربی پایهٔ هشتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ تفکر و سبک زندگی — پایهٔ هفتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/7/thinking.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/7/thinking.html</id>
+    <updated>2026-10-14T13:10:55.051Z</updated>
+    <summary>جزوهٔ کامل تفکر و سبک زندگی پایهٔ هفتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ کار و فناوری — پایهٔ هفتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/7/tech.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/7/tech.html</id>
+    <updated>2026-10-14T13:10:55.048Z</updated>
+    <summary>جزوهٔ کامل کار و فناوری پایهٔ هفتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ مطالعات اجتماعی — پایهٔ هفتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/7/social.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/7/social.html</id>
+    <updated>2026-10-14T13:10:55.037Z</updated>
+    <summary>جزوهٔ کامل مطالعات اجتماعی پایهٔ هفتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ علوم تجربی — پایهٔ هفتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/7/science.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/7/science.html</id>
+    <updated>2026-10-14T13:10:55.026Z</updated>
+    <summary>جزوهٔ کامل علوم تجربی پایهٔ هفتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ پیام‌های آسمان — پایهٔ هفتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/7/religion.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/7/religion.html</id>
+    <updated>2026-10-14T13:10:55.020Z</updated>
+    <summary>جزوهٔ کامل پیام‌های آسمان پایهٔ هفتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ قرآن — پایهٔ هفتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/7/quran.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/7/quran.html</id>
+    <updated>2026-10-14T13:10:55.014Z</updated>
+    <summary>جزوهٔ کامل قرآن پایهٔ هفتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ نگارش و انشا — پایهٔ هفتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/7/negaresh.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/7/negaresh.html</id>
+    <updated>2026-10-14T13:10:55.012Z</updated>
+    <summary>جزوهٔ کامل نگارش و انشا پایهٔ هفتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ ریاضی — پایهٔ هفتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/7/math.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/7/math.html</id>
+    <updated>2026-10-14T13:10:55.008Z</updated>
+    <summary>جزوهٔ کامل ریاضی پایهٔ هفتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ فارسی — پایهٔ هفتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/7/farsi.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/7/farsi.html</id>
+    <updated>2026-10-14T13:10:54.997Z</updated>
+    <summary>جزوهٔ کامل فارسی پایهٔ هفتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ زبان انگلیسی — پایهٔ هفتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/7/english.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/7/english.html</id>
+    <updated>2026-10-14T13:10:54.991Z</updated>
+    <summary>جزوهٔ کامل زبان انگلیسی پایهٔ هفتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ فرهنگ و هنر — پایهٔ هفتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/7/art.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/7/art.html</id>
+    <updated>2026-10-14T13:10:54.986Z</updated>
+    <summary>جزوهٔ کامل فرهنگ و هنر پایهٔ هفتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+  <entry>
+    <title>جزوهٔ عربی — پایهٔ هفتم</title>
+    <link href="https://www.hamkardarsi.ir/jozve/7/arabic.html"/>
+    <id>https://www.hamkardarsi.ir/jozve/7/arabic.html</id>
+    <updated>2026-10-14T13:10:54.984Z</updated>
+    <summary>جزوهٔ کامل عربی پایهٔ هفتم همراه با آزمون، جمع‌بندی نهایی، اشتباه‌های رایج و تمرین تشریحی با پاسخ.</summary>
+  </entry>
+</feed>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>پنل مدیریت — رهنما</title>
+<meta name="description" content="پنل مدیریت رهنما: کاربران، عضویت‌ها، پیشرفت دانش‌آموزان، اعلان سراسری، تنظیمات سایت، گزارش رویدادها و خروجی داده‌ها.">
+<link rel="stylesheet" href="assets/fonts.css?v=10.0">
+<link rel="stylesheet" href="assets/style.css?v=10.0">
+<meta name="theme-color" content="#6d5efc">
+<link rel="icon" href="assets/icons/favicon.png">
+<link rel="stylesheet" href="assets/enhance.css?v=10.0">
+<link rel="stylesheet" href="assets/ultra.css?v=10.0">
+<link rel="stylesheet" href="assets/hk.css?v=10.0">
+<link rel="stylesheet" href="assets/hk3d.css?v=10.0">
+<link rel="stylesheet" href="assets/hk-school.css?v=10.0">
+<link rel="stylesheet" href="assets/admin.css?v=10.0">
+<link rel="stylesheet" href="assets/print.css?v=10.0">
+  <link rel="stylesheet" href="assets/ai2.css?v=10.0">
+  <!-- seo:domain -->
+  <link rel="canonical" href="https://www.hamkardarsi.ir/admin.html">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="رهنما">
+  <meta property="og:locale" content="fa_IR">
+  <meta property="og:title" content="پنل مدیریت — رهنما">
+  <meta property="og:description" content="پنل مدیریت رهنما: کاربران، عضویت‌ها، پیشرفت دانش‌آموزان، اعلان سراسری، تنظیمات سایت، گزارش رویدادها و خروجی داده‌ها.">
+  <meta property="og:url" content="https://www.hamkardarsi.ir/admin.html">
+  <meta property="og:image" content="https://www.hamkardarsi.ir/assets/icons/icon-512.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="پنل مدیریت — رهنما">
+  <meta name="twitter:description" content="پنل مدیریت رهنما: کاربران، عضویت‌ها، پیشرفت دانش‌آموزان، اعلان سراسری، تنظیمات سایت، گزارش رویدادها و خروجی داده‌ها.">
+  <meta name="twitter:image" content="https://www.hamkardarsi.ir/assets/icons/icon-512.png">
+  <!-- /seo:domain -->
+<link rel="stylesheet" href="assets/polish.css?v=10.0">
+<link rel="stylesheet" href="assets/cute.css?v=10.0">
+<link rel="stylesheet" href="assets/r6.css?v=10.0">
+ <link rel="stylesheet" href="assets/r7.css?v=10.0">
+ <link rel="stylesheet" href="assets/r8.css?v=10.0">
+ <link rel="stylesheet" href="assets/r9.css?v=10.0">
+ <link rel="stylesheet" href="assets/r10.css?v=10.0">
+<link rel="stylesheet" href="assets/r13.css?v=10.0">
+<link rel="stylesheet" href="assets/r14.css?v=10.0">
+</head>
+<body data-grade="8" data-base="" data-subject="admin">
+<div id="readbar"></div>
+
+<!-- ------------------------------- بدون دسترسی ------------------------------- -->
+<div id="admDeny" hidden style="max-width:640px;margin:12vh auto;padding:22px">
+  <div class="card">
+    <h4><span class="card-icon">!</span> دسترسی به پنل مدیریت</h4>
+    <p>این بخش فقط برای <b>مالک</b> و <b>مدیران سایت</b> است. با حساب مدیریتی وارد شو.</p>
+    <div class="flex mt-3" style="flex-wrap:wrap">
+      <a class="btn btn-primary" href="profile.html">ورود به حساب</a>
+      <a class="btn btn-ghost" href="index.html">بازگشت به سایت</a>
+    </div>
+  </div>
+</div>
+
+<!-- ----------------------------------- پنل ----------------------------------- -->
+<div class="adm" id="admBody" hidden>
+
+  <aside class="adm-side" id="admSide">
+    <a class="adm-brand" href="index.html">
+      <span class="m">م</span>
+      <span><b>پنل مدیریت</b><small>رهنما</small></span>
+    </a>
+
+    <nav class="adm-nav" aria-label="بخش‌های پنل">
+      <button data-nav="overview" class="on"><span class="ic">▦</span> نمای کلی</button>
+      <button data-nav="users" hidden><span class="ic">👥</span> کاربران <span class="badge" data-badge="users">۰</span></button>
+      <button data-nav="announce"><span class="ic">📣</span> اعلان سراسری</button>
+      <button data-nav="settings" data-admin-only><span class="ic">⚙</span> تنظیمات سایت</button>
+      <button data-nav="school"><span class="ic">🎓</span> کلاس و</button>
+      <button data-nav="events"><span class="ic">📈</span> گزارش رویدادها</button>
+      <button data-nav="audit"><span class="ic">🧾</span> گزارش اقدامات</button>
+      <button data-nav="tools" data-admin-only><span class="ic">🧰</span> ابزار و خروجی</button>
+    </nav>
+
+    <div class="adm-sidefoot">
+      <div>وارد شده: <b id="admWho">—</b></div>
+      <div style="margin-top:6px"><a href="profile.html" style="color:var(--accent)">پروفایل من</a> · <a href="index.html" style="color:var(--accent)">بازگشت به سایت</a></div>
+      <div style="margin-top:8px;opacity:.85">میان‌برها: <b>Alt+G</b> نمای کلی · <b>Alt+U</b> کاربران · <b>Alt+N</b> اعلان · <b>Alt+S</b> تنظیمات</div>
+    </div>
+  </aside>
+
+  <main class="adm-main">
+    <div class="adm-top">
+      <button class="icon-btn" id="admMenu" aria-label="فهرست">≡</button>
+      <div>
+        <h1>پنل مدیریت</h1>
+        <div class="sub">کاربران، پیشرفت دانش‌آموزان، اعلان‌ها و سلامتی سایت</div>
+      </div>
+      <span class="sp"></span>
+      <div class="adm-search"><span>⌕</span><input id="admSearch" type="search" placeholder="جست‌وجوی نام، ایمیل، مدرسه…" aria-label="جست‌وجوی کاربر"></div>
+      <select id="admRole" class="chip" style="padding:9px 12px;font-weight:800">
+        <option value="">همهٔ نقش‌ها</option>
+        <option value="owner">مالک سایت</option>
+        <option value="admin">مدیر</option>
+        <option value="teacher">دبیر</option>
+        <option value="student">دانش‌آموز</option>
+      </select>
+      <select id="admGrade" class="chip" style="padding:9px 12px;font-weight:800">
+        <option value="">همهٔ پایه‌ها</option>
+        <option value="7">هفتم</option><option value="8">هشتم</option><option value="9">نهم</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" id="toolReload" title="تازه‌سازی">↺</button>
+      <button class="btn btn-ghost btn-sm" data-print>چاپ</button>
+    </div>
+
+    <!-- ============================== نمای کلی ============================== -->
+    <section class="adm-pane" data-pane="overview">
+      <div class="adm-kpis" id="admKpis"></div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h4><span class="card-icon">◆</span> روند ۱۴ روز گذشته</h4>
+          <div id="admChart"></div>
+        </div>
+        <div class="card">
+          <h4><span class="card-icon">◆</span> نکته‌های مهم</h4>
+          <div id="admAlerts"></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h4><span class="card-icon">◆</span> توزیع کاربران بر پایهٔ تحصیلی</h4>
+          <div id="admGrades"></div>
+        </div>
+        <div class="card">
+          <h4><span class="card-icon">◆</span> توزیع نقش‌ها</h4>
+          <div id="admRoles"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== کاربران ============================== -->
+    <section class="adm-pane" data-pane="users" hidden>
+      <div class="card">
+        <div class="flex" style="align-items:center;gap:12px;flex-wrap:wrap">
+          <h4 style="margin:0"><span class="card-icon">◆</span> فهرست کاربران</h4>
+          <span class="chip" id="admUsersCount">—</span>
+          <span class="sp" style="margin-inline-start:auto"></span>
+          <button class="btn btn-ghost btn-sm" id="toolExportUsers">خروجی CSV کاربران</button>
+        </div>
+        <div class="adm-tablewrap mt-3">
+          <table class="adm-table" id="admTable">
+            <thead>
+              <tr>
+                <th data-sort="new">کاربر</th>
+                <th>نقش</th>
+                <th>پایه</th>
+                <th>مدرسه / شهر</th>
+                <th data-sort="active" title="مرتب‌سازی بر پایهٔ مطالعه">درس</th>
+                <th>آزمون</th>
+                <th data-sort="active">دقیقه</th>
+                <th>آخرین ورود</th>
+                <th>اقدام</th>
+              </tr>
+            </thead>
+            <tbody id="admUsers"><tr><td colspan="9" style="text-align:center;color:var(--muted);padding:26px">در حال بارگذاری…</td></tr></tbody>
+          </table>
+        </div>
+        <div class="adm-pager" id="admPager"></div>
+      </div>
+    </section>
+
+    <!-- ============================== اعلان ============================== -->
+    <section class="adm-pane" data-pane="announce" hidden>
+      <div class="grid-2">
+        <div class="card">
+          <h4><span class="card-icon">◆</span> ساخت اعلان سراسری</h4>
+          <p style="font-size:.86rem">این پیام بالای همهٔ صفحه‌های سایت به همهٔ بازدیدکنندگان نشان داده می‌شود — برای اطلاع امتحان‌ها، تعطیلی یا خبرهای مهم.</p>
+          <div class="hk-field"><label for="anText">متن اعلان</label>
+            <textarea id="anText" rows="3" placeholder="مثلاً: امتحان‌های نوبت اول از هفتهٔ آینده شروع می‌شود."
+              style="width:100%;padding:11px 13px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);color:var(--text);font:inherit;font-family:inherit;resize:vertical"></textarea></div>
+          <div class="hk-field"><label for="anLevel">رنگ و اهمیت</label>
+            <select id="anLevel">
+              <option value="info">اطلاع‌رسانی (بنفش)</option>
+              <option value="success">خبر خوب (سبز)</option>
+              <option value="warn">هشدار (نارنجی)</option>
+              <option value="danger">فوری (قرمز)</option>
+            </select></div>
+          <label class="adm-switch" style="cursor:pointer">
+            <input type="checkbox" id="anActive" style="width:18px;height:18px">
+            <span class="info"><b>نمایش اعلان</b><small>اگر خاموش باشد، اعلان به بازدیدکنندگان نشان داده نمی‌شود.</small></span>
+          </label>
+          <div class="adm-actions">
+            <button class="btn btn-primary btn-sm" id="anSave">ذخیره و نمایش</button>
+            <button class="btn btn-ghost btn-sm" id="anOff">خاموش کردن اعلان</button>
+          </div>
+        </div>
+        <div class="card">
+          <h4><span class="card-icon">◆</span> پیش‌نمایش زنده</h4>
+          <div id="anPreview" class="hk-announce lv-info" style="border-radius:12px;margin-bottom:14px"><span>متن اعلان اینجا نمایش داده می‌شود…</span></div>
+          <p style="font-size:.8rem;color:var(--muted)">اعلان در بالای صفحه، زیر سربرگ سایت ظاهر می‌شود و کاربر می‌تواند آن را ببندد.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== تنظیمات ============================== -->
+    <section class="adm-pane" data-pane="settings" hidden>
+      <div class="grid-2">
+        <div class="card">
+          <h4><span class="card-icon">◆</span> وضعیت سایت</h4>
+
+          <div class="adm-switch" style="cursor:pointer">
+            <span class="info"><b>ثبت‌نام باز باشد</b><small>اگر خاموش شود، هیچ کاربر تازه‌ای نمی‌تواند حساب بسازد.</small></span>
+            <span class="adm-toggle on" data-switch="registrationOpen" role="switch" aria-label="ثبت‌نام"></span>
+          </div>
+
+          <div class="adm-switch" style="cursor:pointer">
+            <span class="info"><b>حالت تعمیر</b><small>سایت برای بازدیدکنندگان پیام «به‌زودی برمی‌گردیم» نشان می‌دهد؛ مدیر دسترسی دارد.</small></span>
+            <span class="adm-toggle" data-switch="maintenance" role="switch" aria-label="حالت تعمیر"></span>
+          </div>
+
+          <div class="adm-switch" style="cursor:pointer">
+            <span class="info"><b>دستیار هوشمند آنلاین</b><small>اگر خاموش شود، مشاور فقط از جزوه‌های داخلی پاسخ می‌دهد.</small></span>
+            <span class="adm-toggle on" data-switch="aiEnabled" role="switch" aria-label="دستیار هوشمند"></span>
+          </div>
+
+          <div class="hk-field mt-3"><label for="stNote">متن صفحهٔ حالت تعمیر</label>
+            <textarea id="stNote" rows="2" style="width:100%;padding:11px 13px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface-2);color:var(--text);font:inherit;font-family:inherit;resize:vertical"></textarea></div>
+
+          <button class="btn btn-primary btn-sm" id="stSave">ذخیرهٔ تنظیمات</button>
+        </div>
+
+        <div class="card">
+          <h4><span class="card-icon">◆</span> پایه‌های مجاز</h4>
+          <p style="font-size:.86rem">اگر یکی از پایه‌ها را خاموش کنی، در ثبت‌نام و انتخاب پایه نمایش داده نمی‌شود.</p>
+          <label class="adm-switch" style="cursor:pointer"><input type="checkbox" data-grade-chk="7" style="width:18px;height:18px"><span class="info"><b>پایهٔ هفتم</b><small>۲۲۱ درس</small></span></label>
+          <label class="adm-switch" style="cursor:pointer"><input type="checkbox" data-grade-chk="8" style="width:18px;height:18px"><span class="info"><b>پایهٔ هشتم</b><small>۲۰۶ درس</small></span></label>
+          <label class="adm-switch" style="cursor:pointer"><input type="checkbox" data-grade-chk="9" style="width:18px;height:18px"><span class="info"><b>پایهٔ نهم</b><small>۱۸۲ درس</small></span></label>
+          <div class="callout tip mt-3"><span class="c-ico">◆</span><div><span class="c-title">نکته</span><p>تغییرات این صفحه بلافاصله روی سایت اعمال می‌شود؛ نیازی به راه‌اندازی دوبارهٔ سرور نیست.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== رویدادها ============================== -->
+    <section class="adm-pane" data-pane="events" hidden>
+      <div class="card">
+        <div class="flex" style="align-items:center;gap:12px;flex-wrap:wrap">
+          <h4 style="margin:0"><span class="card-icon">◆</span> گزارش رویدادها</h4>
+          <select id="evFilter" class="chip" style="padding:9px 12px;font-weight:800">
+            <option value="">همهٔ رویدادها</option>
+            <option value="login">ورود</option>
+            <option value="login_fail">ورود ناموفق</option>
+            <option value="register">ثبت‌نام</option>
+            <option value="sync">همگامی داده</option>
+            <option value="quiz">آزمون</option>
+            <option value="admin_user_update">تغییر کاربر توسط مدیر</option>
+            <option value="announce">اعلان</option>
+          </select>
+          <span style="margin-inline-start:auto"></span>
+          <button class="btn btn-ghost btn-sm" id="toolExportEvents">خروجی CSV رویدادها</button>
+        </div>
+        <div class="adm-log mt-3" id="admEvents"></div>
+      </div>
+    </section>
+
+    <!-- ============================== گزارش اقدامات ============================== -->
+    <section class="adm-pane" data-pane="audit" hidden>
+      <div class="card">
+        <h4><span class="card-icon">◆</span> گزارش اقدامات مدیران</h4>
+        <p style="font-size:.85rem;color:var(--muted)">هر تغییری که مدیر یا دبیر در پنل انجام دهد، اینجا ثبت می‌شود (شفافیت و پیگیری).</p>
+        <div class="adm-log mt-3" id="admAudit"></div>
+      </div>
+    </section>
+
+    <!-- ========================= کلاس مجازی و ========================= -->
+    <section class="adm-pane" data-pane="school" hidden>
+      <div class="grid-3" id="admSchoolKpi"></div>
+      <div class="card">
+        <h4><span class="card-icon">◆</span> کلاس‌های مجازی مدرسه</h4>
+        <p style="font-size:.85rem;color:var(--muted)">همهٔ کلاس‌های ساخته‌شده، کد ورود، شمار اعضا و جلسهٔ زندهٔ آن‌ها. برای گزارش حضور و غیاب هر جلسه، به صفحهٔ کلاس مجازی بروید یا <span class="ltr">CSV</span> را بگیرید.</p>
+        <div id="admSchoolClasses" class="mt-3"></div>
+      </div>
+      <div class="card">
+        <h4><span class="card-icon">◆</span> جلسه‌های زندهٔ همین حالا</h4>
+        <div id="admSchoolLive" class="mt-2"></div>
+      </div>
+      <div class="card">
+        <h4><span class="card-icon">♛</span> مالکان سایت و تیک آبی‌ها</h4>
+        <p style="font-size:.85rem;color:var(--muted)">فهرست مالکان سایت (تگ طلایی)، کاربران تأییدشده (تیک آبی)، مدیران کلاس مجازی و دبیران. مالک سایت می‌تواند تیک آبی بدهد یا بردارد.</p>
+        <div id="admSchoolOwnerKpi" class="mt-2"></div>
+        <div id="admSchoolOwners" class="mt-3"></div>
+        <div id="admSchoolVerified" class="mt-3"></div>
+      </div>
+    </section>
+
+    <!-- ============================== ابزارها ============================== -->
+    <section class="adm-pane" data-pane="tools" hidden>
+      <div class="grid-2">
+        <div class="card">
+          <h4><span class="card-icon">◆</span> خروجی گرفتن از داده‌ها</h4>
+          <p style="font-size:.86rem">فایل‌های CSV با کدگذاری UTF-8 و BOM ساخته می‌شوند تا در اکسل فارسی درست باز شوند.</p>
+          <div class="adm-actions">
+            <button class="btn btn-ghost btn-sm" id="toolExportUsers2">کاربران (CSV)</button>
+            <button class="btn btn-ghost btn-sm" id="toolExportProgress">دادهٔ مطالعه (CSV)</button>
+            <button class="btn btn-ghost btn-sm" id="toolExportEvents2">رویدادها (CSV)</button>
+          </div>
+        </div>
+        <div class="card">
+          <h4><span class="card-icon">◆</span> نگه‌داری داده‌ها</h4>
+          <p style="font-size:.86rem">با پاک‌سازی، فقط رویدادهای قدیمی حذف می‌شوند؛ حساب‌ها و دادهٔ مطالعه دست‌نخورده می‌ماند.</p>
+          <div class="hk-field"><label for="pruneDays">نگه‌داشتن رویدادهای چند روز اخیر؟</label>
+            <input id="pruneDays" type="number" min="7" max="365" value="90"
+              style="width:100%;padding:10px 12px;border-radius:11px;border:1px solid var(--border-strong);background:var(--surface-2);color:var(--text);font:inherit"></div>
+          <button class="btn btn-primary btn-sm" id="toolPrune">پاک‌سازی رویدادهای قدیمی</button>
+        </div>
+      </div>
+      <div class="card">
+        <h4><span class="card-icon">◆</span> نکته‌های راه‌اندازی</h4>
+        <ul class="ticks">
+          <li>رمز مدیر را در اولین ورود از <a href="profile.html">صفحهٔ پروفایل</a> عوض کن.</li>
+          <li>برای بازگردانی رمز مدیری که رمزش را گم کرده، از تب کاربران → «رمز» استفاده کن.</li>
+          <li>نسخهٔ پشتیبان پوشهٔ <code>data/</code> را مرتب بگیر؛ همهٔ حساب‌ها و داده‌ها همان‌جا است.</li>
+          <li>برای اجرای دستیار آنلاین، سرور را با <code>AI_API_KEY</code> بالا بیاور.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ------------------------------- پنجرهٔ ویرایش کاربر ------------------------------- -->
+<div class="adm-modal" id="admModal">
+  <div class="adm-modal-box">
+    <h3 id="umTitle">ویرایش کاربر</h3>
+    <input type="hidden" id="umId">
+    <div id="umInfo" class="flex" style="flex-wrap:wrap;gap:6px;margin-bottom:14px"></div>
+
+    <!-- جزئیات کامل کاربر (فقط‌خواندنی) -->
+    <div id="umDetail" class="um-detail" hidden></div>
+
+    <div class="adm-grid2" id="umEditFields">
+      <div class="hk-field"><label for="umName">نام</label><input id="umName" type="text"></div>
+      <div class="hk-field"><label for="umEmail">ایمیل (غیرقابل تغییر)</label><input id="umEmail" type="email" disabled></div>
+      <div class="hk-field"><label for="umPhone">شمارهٔ تماس</label><input id="umPhone" type="tel" dir="ltr" placeholder="09xxxxxxxxx"></div>
+      <div class="hk-field"><label for="umGrade">پایه</label>
+        <select id="umGrade"><option value="7">هفتم</option><option value="8">هشتم</option><option value="9">نهم</option></select></div>
+      <div class="hk-field"><label for="umRole">نقش</label>
+        <select id="umRole">
+          <option value="student">دانش‌آموز</option>
+          <option value="teacher">دبیر</option>
+          <option value="admin">مدیر</option>
+          <option value="owner">مالک سایت</option>
+        </select></div>
+      <div class="hk-field"><label for="umSchool">مدرسه</label><input id="umSchool" type="text"></div>
+      <div class="hk-field"><label for="umCity">شهر</label><input id="umCity" type="text"></div>
+    </div>
+
+    <label class="adm-switch" style="cursor:pointer" id="umTickWrap">
+      <input type="checkbox" id="umTick" style="width:18px;height:18px">
+      <span class="info"><b>نشان تیک آبی (حساب تأییدشده)</b><small>با فعال‌کردن، کنار نام این کاربر یک تیک آبی نمایش داده می‌شود.</small></span>
+    </label>
+
+    <label class="adm-switch" style="cursor:pointer">
+      <input type="checkbox" id="umBan" style="width:18px;height:18px">
+      <span class="info"><b>مسدود کردن حساب</b><small>کاربر مسدود نمی‌تواند وارد شود و نشست‌هایش بسته می‌شود.</small></span>
+    </label>
+
+    <div class="adm-actions">
+      <button class="btn btn-primary btn-sm" id="umSave">ذخیره</button>
+      <button class="btn btn-ghost btn-sm" id="umMakeOwner" title="انتقال تگ مالک به این کاربر">♛ تعیین به‌عنوان مالک سایت</button>
+      <button class="btn btn-ghost btn-sm" data-modal-close>بستن</button>
+    </div>
+    <p style="font-size:.76rem;color:var(--muted);margin-top:10px" id="umOwnerWrap">
+      تیک آبی و تگ مالک فقط توسط «مالک سایت» داده می‌شود. مالک سایت همیشه تیک آبی دارد.
+    </p>
+  </div>
+</div>
+
+<button id="toTop" aria-label="بازگشت به بالا"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m5 14 7-7 7 7"/></svg></button>
+
+<script src="assets/hk-server.js?v=10.0"></script>
+<script src="assets/app.js?v=10.0"></script>
+<script src="assets/enhance.js?v=10.0"></script>
+<script src="assets/ultra.js?v=10.0"></script>
+<script src="assets/hk3d.js?v=10.0"></script>
+<script src="assets/admin.js?v=10.0"></script>
+  <script src="assets/ai2.js?v=10.0"></script>
+  <script src="assets/hk-auth.js?v=10.0"></script>
+  <script src="assets/hk-agent.js?v=10.0"></script>
+  <script src="assets/hk-panel.js?v=10.0"></script>
+  <script src="assets/hk-jozve.js?v=10.0"></script>
+<script src="assets/admin-extra.js?v=10.0"></script>
+<script src="assets/polish.js?v=10.0" defer></script>
+ <script src="assets/r6.js?v=10.0" defer></script>
+ <script src="assets/r6-owner.js?v=10.0" defer></script>
+  <script src="assets/r7.js?v=10.0" defer></script>
+  <script src="assets/r8.js?v=10.0" defer></script>
+  <script src="assets/r9.js?v=10.0" defer></script>
+  <script src="assets/r9-owner.js?v=10.0" defer></script>
+  <script src="assets/r10.js?v=10.0" defer></script>
+<script src="assets/r12-support.js?v=10.0" defer></script>
+<script src="assets/r13.js?v=10.0" defer></script>
+<script src="assets/r14.js?v=10.0" defer></script>
+</body>
+</html>

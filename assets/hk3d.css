@@ -1,0 +1,273 @@
+/* ==========================================================================
+   رهنما — لایهٔ سه‌بعدی و گزینه‌های حرفه‌ای  |  hk3d.css
+   • صحنهٔ سه‌بعدی، مکعب چرخان، کارت‌های عمق‌دار، تیلت واقعی
+   • بسته‌های رنگ، تراکم، گردی گوشه‌ها، شدت سه‌بعدی، پس‌زمینه
+   • پالت فرمان (Ctrl+K) و زمان‌سنج مطالعه
+   ========================================================================== */
+
+/* ------------------------------------------------------ بسته‌های رنگ */
+[data-hk-theme="violet"]  { --brand:#6d5efc; --brand-2:#a855f7; --brand-3:#22d3ee; --accent-soft:rgba(109,94,252,.12); --bg-grad-1:rgba(109,94,252,.10); --bg-grad-2:rgba(34,211,238,.10); }
+[data-hk-theme="ocean"]   { --brand:#0ea5e9; --brand-2:#2563eb; --brand-3:#22d3ee; --accent-soft:rgba(14,165,233,.13); --bg-grad-1:rgba(14,165,233,.12); --bg-grad-2:rgba(37,99,235,.10); }
+[data-hk-theme="emerald"] { --brand:#10b981; --brand-2:#059669; --brand-3:#34d399; --accent-soft:rgba(16,185,129,.13); --bg-grad-1:rgba(16,185,129,.12); --bg-grad-2:rgba(52,211,153,.10); }
+[data-hk-theme="sunset"]  { --brand:#f97316; --brand-2:#ef4444; --brand-3:#f59e0b; --accent-soft:rgba(249,115,22,.13); --bg-grad-1:rgba(249,115,22,.12); --bg-grad-2:rgba(239,68,68,.10); }
+[data-hk-theme="rose"]    { --brand:#e11d48; --brand-2:#f43f5e; --brand-3:#fb7185; --accent-soft:rgba(225,29,72,.12); --bg-grad-1:rgba(225,29,72,.11); --bg-grad-2:rgba(251,113,133,.10); }
+[data-hk-theme="royal"]   { --brand:#4f46e5; --brand-2:#7c3aed; --brand-3:#c026d3; --accent-soft:rgba(79,70,229,.13); --bg-grad-1:rgba(79,70,229,.12); --bg-grad-2:rgba(192,38,211,.10); }
+[data-hk-theme="amber"]   { --brand:#d97706; --brand-2:#ea580c; --brand-3:#facc15; --accent-soft:rgba(217,119,6,.13); --bg-grad-1:rgba(217,119,6,.12); --bg-grad-2:rgba(250,204,21,.10); }
+[data-hk-theme="slate"]   { --brand:#475569; --brand-2:#334155; --brand-3:#64748b; --accent-soft:rgba(71,85,105,.13); --bg-grad-1:rgba(71,85,105,.12); --bg-grad-2:rgba(100,116,139,.10); }
+
+/* --------------------------------------------------- گزینه‌های چیدمان */
+:root { --hk-density-pad: 1; --hk-radius: 20px; --hk-card-radius: var(--hk-radius); --hk-gap: 1; }
+
+[data-hk-radius="sharp"]  { --hk-radius: 6px; }
+[data-hk-radius="soft"]   { --hk-radius: 14px; }
+[data-hk-radius="round"]  { --hk-radius: 28px; }
+[data-hk-radius="pill"]   { --hk-radius: 999px; }
+
+[data-hk-density="compact"] { --hk-density-pad: .72; --hk-gap: .78; }
+[data-hk-density="airy"]    { --hk-density-pad: 1.28; --hk-gap: 1.25; }
+
+[data-hk-density] .card,
+[data-hk-density] .subject-card,
+[data-hk-density] .rp-card,
+[data-hk-density] .kpi,
+[data-hk-density] .tool-card { border-radius: var(--hk-card-radius); }
+
+[data-hk-density="compact"] .card { padding: calc(16px * var(--hk-density-pad)); }
+[data-hk-density="airy"] .card { padding: calc(16px * var(--hk-density-pad)); }
+[data-hk-density="compact"] .subject-grid { gap: calc(16px * var(--hk-gap)); }
+[data-hk-density="compact"] .lesson .panel-body { line-height: 1.85; }
+
+[data-hk-radius="sharp"] .subject-icon,
+[data-hk-radius="sharp"] .brand-mark { border-radius: 6px; }
+[data-hk-radius="round"] .subject-icon,
+[data-hk-radius="round"] .brand-mark { border-radius: 50%; }
+
+/* ------------------------------------------------------ پس‌زمینه‌ها */
+[data-hk-bg="plain"] body::after { display: none; }
+[data-hk-bg="grid"] body::after {
+  background-image: linear-gradient(color-mix(in srgb, var(--border-strong) 55%, transparent) 1px, transparent 1px),
+                    linear-gradient(90deg, color-mix(in srgb, var(--border-strong) 55%, transparent) 1px, transparent 1px);
+  background-size: 38px 38px; opacity: .5;
+  mask-image: none; -webkit-mask-image: none;
+}
+[data-hk-bg="dots"] body::after {
+  background-image: radial-gradient(color-mix(in srgb, var(--brand) 40%, transparent) 1.4px, transparent 1.4px);
+  background-size: 22px 22px; opacity: .45;
+}
+[data-hk-bg="aurora"] body::before {
+  background:
+    radial-gradient(60% 50% at 12% -8%, color-mix(in srgb, var(--brand) 26%, transparent), transparent 62%),
+    radial-gradient(52% 44% at 92% 4%, color-mix(in srgb, var(--brand-2) 24%, transparent), transparent 60%),
+    radial-gradient(70% 46% at 50% 106%, color-mix(in srgb, var(--brand-3) 22%, transparent), transparent 62%),
+    linear-gradient(180deg, var(--bg), var(--bg));
+  animation: hk3-aurora 18s ease-in-out infinite alternate;
+}
+@keyframes hk3-aurora { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(26deg); } }
+
+/* ================================================== ۱) صحنهٔ سه‌بعدی */
+.h3-scene {
+  position: relative; perspective: 1100px; perspective-origin: 50% 40%;
+  display: grid; place-items: center; min-height: 250px; margin-bottom: 16px;
+}
+.h3-cube {
+  position: relative; width: 148px; height: 148px;
+  transform-style: preserve-3d;
+  transform: rotateX(-18deg) rotateY(28deg);
+  animation: h3-spin 22s linear infinite;
+  will-change: transform;
+}
+@keyframes h3-spin {
+  0%   { transform: rotateX(-18deg) rotateY(0deg); }
+  100% { transform: rotateX(-18deg) rotateY(360deg); }
+}
+.h3-face {
+  position: absolute; inset: 0; border-radius: 16px;
+  display: grid; place-items: center; gap: 8px; text-align: center;
+  font-weight: 900; font-size: .82rem; color: #fff;
+  border: 1px solid rgba(255, 255, 255, .28);
+  box-shadow: inset 0 0 40px rgba(255, 255, 255, .18);
+  backface-visibility: hidden;
+}
+.h3-face b { display: block; font-size: 1.5rem; line-height: 1; }
+.h3-face small { display: block; font-size: .68rem; opacity: .92; font-weight: 700; }
+.h3-face:nth-child(1) { background: linear-gradient(140deg, var(--brand), var(--brand-2));  transform: translateZ(74px); }
+.h3-face:nth-child(2) { background: linear-gradient(140deg, var(--brand-2), var(--brand-3)); transform: rotateY(90deg) translateZ(74px); }
+.h3-face:nth-child(3) { background: linear-gradient(140deg, var(--brand-3), var(--brand));  transform: rotateY(180deg) translateZ(74px); }
+.h3-face:nth-child(4) { background: linear-gradient(140deg, var(--brand), var(--brand-3));  transform: rotateY(-90deg) translateZ(74px); }
+.h3-face:nth-child(5) { background: linear-gradient(140deg, var(--brand-2), var(--brand));  transform: rotateX(90deg) translateZ(74px); }
+.h3-face:nth-child(6) { background: linear-gradient(140deg, var(--brand-3), var(--brand-2)); transform: rotateX(-90deg) translateZ(74px); }
+
+/* سایه و انعکاس زیر مکعب */
+.h3-shadow {
+  width: 130px; height: 24px; margin-top: -30px; border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--brand) 42%, transparent), transparent);
+  filter: blur(7px); animation: h3-shadow 22s linear infinite;
+}
+@keyframes h3-shadow { 0%,100% { transform: scaleX(1); opacity:.6 } 50% { transform: scaleX(.82); opacity:.42 } }
+
+/* نشان‌های شناور دور مکعب */
+.h3-float {
+  position: absolute; padding: 6px 11px; border-radius: 999px; font-size: .72rem; font-weight: 800;
+  background: color-mix(in srgb, var(--surface) 88%, transparent); color: var(--text);
+  border: 1px solid var(--border-strong); box-shadow: var(--shadow-sm);
+  animation: h3-bob 5.2s ease-in-out infinite;
+}
+.h3-float:nth-of-type(1) { inset-inline-start: 4%;  inset-block-start: 12%; animation-delay: .3s; }
+.h3-float:nth-of-type(2) { inset-inline-end: 5%;    inset-block-start: 22%; animation-delay: 1.4s; }
+.h3-float:nth-of-type(3) { inset-inline-start: 12%; inset-block-end: 12%; animation-delay: 2.2s; }
+@keyframes h3-bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-9px) } }
+
+[data-hk-3d="off"] .h3-scene { display: none; }
+[data-hk-3d="off"] .h3-cube { animation: none; }
+
+/* ============================================ ۲) کارت‌های سه‌بعدی */
+.h3-tilt {
+  transform-style: preserve-3d;
+  transition: transform .42s cubic-bezier(.22,1,.36,1), box-shadow .42s ease;
+  will-change: transform;
+}
+.h3-tilt .h3-pop-1 { transform: translateZ(26px); }
+.h3-tilt .h3-pop-2 { transform: translateZ(14px); }
+[data-hk-3d="off"] .h3-tilt { transform: none !important; }
+
+/* درخشش متحرک روی سطح کارت */
+.h3-shine { position: relative; overflow: hidden; }
+.h3-shine::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 0%), rgba(255,255,255,.22), transparent 62%);
+  opacity: 0; transition: opacity .35s ease;
+}
+.h3-shine:hover::before { opacity: 1; }
+
+/* دکمهٔ سه‌بعدی */
+.h3-btn {
+  position: relative; transform: translateY(0);
+  box-shadow: 0 6px 0 color-mix(in srgb, var(--brand) 55%, #000 8%), 0 12px 26px color-mix(in srgb, var(--brand) 30%, transparent);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.h3-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 0 color-mix(in srgb, var(--brand) 55%, #000 8%), 0 18px 34px color-mix(in srgb, var(--brand) 36%, transparent); }
+.h3-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 color-mix(in srgb, var(--brand) 55%, #000 8%), 0 6px 14px color-mix(in srgb, var(--brand) 26%, transparent); }
+
+/* دسته‌کارت پشته‌ای (برای فهرست جزوه‌ها) */
+.h3-deck { perspective: 1200px; }
+.h3-deck .subject-card:nth-child(3n+1) { transform: rotateY(1.2deg); }
+.h3-deck .subject-card:nth-child(3n+2) { transform: rotateY(-1.2deg); }
+
+/* ================================ ۳) پالت فرمان (Ctrl+K) */
+.hk-cmd {
+  position: fixed; inset: 0; z-index: 500; display: none;
+  justify-content: center; align-items: flex-start; padding-top: 9vh;
+  background: rgba(10, 12, 26, .55); backdrop-filter: blur(4px);
+}
+.hk-cmd.open { display: flex; }
+.hk-cmd-box {
+  width: min(660px, 94vw); max-height: 74vh; display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--border-strong); border-radius: 20px;
+  box-shadow: 0 30px 90px rgba(10, 12, 30, .45); overflow: hidden;
+  transform: translateY(-14px) scale(.98); opacity: 0; transition: .26s cubic-bezier(.22,1,.36,1);
+}
+.hk-cmd.open .hk-cmd-box { transform: none; opacity: 1; }
+.hk-cmd-in {
+  padding: 16px 18px; border: 0; border-bottom: 1px solid var(--border); font: inherit;
+  font-size: 1rem; background: var(--surface); color: var(--text); outline: none;
+}
+.hk-cmd-hint { padding: 8px 18px; font-size: .72rem; color: var(--muted); border-bottom: 1px solid var(--border); display: flex; gap: 12px; flex-wrap: wrap; }
+.hk-cmd-hint kbd {
+  background: var(--surface-3); border: 1px solid var(--border-strong); border-radius: 6px;
+  padding: 1px 6px; font-family: inherit; font-size: .7rem; font-weight: 800;
+}
+.hk-cmd-list { overflow-y: auto; padding: 8px; }
+.hk-cmd-item {
+  display: flex; gap: 11px; align-items: center; padding: 11px 12px; border-radius: 12px;
+  cursor: pointer; transition: background .16s ease;
+}
+.hk-cmd-item:hover, .hk-cmd-item.on { background: var(--accent-soft); }
+.hk-cmd-item .ic {
+  flex: 0 0 32px; width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center;
+  background: linear-gradient(140deg, var(--brand), var(--brand-2)); color: #fff; font-weight: 900; font-size: .82rem;
+}
+.hk-cmd-item .tx { flex: 1; min-width: 0; }
+.hk-cmd-item .tx b { display: block; font-size: .88rem; }
+.hk-cmd-item .tx small { display: block; color: var(--muted); font-size: .73rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hk-cmd-item .kind { font-size: .68rem; font-weight: 800; color: var(--muted); }
+.hk-cmd-empty { padding: 22px; text-align: center; color: var(--muted); font-size: .86rem; }
+
+/* ========================================= ۴) زمان‌سنج مطالعه */
+.hk-timer {
+  position: fixed; inset-inline-start: 16px; bottom: calc(20px + var(--u-shell-h, 0px));
+  z-index: 200; display: flex; align-items: center; gap: 9px;
+  padding: 9px 12px; border-radius: 999px; border: 1px solid var(--border-strong);
+  background: color-mix(in srgb, var(--surface) 95%, transparent); backdrop-filter: blur(10px);
+  box-shadow: var(--shadow); font-size: .8rem; font-weight: 800;
+}
+.hk-timer .t { font-variant-numeric: tabular-nums; min-width: 52px; text-align: center; }
+.hk-timer.running { border-color: color-mix(in srgb, var(--brand) 50%, transparent); }
+.hk-timer button {
+  border: 0; background: none; cursor: pointer; font-size: 1rem; line-height: 1; color: var(--text-soft);
+}
+.hk-timer button:hover { color: var(--accent); }
+.hk-timer .ring {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: conic-gradient(var(--brand) calc(var(--tp, 0) * 1%), var(--surface-3) 0);
+  display: grid; place-items: center;
+}
+.hk-timer .ring i { width: 18px; height: 18px; border-radius: 50%; background: var(--surface); }
+
+/* ==================================== ۵) پنجرهٔ راهنمای میان‌برها */
+.hk-help {
+  position: fixed; inset: 0; z-index: 500; display: none; place-items: center;
+  background: rgba(10, 12, 26, .55); backdrop-filter: blur(4px);
+}
+.hk-help.open { display: grid; }
+.hk-help-box {
+  width: min(560px, 94vw); max-height: 80vh; overflow: auto; background: var(--surface);
+  border: 1px solid var(--border-strong); border-radius: 20px; padding: 20px; box-shadow: var(--shadow-lg);
+}
+.hk-help-box h3 { margin: 0 0 14px; }
+.hk-help-row { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: .86rem; }
+.hk-help-row kbd {
+  background: var(--surface-3); border: 1px solid var(--border-strong); border-radius: 7px;
+  padding: 2px 8px; font-family: inherit; font-size: .76rem; font-weight: 800; white-space: nowrap;
+}
+
+/* ============================== ۶) تنظیمات ظاهر داخل پنل مشاور */
+.hk-swatches { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.hk-sw {
+  width: 38px; height: 38px; border-radius: 12px; cursor: pointer; border: 2px solid transparent;
+  position: relative; transition: transform .2s ease, border-color .2s ease;
+}
+.hk-sw:hover { transform: translateY(-2px) scale(1.06); }
+.hk-sw.on { border-color: var(--text); }
+.hk-sw.on::after { content: "✓"; position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-weight: 900; text-shadow: 0 1px 3px rgba(0,0,0,.5); }
+.hk-seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+.hk-seg button {
+  border: 0; background: var(--surface); color: var(--text-soft); font: inherit; font-size: .76rem;
+  font-weight: 800; padding: 8px 13px; cursor: pointer; transition: .2s;
+}
+.hk-seg button + button { border-inline-start: 1px solid var(--border-strong); }
+.hk-seg button.on { background: linear-gradient(120deg, var(--brand), var(--brand-2)); color: #fff; }
+.hk-field { margin-bottom: 12px; }
+.hk-field > label { display: block; font-size: .76rem; font-weight: 800; color: var(--muted); margin-bottom: 6px; }
+
+/* اسلایدر شدت سه‌بعدی */
+.hk-range { width: 100%; accent-color: var(--brand); }
+
+@media (max-width: 720px) {
+  .h3-scene { min-height: 190px; }
+  .h3-cube { width: 108px; height: 108px; }
+  .h3-face:nth-child(1) { transform: translateZ(54px); }
+  .h3-face:nth-child(2) { transform: rotateY(90deg)  translateZ(54px); }
+  .h3-face:nth-child(3) { transform: rotateY(180deg) translateZ(54px); }
+  .h3-face:nth-child(4) { transform: rotateY(-90deg) translateZ(54px); }
+  .h3-face:nth-child(5) { transform: rotateX(90deg)  translateZ(54px); }
+  .h3-face:nth-child(6) { transform: rotateX(-90deg) translateZ(54px); }
+  .h3-face b { font-size: 1.2rem; }
+  .hk-timer { inset-inline-start: 10px; bottom: calc(84px + var(--u-shell-h, 0px)); transform: scale(.92); transform-origin: bottom left; }
+  .hk-cmd { padding-top: 4vh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .h3-cube, .h3-shadow, .h3-float, [data-hk-bg="aurora"] body::before { animation: none !important; }
+}
+body.u-lite .h3-cube, body.u-lite .h3-shadow { animation: none; }
+body.u-lite .h3-float { animation: none; }
+@media print { .h3-scene, .hk-timer, .hk-cmd, .hk-help { display: none !important; } }

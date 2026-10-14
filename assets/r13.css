@@ -1,0 +1,298 @@
+/* ==========================================================================
+   رهنما — لایهٔ شکوفایی (r13.css)
+   --------------------------------------------------------------------------
+   صیقل نهایی ظاهر سایت: سربرگ شیشه‌ای تمیزتر، دکمه‌های زنده، کارت‌های نرم،
+   ریتم تایپوگرافی و انیمیشن‌های ملایم که هنگام اسکرول باز می‌شوند.
+
+   سه قاعده که همیشه رعایت شده:
+     ۱) چیدمان هیچ صفحه‌ای جابه‌جا نمی‌شود (فقط رنگ، سایه، گردی و حرکت).
+     ۲) همهٔ انیمیشن‌ها فقط روی transform / opacity هستند تا سایت روان بماند.
+     ۳) روی «حالت سبک» (body.r8-lite) و «کاهش حرکت» ویندوز، خودکار خاموش می‌شود.
+   این فایل آخر از همه بارگذاری می‌شود، پس در هم‌ترازیِ وزنِ انتخابگرها برنده است.
+   ========================================================================== */
+
+:root {
+  --r13-ease: cubic-bezier(.22, .68, .24, 1);
+  --r13-ease-back: cubic-bezier(.34, 1.42, .44, 1);
+  --r13-sh-1: 0 1px 2px rgba(16, 18, 40, .04), 0 1px 3px rgba(16, 18, 40, .03);
+  --r13-sh-2: 0 10px 30px -14px rgba(16, 18, 40, .22), 0 2px 8px rgba(16, 18, 40, .045);
+  --r13-sh-3: 0 30px 70px -28px rgba(16, 18, 40, .34);
+  --r13-hair: color-mix(in srgb, var(--border) 78%, transparent);
+  --r13-pad: clamp(16px, 2.3vw, 26px);
+}
+
+[data-theme="dark"] {
+  --r13-sh-1: 0 1px 2px rgba(0, 0, 0, .4);
+  --r13-sh-2: 0 14px 38px -16px rgba(0, 0, 0, .78), 0 1px 3px rgba(0, 0, 0, .5);
+  --r13-sh-3: 0 34px 80px -30px rgba(0, 0, 0, .9);
+  --r13-hair: color-mix(in srgb, var(--border) 88%, transparent);
+}
+
+/* ══════════════════════════ ۱. پایه: خوانایی و لمس ══════════════════════════ */
+
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 12px); }
+
+/* حلقهٔ تمرکز یکدست و دیده‌شدنی — برای کاربر کیبورد و صفحه‌خوان */
+:focus-visible {
+  outline: 2.5px solid color-mix(in srgb, var(--brand) 82%, transparent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+::selection { background: color-mix(in srgb, var(--brand) 24%, transparent); }
+
+/* نوار پیمایش نازک و آرام */
+* { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--muted) 42%, transparent) transparent; }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--muted) 34%, transparent);
+  border: 3.5px solid transparent; border-radius: 99px; background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--muted) 62%, transparent); background-clip: padding-box; }
+
+/* متن‌های کم‌اهمیت کمی نرم‌تر و خوانا‌تر */
+.hero-lead, .lead { color: var(--text-soft); line-height: 2.05; }
+small, .muted, .mini { color: var(--muted); }
+
+/* عنوان‌ها: فاصلهٔ حرف کمی بازتر تا فارسی نفس بکشد */
+h1, h2, h3, h4 { letter-spacing: -.35px; }
+h1 { text-wrap: balance; }
+h2 { text-wrap: balance; }
+p { text-wrap: pretty; }
+
+/* نوشتهٔ رنگی: شیب ملایم و زنده، بدون چشمک */
+.grad-text {
+  background: linear-gradient(100deg, var(--brand) 0%, var(--brand-2) 42%, var(--brand-3) 74%, var(--brand) 100%);
+  background-size: 260% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent; -webkit-text-fill-color: transparent;
+  animation: r13-hue 14s linear infinite;
+}
+@keyframes r13-hue {
+  0%   { background-position: 0% 0; }
+  100% { background-position: 260% 0; }
+}
+
+/* تصویر و ویدیو: گردی یکدست و بدون لرزش */
+img, video, svg { max-inline-size: 100%; }
+img { border-radius: inherit; }
+
+/* ══════════════════════════ ۲. سربرگ ══════════════════════════ */
+
+.site-header {
+  transition: box-shadow .4s var(--r13-ease), background-color .4s var(--r13-ease),
+              border-color .4s var(--r13-ease);
+}
+.site-header::after {
+  content: ""; position: absolute; inset-inline: 0; bottom: -1px; height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--brand), var(--brand-2), var(--brand-3), transparent);
+  opacity: 0; transform: scaleX(.35);
+  transition: opacity .5s var(--r13-ease), transform .6s var(--r13-ease);
+  pointer-events: none;
+}
+.r13-scrolled .site-header { box-shadow: 0 12px 34px -22px rgba(16, 18, 40, .5); border-color: transparent; }
+.r13-scrolled .site-header::after { opacity: .95; transform: scaleX(1); }
+
+/* نشان سایت: حرکت نرم هنگام هاور */
+.brand { transition: transform .4s var(--r13-ease-back); }
+.brand:hover { transform: translateY(-1.5px); }
+.brand-mark { transition: transform .5s var(--r13-ease-back), box-shadow .4s var(--r13-ease); }
+.brand:hover .brand-mark { transform: rotate(-7deg) scale(1.07); }
+
+/* پیوندهای منو: قرص نرم با زیرخطِ لغزان */
+.header-nav a {
+  position: relative; overflow: hidden;
+  transition: color .24s var(--r13-ease), background-color .24s var(--r13-ease), transform .3s var(--r13-ease);
+}
+.header-nav a::after {
+  content: ""; position: absolute; inset-inline: 22%; bottom: 5px; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+  opacity: 0; transform: scaleX(.2) translateZ(0);
+  transition: opacity .3s var(--r13-ease), transform .42s var(--r13-ease);
+  pointer-events: none;
+}
+.header-nav a:hover { transform: translateY(-1px); }
+.header-nav a:hover::after, .header-nav a.on::after, .header-nav a.is-active::after {
+  opacity: 1; transform: scaleX(1) translateZ(0);
+}
+.header-nav a.on { background: var(--accent-soft); color: var(--accent); }
+
+/* دکمهٔ فهرست موبایل: خط‌ها وقتی باز است به ضربدر تبدیل می‌شوند */
+.nav-toggle svg path { transition: transform .34s var(--r13-ease), opacity .24s linear; transform-origin: center; }
+.nav-toggle { transition: background-color .24s var(--r13-ease), border-color .24s var(--r13-ease), transform .3s var(--r13-ease-back); }
+.nav-toggle:active { transform: scale(.93); }
+.r13-navopen .nav-toggle svg path:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+.r13-navopen .nav-toggle svg path:nth-child(2) { opacity: 0; }
+.r13-navopen .nav-toggle svg path:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+
+/* روی صفحه‌های کوچک، منو یک کشوی تمیز و مرتب می‌شود (نه ردیف شلوغ) */
+@media (max-width: 900px) {
+  .header-nav.open {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    position: absolute; inset-inline: 12px; top: calc(var(--header-h) - 6px);
+    padding: 12px; border-radius: 20px;
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    border: 1px solid var(--hair, var(--border));
+    box-shadow: var(--r13-sh-3);
+    backdrop-filter: blur(20px) saturate(170%);
+    -webkit-backdrop-filter: blur(20px) saturate(170%);
+    animation: r13-drawer .34s var(--r13-ease) both;
+    max-height: min(72vh, 560px); overflow-y: auto;
+    z-index: 120;
+  }
+  .header-nav.open a {
+    flex: 1 1 auto; text-align: center; padding: 11px 12px;
+    background: var(--surface-2); border: 1px solid var(--r13-hair);
+    animation: r13-item .42s var(--r13-ease) both;
+  }
+  .header-nav.open a:nth-child(1) { animation-delay: .02s; }
+  .header-nav.open a:nth-child(2) { animation-delay: .05s; }
+  .header-nav.open a:nth-child(3) { animation-delay: .08s; }
+  .header-nav.open a:nth-child(4) { animation-delay: .11s; }
+  .header-nav.open a:nth-child(5) { animation-delay: .14s; }
+  .header-nav.open a:nth-child(n+6) { animation-delay: .17s; }
+  .header-nav.open a::after { display: none; }
+}
+@keyframes r13-drawer {
+  from { opacity: 0; transform: translate3d(0, -12px, 0) scale(.985); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes r13-item {
+  from { opacity: 0; transform: translate3d(0, 8px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ══════════════════════════ ۳. دکمه‌ها ══════════════════════════ */
+
+.btn {
+  position: relative; overflow: hidden;
+  border-radius: 15px; font-weight: 700;
+  transition: transform .28s var(--r13-ease), box-shadow .32s var(--r13-ease),
+              background-color .28s var(--r13-ease), border-color .28s var(--r13-ease), color .22s linear;
+  -webkit-tap-highlight-color: transparent;
+}
+/* برق نازکی که هنگام هاور روی دکمه می‌سُرد */
+.btn::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(112deg, transparent 34%, rgba(255, 255, 255, .42) 50%, transparent 66%);
+  transform: translateX(-130%) skewX(-14deg);
+  transition: transform .72s var(--r13-ease);
+}
+.btn:hover::after { transform: translateX(130%) skewX(-14deg); }
+.btn:active { transform: translateY(0) scale(.975); transition-duration: .09s; }
+.btn-primary { box-shadow: 0 8px 22px -10px color-mix(in srgb, var(--brand) 88%, transparent); }
+.btn-primary:hover { box-shadow: 0 16px 34px -12px color-mix(in srgb, var(--brand) 92%, transparent), 0 0 0 1px color-mix(in srgb, var(--brand) 24%, transparent) inset; }
+.btn-ghost { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.btn-ghost:hover { background: color-mix(in srgb, var(--accent) 7%, var(--surface)); }
+
+.icon-btn { border-radius: 13px; transition: transform .3s var(--r13-ease-back), background-color .22s var(--r13-ease), color .22s var(--r13-ease), border-color .22s var(--r13-ease); }
+.icon-btn:hover { transform: translateY(-1.5px); }
+.icon-btn:active { transform: scale(.93); }
+
+/* ══════════════════════════ ۴. کارت‌ها و سطح‌ها ══════════════════════════ */
+
+.card, .subject-card, .tool-card, .rt-card, .stat-card, .panel-card, .cls-card {
+  border-color: var(--r13-hair);
+  box-shadow: var(--r13-sh-1);
+}
+.card:hover, .subject-card:hover, .tool-card:hover, .rt-card:hover, .stat-card:hover {
+  box-shadow: var(--r13-sh-2);
+}
+/* نوار نوری بسیار ملایم در لبهٔ بالای کارت‌ها */
+.subject-card, .tool-card, .rt-card, .stat-card { position: relative; }
+.subject-card::before, .tool-card::before, .rt-card::before {
+  content: ""; position: absolute; inset-inline: 12%; top: 0; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent, var(--brand)), transparent);
+  opacity: 0; transform: scaleX(.4) translateZ(0);
+  transition: opacity .4s var(--r13-ease), transform .5s var(--r13-ease);
+  pointer-events: none;
+}
+.subject-card:hover::before, .tool-card:hover::before, .rt-card:hover::before { opacity: .85; transform: scaleX(1) translateZ(0); }
+
+/* جدول‌ها: خط‌های روشن‌تر و ردیف‌های نفس‌گیر */
+table { border-collapse: separate; border-spacing: 0; }
+th { font-weight: 700; letter-spacing: -.2px; }
+tbody tr { transition: background-color .22s var(--r13-ease); }
+
+/* ورودی‌ها: کادر آرام و تمرکز نرم */
+input, select, textarea { transition: border-color .24s var(--r13-ease), box-shadow .3s var(--r13-ease), background-color .24s var(--r13-ease); }
+input:focus, select:focus, textarea:focus { box-shadow: var(--ring); border-color: color-mix(in srgb, var(--accent) 62%, var(--border)); }
+::placeholder { color: color-mix(in srgb, var(--muted) 82%, transparent); }
+
+/* ══════════════════════════ ۵. بازشدن هنگام اسکرول ══════════════════════════ */
+
+/* فقط وقتی JavaScript آماده است پنهان می‌کنیم؛ اگر خطایی رخ دهد، سایت سالم می‌ماند */
+.r13-on .r13-reveal {
+  opacity: 0; transform: translate3d(0, 20px, 0);
+  transition: opacity .78s var(--r13-ease), transform .78s var(--r13-ease);
+}
+.r13-on .r13-reveal.r13-in { opacity: 1; transform: none; }
+/* عمداً از will-change استفاده نمی‌کنیم: روی نیاکان، کادر مرجع می‌سازد و
+   می‌تواند نوارهای چسبان (sticky) صفحه را از کار بیندازد. */
+
+/* نوار پیشرفت مطالعه — همان #readbar که app.js پرمی‌کند (نسخهٔ تازه ساخته نمی‌شود) */
+#readbar {
+  height: 3px;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--brand) 58%, transparent),
+              0 1px 0 rgba(255, 255, 255, .28) inset;
+  transition: width .14s linear;
+}
+
+/* دکمهٔ بازگشت به بالا — همان #toTop؛ فقط زنده‌تر و نرم‌تر */
+#toTop {
+  border-radius: 15px;
+  border-color: transparent;
+  background: linear-gradient(140deg, var(--brand), var(--brand-2));
+  color: #fff;
+  box-shadow: 0 14px 30px -12px color-mix(in srgb, var(--brand) 72%, transparent);
+  transform: translate3d(0, 14px, 0) scale(.92);
+  transition: opacity .34s var(--r13-ease), transform .46s var(--r13-ease-back),
+              background-color .24s var(--r13-ease), box-shadow .3s var(--r13-ease);
+}
+#toTop.show { transform: none; }
+#toTop:hover {
+  background: linear-gradient(140deg, var(--brand-2), var(--brand));
+  color: #fff; transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 18px 36px -12px color-mix(in srgb, var(--brand) 84%, transparent);
+}
+#toTop:active { transform: scale(.93); }
+
+/* شمارندهٔ اعداد: بدون لرزش چیدمان */
+.r13-count { display: inline-block; font-variant-numeric: tabular-nums; }
+
+/* نشانگر بارگذاری (اسکلت) برای بخش‌های در حال خواندن */
+.r13-sk {
+  border-radius: 12px;
+  background: linear-gradient(100deg, var(--surface-3) 26%, color-mix(in srgb, var(--surface) 70%, var(--surface-3)) 46%, var(--surface-3) 66%);
+  background-size: 280% 100%;
+  animation: r13-sk 1.35s ease-in-out infinite;
+}
+@keyframes r13-sk {
+  0%   { background-position: 130% 0; }
+  100% { background-position: -30% 0; }
+}
+
+/* ══════════════════════════ ۶. محافظ‌ها ══════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .grad-text { animation: none; }
+  .r13-on .r13-reveal { opacity: 1 !important; transform: none !important; }
+  .btn::after { display: none; }
+  .header-nav.open, .header-nav.open a { animation: none; }
+  .r13-sk { animation: none; }
+  #toTop { transform: none; transition: opacity .2s linear, visibility .2s linear; }
+}
+body.r8-lite .grad-text { animation: none; }
+body.r8-lite .r13-on .r13-reveal { opacity: 1; transform: none; transition: none; }
+body.r8-lite .r13-sk { animation: none; }
+body.r8-lite .btn::after { display: none; }
+body.r8-lite .header-nav.open,
+body.r8-lite .header-nav.open a { animation: none; }
+
+/* چاپ: هیچ‌کدام از عناصر تزئینی چاپ نشوند */
+@media print {
+  #readbar, #toTop { display: none !important; }
+  .r13-on .r13-reveal { opacity: 1 !important; transform: none !important; }
+}
