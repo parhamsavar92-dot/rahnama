@@ -1,0 +1,203 @@
+/* ==========================================================================
+   رهنما — لایهٔ توانمندی‌ها (r14.css)
+   --------------------------------------------------------------------------
+   استایل پالت فرمان، نشانگر آفلاین، دکمهٔ نصب اپلیکیشن، علاقه‌مندی‌ها،
+   اشتراک‌گذاری و حالت تمرکز. همه سبک و بی‌مزاحم؛ روی «کاهش حرکت» آرام می‌شوند.
+   ========================================================================== */
+
+/* ═══════════ پالت فرمان (Ctrl + K) ═══════════ */
+.r14-pal {
+  position: fixed; inset: 0; z-index: 600;
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: 8vh 16px 16px;
+  background: rgba(10, 12, 26, .52);
+  backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px);
+  animation: r14-fade .2s linear both;
+}
+@keyframes r14-fade { from { opacity: 0; } to { opacity: 1; } }
+.r14-pal-box {
+  width: min(660px, 100%); max-height: 78vh; overflow: hidden;
+  display: flex; flex-direction: column;
+  border-radius: 22px; border: 1px solid var(--r13-hair, var(--border));
+  background: var(--surface);
+  box-shadow: 0 40px 100px -30px rgba(8, 10, 24, .6);
+  animation: r14-rise .28s var(--r13-ease-back, cubic-bezier(.34,1.42,.44,1)) both;
+}
+@keyframes r14-rise { from { opacity: 0; transform: translate3d(0, -14px, 0) scale(.97); } to { opacity: 1; transform: none; } }
+.r14-pal-in {
+  display: flex; align-items: center; gap: 10px;
+  padding: 15px 18px; border-bottom: 1px solid var(--r13-hair, var(--border));
+}
+.r14-pal-in svg { inline-size: 19px; block-size: 19px; color: var(--muted); flex: 0 0 auto; }
+.r14-pal-in input {
+  flex: 1 1 auto; border: none; outline: none; background: none;
+  font-family: inherit; font-size: 1rem; color: var(--text);
+}
+.r14-pal-in kbd {
+  padding: 3px 8px; border-radius: 7px; font-size: .7rem; font-family: inherit;
+  color: var(--muted); background: var(--surface-2); border: 1px solid var(--border);
+}
+.r14-pal-list { overflow-y: auto; padding: 7px; margin: 0; list-style: none; }
+.r14-pal-sec {
+  padding: 9px 12px 5px; font-size: .72rem; font-weight: 700; color: var(--muted);
+  letter-spacing: .3px;
+}
+.r14-pal-item {
+  display: flex; align-items: center; gap: 11px; width: 100%;
+  padding: 10px 12px; border-radius: 13px; cursor: pointer; text-align: start;
+  border: none; background: none; color: var(--text); font-family: inherit;
+  transition: background-color .14s linear, transform .18s var(--r13-ease, ease);
+}
+.r14-pal-item:hover, .r14-pal-item[aria-selected="true"] {
+  background: color-mix(in srgb, var(--brand) 11%, transparent);
+}
+.r14-pal-item[aria-selected="true"] { transform: translateX(-3px); }
+.r14-pal-ico {
+  inline-size: 32px; block-size: 32px; flex: 0 0 auto; border-radius: 10px;
+  display: grid; place-items: center; font-size: .95rem;
+  background: var(--surface-2); border: 1px solid var(--r13-hair, var(--border));
+}
+.r14-pal-tx { min-inline-size: 0; flex: 1 1 auto; }
+.r14-pal-tx b { display: block; font-size: .88rem; font-weight: 700; }
+.r14-pal-tx span { display: block; font-size: .74rem; color: var(--muted); }
+.r14-pal-empty { padding: 26px 16px; text-align: center; color: var(--muted); font-size: .86rem; }
+.r14-pal-foot {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 16px; border-top: 1px solid var(--r13-hair, var(--border));
+  font-size: .72rem; color: var(--muted); background: var(--surface-2);
+}
+.r14-pal-foot b { font-weight: 700; color: var(--text-soft); }
+
+/* ═══════════ نوار ابزار شناور کنار صفحه ═══════════ */
+.r14-rail {
+  position: fixed; inset-inline-end: 14px; bottom: 76px; z-index: 235;
+  display: flex; flex-direction: column; gap: 9px;
+}
+.r14-fab {
+  inline-size: 44px; block-size: 44px; border-radius: 14px; cursor: pointer;
+  display: grid; place-items: center; position: relative;
+  color: var(--text-soft); background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border: 1px solid var(--r13-hair, var(--border));
+  box-shadow: var(--r13-sh-2, 0 8px 24px rgba(16, 18, 40, .18));
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  transition: transform .3s var(--r13-ease-back, ease), color .2s linear,
+              border-color .24s ease, background-color .24s ease;
+}
+.r14-fab:hover { transform: translateY(-3px) scale(1.05); color: var(--brand); border-color: color-mix(in srgb, var(--brand) 42%, var(--border)); }
+.r14-fab:active { transform: scale(.93); }
+.r14-fab svg { inline-size: 20px; block-size: 20px; }
+.r14-fab[aria-pressed="true"] { color: #f59e0b; border-color: color-mix(in srgb, #f59e0b 45%, var(--border)); }
+.r14-fab[hidden] { display: none; }
+.r14-fab .r14-dot {
+  position: absolute; inset-block-start: -3px; inset-inline-end: -3px;
+  inline-size: 11px; block-size: 11px; border-radius: 50%;
+  background: linear-gradient(140deg, #6d5efc, #a855f7);
+  border: 2px solid var(--surface);
+  animation: r14-pulse 2.2s ease-in-out infinite;
+}
+@keyframes r14-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+
+/* روی صفحه‌های کوچک، فقط مهم‌ترین دکمه‌ها بمانند */
+@media (max-width: 560px) {
+  .r14-rail { inset-inline-end: 10px; bottom: 70px; gap: 7px; }
+  .r14-fab { inline-size: 41px; block-size: 41px; }
+  .r14-fab.r14-hide-sm { display: none; }
+}
+
+/* ═══════════ نشانگر وضعیت اتصال ═══════════ */
+.r14-net {
+  position: fixed; inset-inline: 0; inset-block-start: 0; z-index: 520;
+  padding: 7px 14px; text-align: center; font-size: .78rem; font-weight: 700; color: #fff;
+  background: linear-gradient(90deg, #b45309, #d97706);
+  transform: translate3d(0, -110%, 0);
+  transition: transform .4s var(--r13-ease, ease);
+}
+.r14-net.r14-on { transform: none; }
+.r14-net.r14-ok { background: linear-gradient(90deg, #15803d, #16a34a); }
+/* نوار پیشرفت مطالعه کمی پایین‌تر می‌رود تا با نشانگر قطعی تلاقی نکند */
+.r14-offline #readbar { inset-block-start: 30px; }
+
+/* ═══════════ کارت نصب اپلیکیشن ═══════════ */
+.r14-install {
+  position: fixed; inset-inline: 14px; inset-block-end: 14px; z-index: 260;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  max-inline-size: 470px; margin-inline: auto;
+  padding: 14px 16px; border-radius: 18px;
+  background: var(--surface); border: 1px solid var(--r13-hair, var(--border));
+  box-shadow: 0 26px 60px -24px rgba(8, 10, 24, .45);
+  animation: r14-sheet .42s var(--r13-ease-back, ease) both;
+}
+@keyframes r14-sheet { from { opacity: 0; transform: translate3d(0, 22px, 0); } to { opacity: 1; transform: none; } }
+.r14-install i { font-style: normal; font-size: 1.5rem; }
+.r14-install div { flex: 1 1 150px; min-inline-size: 0; }
+.r14-install b { display: block; font-size: .89rem; }
+.r14-install span { font-size: .76rem; color: var(--muted); }
+.r14-install button {
+  padding: 9px 16px; border-radius: 12px; cursor: pointer; font-family: inherit;
+  font-size: .82rem; font-weight: 700; border: 1px solid transparent;
+  transition: transform .24s var(--r13-ease-back, ease), opacity .2s linear;
+}
+.r14-install button:hover { transform: translateY(-2px); }
+.r14-install .r14-go { color: #fff; background: linear-gradient(135deg, var(--brand), var(--brand-2)); }
+.r14-install .r14-no { color: var(--text-soft); background: var(--surface-2); border-color: var(--border); }
+
+/* ═══════════ نشانهٔ علاقه‌مندی روی کارت‌ها ═══════════ */
+.r14-star {
+  position: absolute; inset-block-start: 8px; inset-inline-start: 8px; z-index: 3;
+  inline-size: 34px; block-size: 34px; border-radius: 11px; cursor: pointer;
+  display: grid; place-items: center; border: none;
+  color: #fff; background: rgba(16, 18, 40, .5);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  opacity: 0; transform: translateY(-5px) scale(.9);
+  transition: opacity .26s var(--r13-ease, ease), transform .3s var(--r13-ease-back, ease), background-color .22s linear;
+}
+.subject-card:hover .r14-star, .tool-card:hover .r14-star, .r14-star[aria-pressed="true"] { opacity: 1; transform: none; }
+.r14-star:hover { background: rgba(16, 18, 40, .78); transform: scale(1.08); }
+.r14-star[aria-pressed="true"] { color: #fbbf24; background: rgba(16, 18, 40, .66); }
+.r14-star svg { inline-size: 17px; block-size: 17px; }
+
+/* ═══════════ حالت تمرکز: فقط متن ═══════════ */
+body.r14-focus .site-header,
+body.r14-focus .site-footer,
+body.r14-focus .toc,
+body.r14-focus .r14-rail,
+body.r14-focus #toTop,
+body.r14-focus .hk-fab,
+body.r14-focus #r6-ai-fab { display: none !important; }
+body.r14-focus main .wrap { max-inline-size: 860px; }
+body.r14-focus .lesson { box-shadow: none; border-color: transparent; }
+body.r14-focus { background: var(--surface); }
+
+/* ═══════════ خواندن با صدای بلند (دکمهٔ کنار عنوان درس) ═══════════ */
+.r14-read {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 11px; cursor: pointer; font-family: inherit;
+  font-size: .78rem; font-weight: 700; color: var(--text-soft);
+  background: var(--surface-2); border: 1px solid var(--r13-hair, var(--border));
+  transition: color .2s linear, border-color .22s ease, transform .26s var(--r13-ease-back, ease);
+}
+.r14-read:hover { color: var(--brand); border-color: color-mix(in srgb, var(--brand) 38%, var(--border)); transform: translateY(-1.5px); }
+.r14-read[aria-pressed="true"] { color: #fff; background: linear-gradient(135deg, var(--brand), var(--brand-2)); border-color: transparent; }
+.r14-read svg { inline-size: 15px; block-size: 15px; }
+
+/* ═══════════ تخمین زمان مطالعه ═══════════ */
+.r14-minutes {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 11px; border-radius: 9px; font-size: .73rem; font-weight: 700;
+  color: color-mix(in srgb, var(--brand) 80%, var(--text));
+  background: color-mix(in srgb, var(--brand) 10%, transparent);
+}
+
+/* ═══════════ محافظ‌ها ═══════════ */
+@media (prefers-reduced-motion: reduce) {
+  .r14-pal, .r14-pal-box, .r14-install { animation: none; }
+  .r14-fab .r14-dot { animation: none; }
+  .r14-fab:hover, .r14-star:hover { transform: none; }
+}
+body.r8-lite .r14-pal, body.r8-lite .r14-pal-box, body.r8-lite .r14-install { animation: none; }
+body.r8-lite .r14-fab .r14-dot { animation: none; }
+body.r8-lite .r14-fab:hover, body.r8-lite .r14-star:hover { transform: none; }
+
+@media print {
+  .r14-rail, .r14-net, .r14-install, .r14-star, .r14-pal, .r14-read { display: none !important; }
+}

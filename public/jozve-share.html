@@ -20,24 +20,24 @@
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 <link rel="icon" href="assets/icons/favicon.png">
 
-<link rel="stylesheet" href="assets/fonts.css?v=9.8">
-<link rel="stylesheet" href="assets/style.css?v=9.8">
-<link rel="stylesheet" href="assets/enhance.css?v=9.8">
-<link rel="stylesheet" href="assets/ultra.css?v=9.8">
-<link rel="stylesheet" href="assets/ai2.css?v=9.8">
-<link rel="stylesheet" href="assets/print.css?v=9.8">
-<link rel="stylesheet" href="assets/hk.css?v=9.8">
-<link rel="stylesheet" href="assets/hk3d.css?v=9.8">
-<link rel="stylesheet" href="assets/hk-school.css?v=9.8">
-<link rel="stylesheet" href="assets/polish.css?v=9.8">
-<link rel="stylesheet" href="assets/cute.css?v=9.8">
-<link rel="stylesheet" href="assets/r6.css?v=9.8">
-<link rel="stylesheet" href="assets/r7.css?v=9.8">
-<link rel="stylesheet" href="assets/r8.css?v=9.8">
-<link rel="stylesheet" href="assets/r9.css?v=9.8">
-<link rel="stylesheet" href="assets/r10.css?v=9.8">
-<link rel="stylesheet" href="assets/r13.css?v=9.8">
-<link rel="stylesheet" href="assets/jozve-share.css?v=9.8">
+<link rel="stylesheet" href="assets/fonts.css?v=9.9">
+<link rel="stylesheet" href="assets/style.css?v=9.9">
+<link rel="stylesheet" href="assets/enhance.css?v=9.9">
+<link rel="stylesheet" href="assets/ultra.css?v=9.9">
+<link rel="stylesheet" href="assets/ai2.css?v=9.9">
+<link rel="stylesheet" href="assets/print.css?v=9.9">
+<link rel="stylesheet" href="assets/hk.css?v=9.9">
+<link rel="stylesheet" href="assets/hk3d.css?v=9.9">
+<link rel="stylesheet" href="assets/hk-school.css?v=9.9">
+<link rel="stylesheet" href="assets/polish.css?v=9.9">
+<link rel="stylesheet" href="assets/cute.css?v=9.9">
+<link rel="stylesheet" href="assets/r6.css?v=9.9">
+<link rel="stylesheet" href="assets/r7.css?v=9.9">
+<link rel="stylesheet" href="assets/r8.css?v=9.9">
+<link rel="stylesheet" href="assets/r9.css?v=9.9">
+<link rel="stylesheet" href="assets/r10.css?v=9.9">
+<link rel="stylesheet" href="assets/r13.css?v=9.9">
+<link rel="stylesheet" href="assets/jozve-share.css?v=9.9">
 </head>
 <body data-page="jozve-share" data-base="" data-subject="jozve">
 
@@ -122,7 +122,7 @@
 
       <label class="jz-field">
         <span>عنوان جزوه</span>
-        <input class="jz-in" id="jzTitle" maxlength="120" placeholder="مثلاً: خلاصهٔ فصل ۳ ریاضی — عبارت‌های جبری" required>
+        <input class="jz-in" id="jzTitle" data-draft="title" maxlength="120" placeholder="مثلاً: خلاصهٔ فصل ۳ ریاضی — عبارت‌های جبری" required>
       </label>
 
       <div class="jz-grid2">
@@ -137,7 +137,7 @@
         </label>
         <label class="jz-field">
           <span>درس</span>
-          <input class="jz-in" id="jzSubject" maxlength="40" list="jzSubjects" placeholder="مثلاً: ریاضی">
+          <input class="jz-in" id="jzSubject" data-draft="subject" maxlength="40" list="jzSubjects" placeholder="مثلاً: ریاضی">
           <datalist id="jzSubjects">
             <option value="ریاضی"></option><option value="علوم تجربی"></option><option value="فارسی"></option>
             <option value="نگارش و انشا"></option><option value="عربی"></option><option value="زبان انگلیسی"></option>
@@ -150,7 +150,7 @@
 
       <label class="jz-field">
         <span>متن جزوه</span>
-        <textarea class="jz-in" id="jzText" maxlength="4000" rows="5"
+        <textarea class="jz-in" id="jzText" data-draft="body" maxlength="4000" rows="5"
           placeholder="نکته‌ها، خلاصهٔ درس، فرمول‌ها یا پاسخ تمرین‌ها را این‌جا بنویس…" required></textarea>
       </label>
 
@@ -185,19 +185,19 @@
   </div>
 </footer>
 
-<script src="assets/hk-server.js?v=9.8"></script>
-<script src="assets/app.js?v=9.8"></script>
-<script src="assets/enhance.js?v=9.8"></script>
-<script src="assets/grade.js?v=9.8"></script>
-<script src="assets/ultra.js?v=9.8"></script>
-<script src="assets/hk-auth.js?v=9.8"></script>
-<script src="assets/hk3d.js?v=9.8"></script>
-<script src="assets/polish.js?v=9.8" defer></script>
-<script src="assets/r8.js?v=9.8" defer></script>
-<script src="assets/r9.js?v=9.8" defer></script>
-<script src="assets/r10.js?v=9.8" defer></script>
-<script src="assets/r12-support.js?v=9.8" defer></script>
-<script src="assets/r13.js?v=9.8" defer></script>
-<script src="assets/jozve-share.js?v=9.8" defer></script>
+<script src="assets/hk-server.js?v=9.9"></script>
+<script src="assets/app.js?v=9.9"></script>
+<script src="assets/enhance.js?v=9.9"></script>
+<script src="assets/grade.js?v=9.9"></script>
+<script src="assets/ultra.js?v=9.9"></script>
+<script src="assets/hk-auth.js?v=9.9"></script>
+<script src="assets/hk3d.js?v=9.9"></script>
+<script src="assets/polish.js?v=9.9" defer></script>
+<script src="assets/r8.js?v=9.9" defer></script>
+<script src="assets/r9.js?v=9.9" defer></script>
+<script src="assets/r10.js?v=9.9" defer></script>
+<script src="assets/r12-support.js?v=9.9" defer></script>
+<script src="assets/r13.js?v=9.9" defer></script>
+<script src="assets/jozve-share.js?v=9.9" defer></script>
 </body>
 </html>

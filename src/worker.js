@@ -31,7 +31,14 @@ const SCHEMA = [
   "CREATE TABLE IF NOT EXISTS jozve (id TEXT PRIMARY KEY, t INTEGER NOT NULL, uid TEXT, name TEXT, grade TEXT, subject TEXT, title TEXT, body TEXT, img TEXT, likes TEXT)",
   "CREATE INDEX IF NOT EXISTS jozve_t ON jozve(t)",
   "CREATE INDEX IF NOT EXISTS jozve_uid ON jozve(uid)",
-  "CREATE TABLE IF NOT EXISTS jozve_img (id TEXT PRIMARY KEY, mime TEXT NOT NULL, b64 TEXT NOT NULL)"
+  "CREATE TABLE IF NOT EXISTS jozve_img (id TEXT PRIMARY KEY, mime TEXT NOT NULL, b64 TEXT NOT NULL)",
+  /* ── گزارش تخلف ──────────────────────────────────────────────────────────
+     چون محتوای سایت را خود کاربران می‌گذارند (جزوهٔ همکلاسی‌ها و زنگ تفریح)،
+     داشتن راه رسمی گزارش محتوای نامناسب هم لازمهٔ کار درست است و هم برای
+     مالک سایت پشتوانهٔ قانونی می‌سازد: هر گزارش با زمان و نشانی ثبت می‌شود. */
+  "CREATE TABLE IF NOT EXISTS abuse (id TEXT PRIMARY KEY, t INTEGER NOT NULL, uid TEXT, who TEXT, kind TEXT, target TEXT, reason TEXT, note TEXT, url TEXT, status TEXT)",
+  "CREATE INDEX IF NOT EXISTS abuse_t ON abuse(t)",
+  "CREATE INDEX IF NOT EXISTS abuse_status ON abuse(status)"
 ];
 
 const enc = new TextEncoder();
@@ -698,6 +705,94 @@ async function handleAI(env, req, body, uid) {
 }
 
 /* ============================================================================
+   گزارش تخلف — پشتوانهٔ قانونی برای محتوای کاربران
+   ----------------------------------------------------------------------------
+   هم بازدیدکنندهٔ بدون حساب و هم کاربر واردشده می‌تواند گزارش بدهد.
+   ناشناس‌ها با محدودیت نرخ بر پایهٔ IP مهار می‌شوند تا سیل گزارش نگیریم.
+   فهرست گزارش‌ها فقط برای مالک/مدیر قابل دیدن است.
+   ========================================================================== */
+const ABUSE_KINDS = { jozve: "جزوهٔ همکلاسی‌ها", feed: "زنگ تفریح", comment: "پیام/پاسخ", other: "جای دیگر" };
+const ABUSE_REASONS = {
+  spam: "تبلیغ یا هرزنامه",
+  abuse: "توهین، تهمت یا آزار",
+  unsafe: "محتوای نامناسب یا زیان‌آور",
+  wrong: "اطلاعات نادرست و گمراه‌کننده",
+  copyright: "نقض حق نشر",
+  privacy: "نشر اطلاعات شخصی",
+  other: "دلیل دیگر"
+};
+const ABUSE_NOTES = { 7: "هفتم", 8: "هشتم", 9: "نهم" };
+
+async function handleReport(req, env, url, sub, method, body) {
+  const db = env.DB;
+  const seg = String(sub || "").split("/").filter(Boolean);
+  const action = seg[0] || "send";
+  const u = await whoAmI(env, req);
+  const isStaff = jzAdmin(u);
+
+  /* گزینه‌های مجاز — تا فرم صفحه همیشه با سرور یکی باشد */
+  if (action === "options") {
+    return json({
+      kinds: Object.keys(ABUSE_KINDS).map((k) => ({ id: k, label: ABUSE_KINDS[k] })),
+      reasons: Object.keys(ABUSE_REASONS).map((k) => ({ id: k, label: ABUSE_REASONS[k] }))
+    });
+  }
+
+  if (action === "send" && method === "POST") {
+    /* سقف ناشناس‌ها بر پایهٔ IP است، ولی نه خیلی تنگ: در مدرسه و کافی‌نت
+       ده‌ها دانش‌آموز یک IP مشترک دارند، پس با سقف ۵ گزارش در ساعت
+       عملاً جلوی گزارش‌دادن کل کلاس گرفته می‌شد. */
+    const ip = req.headers.get("CF-Connecting-IP") || "x";
+    const key = u ? "abuse:" + u.id : "abuse:ip:" + ip;
+    if (!(await hit(db, key, u ? 20 : 12, 36e5))) return err("گزارش‌های این ساعت زیاد شد؛ کمی بعد تلاش کن.", 429);
+
+    const kind = ABUSE_KINDS[body.kind] ? String(body.kind) : "other";
+    const reason = ABUSE_REASONS[body.reason] ? String(body.reason) : "other";
+    const target = jzClean(body.target, 120);
+    const urlIn = jzClean(body.url, 400);
+    const note = jzClean(body.note, 1200);
+    if (!note && reason === "other") return err("توضیح کوتاهی بنویس تا بتوانیم بررسی کنیم.");
+
+    const t = Date.now();
+    const row = {
+      id: newId("rp"), t: t,
+      uid: u ? u.id : "",
+      who: u ? (u.name || "کاربر") : "بازدیدکننده",
+      kind: kind, target: target, reason: reason, note: note, url: urlIn, status: "new"
+    };
+    await db.prepare("INSERT INTO abuse(id,t,uid,who,kind,target,reason,note,url,status) VALUES(?,?,?,?,?,?,?,?,?,?)")
+      .bind(row.id, row.t, row.uid, row.who, row.kind, row.target, row.reason, row.note, row.url, row.status).run();
+    return json({ ok: true, id: row.id, message: "گزارش ثبت شد. ممنون که کمک کردی سایت سالم بماند." });
+  }
+
+  if (action === "list" && method === "GET") {
+    if (!isStaff) return err("دسترسی ندارید.", 403);
+    const onlyNew = url.searchParams.get("status") === "new";
+    const r = await db.prepare(
+      "SELECT * FROM abuse" + (onlyNew ? " WHERE status = 'new'" : "") + " ORDER BY t DESC LIMIT 200"
+    ).all();
+    const cnt = await db.prepare("SELECT COUNT(*) AS n FROM abuse WHERE status = 'new'").first();
+    return json({
+      reports: (r.results || []).map((x) => Object.assign({}, x, {
+        kindLabel: ABUSE_KINDS[x.kind] || x.kind,
+        reasonLabel: ABUSE_REASONS[x.reason] || x.reason
+      })),
+      fresh: (cnt && cnt.n) || 0
+    });
+  }
+
+  if (action === "status" && method === "POST") {
+    if (!isStaff) return err("دسترسی ندارید.", 403);
+    const id = jzClean(body.id, 64);
+    const st = ["new", "seen", "done", "rejected"].indexOf(String(body.status)) > -1 ? String(body.status) : "seen";
+    await db.prepare("UPDATE abuse SET status = ? WHERE id = ?").bind(st, id).run();
+    return json({ ok: true, id: id, status: st });
+  }
+
+  return err("مسیر نامعتبر است.", 404);
+}
+
+/* ============================================================================
    جزوهٔ همکلاسی‌ها — پنل اشتراک جزوه (متن + عکس)
    ----------------------------------------------------------------------------
    این بخش عمداً مستقیم روی D1 کار می‌کند و از «موتور مشترک» رد نمی‌شود:
@@ -876,6 +971,9 @@ async function api(req, env, url) {
   /* جزوهٔ همکلاسی‌ها: پیش از بارگذاری وضعیت سایت رسیدگی می‌شود تا سبک بماند */
   if (seg[0] === "jozve") return handleJozve(req, env, url, seg.slice(1).join("/"), method, body);
 
+  /* گزارش تخلف: مستقل از موتور، مستقیم روی D1 */
+  if (seg[0] === "report") return handleReport(req, env, url, seg.slice(1).join("/"), method, body);
+
   const token = cookieOf(req);
   const tokenHash = token ? await sha256hex(token) : "";
   const plan = planOf(seg);
@@ -970,7 +1068,20 @@ export default {
           } catch (e) { /* نامزد بعدی */ }
         }
       }
-      return withSec(await env.ASSETS.fetch(req));
+      const res = withSec(await env.ASSETS.fetch(req));
+      /* صفحهٔ ۴۰۴ سفارشی: به‌جای صفحهٔ خشک و بی‌رنگ کلادفلر، صفحهٔ خود سایت با
+         پیوندهای راهنما و جست‌وجوی سریع نشان داده می‌شود (کد وضعیت همان ۴۰۴
+         می‌ماند تا موتورهای جست‌وجو آن را «یافت‌نشده» بشمارند). */
+      if (res.status === 404 && req.method === "GET" &&
+          (req.headers.get("accept") || "").includes("text/html")) {
+        try {
+          const nf = await env.ASSETS.fetch(new Request(new URL("/404.html", url).href, req));
+          if (nf && nf.status === 200) {
+            return withSec(new Response(nf.body, { status: 404, headers: nf.headers }));
+          }
+        } catch (e) { /* صفحهٔ پیش‌فرض کلادفلر */ }
+      }
+      return res;
     }
     try {
       if (!env.DB) return json({ error: "دیتابیس D1 به Worker وصل نیست (binding با نام DB)." }, 500);

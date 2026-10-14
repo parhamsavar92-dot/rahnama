@@ -4,3 +4,6 @@ Allow: /
 Disallow: /api/
 
 Sitemap: https://www.hamkardarsi.ir/sitemap.xml
+
+# خوراک تازه‌ها (Atom)
+# https://www.hamkardarsi.ir/feed.xml

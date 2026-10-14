@@ -2,12 +2,23 @@
    پایهٔ هشتم — Service Worker  |  sw.js
    مطالعهٔ آفلاین کامل: پیش‌بارگذاری همهٔ صفحه‌ها، تصاویر و دادهٔ مطالعه
    ========================================================================== */
-const VERSION = "g8-v46";
+const VERSION = "g8-v48";
 const CORE = VERSION + "-core";
 const PAGES = VERSION + "-pages";
 const RUNTIME = VERSION + "-runtime";
+const WARM_MARK = VERSION + "-warm-done";
 
 const CORE_ASSETS = [
+  "terms.html",
+  "faq.html",
+  "toolbox.html",
+  "report-abuse.html",
+  "404.html",
+  "feed.xml",
+  "assets/r14.css",
+  "assets/r14.js",
+  "assets/legal.css",
+  "assets/legal.js",
   "jozve-share.html",
   "assets/r13.css",
   "assets/r13.js",
@@ -66,15 +77,7 @@ const CORE_ASSETS = [
   "assets/hk-editor.js",
   "assets/admin-extra.js",
   "assets/admin.js",
-  "assets/mcq.js",
-  "assets/study-data.json",
-  "assets/study-data-g7.json",
-  "assets/study-data-g9.json",
-  "assets/kb.json",
-  "assets/kb-g7.json",
-  "assets/kb-g9.json",
   "assets/jozve-index.json",
-  "assets/search-index.json",
   "assets/grades.json",
   "assets/r6.css",
   "assets/r6.js",
@@ -101,12 +104,50 @@ const CORE_ASSETS = [
   "assets/icons/favicon.png"
 ];
 
+/* ---------------------------------------------------------------------------
+   bugfix (speed): separating heavy assets from the install precache
+   Previously the install step eagerly downloaded 9.5 MB (including the 5 MB
+   mcq.js) on every first visit - painful on a slow connection and heavy on
+   mobile data. Now install only fetches the critical set (~1.5 MB); the list
+   below is warmed lazily in the background once the browser is idle and the
+   connection is healthy. Result: light first visit, and full offline support
+   still arrives a few moments later.
+--------------------------------------------------------------------------- */
+const HEAVY_ASSETS = [
+  "assets/mcq.js",
+  "assets/study-data.json",
+  "assets/study-data-g7.json",
+  "assets/study-data-g9.json",
+  "assets/kb.json",
+  "assets/kb-g7.json",
+  "assets/kb-g9.json",
+  "assets/search-index.json"
+];
+
 self.addEventListener("install", (e) => {
   e.waitUntil(
-    caches.open(CORE).then((c) => Promise.allSettled(CORE_ASSETS.map((u) => c.add(new Request(new URL(u, self.registration.scope).href, { cache: "reload" })))))
+    caches.open(CORE).then((c) => Promise.allSettled(CORE_ASSETS.map((u) => c.add(new Request(new URL(u, self.registration.scope).href, { cache: "reload" })))) )
       .then(() => self.skipWaiting())
   );
 });
+
+/* گرم‌کردن آرام: دارایی‌های سنگین را فقط یک‌بار در هر نسخه و بی‌عجله می‌گیرد */
+async function warmHeavy() {
+  try {
+    const cache = await caches.open(CORE);
+    if (await cache.match(new URL(WARM_MARK, self.registration.scope).href)) return;
+    for (const u of HEAVY_ASSETS) {
+      const url = new URL(u, self.registration.scope).href;
+      if (await cache.match(url)) continue;
+      try {
+        const res = await fetch(new Request(url, { cache: "reload" }));
+        if (res && res.status === 200 && res.type === "basic" && !res.redirected) await cache.put(url, res.clone());
+      } catch (err) { return; }        /* اینترنت قطع یا کند شد: بعداً */
+    }
+    await cache.put(new URL(WARM_MARK, self.registration.scope).href,
+      new Response("1", { headers: { "Content-Type": "text/plain" } }));
+  } catch (err) { /* بی‌صدا */ }
+}
 
 self.addEventListener("activate", (e) => {
   e.waitUntil(
@@ -240,4 +281,5 @@ self.addEventListener("message", (e) => {
     );
   }
   if (d.type === "SKIP_WAITING") self.skipWaiting();
+    if (d.type === "WARM") e.waitUntil(warmHeavy());
 });
